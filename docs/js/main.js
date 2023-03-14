@@ -4,6 +4,7 @@ const form = document.querySelector('form');
 const addTabButton = document.getElementById('add-tab-button');
 const removeTabButton = document.getElementById('remove-tab-button');
 const tabGroup = document.querySelector('a-tab-group');
+const consoleEl = document.getElementById('console');
 
 function randomText() {
   const texts = [
@@ -67,7 +68,7 @@ import(componentUrl).then(() => {
   });
 
   document.addEventListener('a-tab-group:change', evt => {
-    console.log('a-tab-group:change ->', evt.detail);
+    consoleEl.innerHTML = `a-tab-group:change -> ${JSON.stringify(evt.detail)}`;
   });
 }).catch(err => {
   console.error(err);

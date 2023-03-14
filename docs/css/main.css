@@ -55,22 +55,32 @@ a-tab-panel :last-child {
 
 /* Component custom style */
 a-tab-group.custom-style {
-  border: 1px solid #dee2e6;
+  --selected-tab-color: var(--background-body);
+  --selected-tab-bg-color: var(--links);
+  --tab-group-border-color: var(--border);
+  --tab-group-bg-color: #ffffff;
+
+  border: 1px solid var(--tab-group-border-color);
   border-radius: 4px;
+  background-color: var(--tab-group-bg-color);
   overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  a-tab-group.custom-style {
+    --tab-group-bg-color: var(--background);
+  }
 }
 
 a-tab-group.custom-style::part(tabs) {
   padding: 0.5rem;
-  background-color: #ffffff;
 }
 
 a-tab-group.custom-style::part(panels) {
   padding: 1rem;
   border-width: 1px 0 0 0;
   border-style: solid;
-  border-color: #dee2e6;
-  background-color: #ffffff;
+  border-color: var(--tab-group-border-color);
 }
 
 a-tab-group[placement="bottom"].custom-style::part(panels) {
@@ -88,12 +98,11 @@ a-tab-group[placement="end"].custom-style::part(panels) {
 a-tab-group.custom-style a-tab {
   border-radius: 4px;
   padding: 0.5rem 1.5rem;
-  color: #000000;
 }
 
 a-tab-group.custom-style a-tab[selected] {
-  background-color: #0d6efd;
-  color: #ffffff;
+  background-color: var(--selected-tab-bg-color);
+  color: var(--selected-tab-color);
 }
 
 a-tab-group[placement="start"].custom-style a-tab,
@@ -102,10 +111,9 @@ a-tab-group[placement="end"].custom-style a-tab {
 }
 
 a-tab-group.custom-style a-tab-panel * {
-  color: #000000;
+  color: var(--panels-color);
 }
 
 a-tab-group.custom-style::part(scroll-button) {
-  color: #000000;
-  background-color: #ffffff;
+  background-color: var(--tab-group-bg-color);
 }
