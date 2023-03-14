@@ -31,6 +31,7 @@ template.innerHTML = /* html */`
     }
 
     :host {
+      --tabs-scroll-behavior: smooth;
       --selected-tab-color: #0d6efd;
       --scroll-buttons-width: 40px;
 
@@ -76,6 +77,7 @@ template.innerHTML = /* html */`
     .tab-group__tabs {
       display: flex;
       overflow-x: auto;
+      scroll-behavior: var(--tabs-scroll-behavior);
       scrollbar-width: none;
     }
 
@@ -490,6 +492,8 @@ class TabGroup extends HTMLElement {
 
     // Select the new tab, that has been determined in the switch-case.
     this.selectTab(tab);
+
+    tab.scrollIntoView();
   };
 
   /**
