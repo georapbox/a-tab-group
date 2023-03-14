@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,7 +11,6 @@
   <link rel="stylesheet" href="css/water.css">
   <link rel="stylesheet" href="css/main.css">
 </head>
-
 <body>
   <h1>&lt;a-tab-group&gt;</h1>
 
@@ -20,50 +18,77 @@
 
   <h2>Demo</h2>
 
-  <a-tab-group>
-    <a-tab slot="tab">Tab 1</a-tab>
-    <a-tab-panel slot="panel">Content for tab panel 1</a-tab-panel>
+  <div class="tabs-container">
+    <a-tab-group>
+      <a-tab id="tab-1" slot="tab" role="heading">Tab 1</a-tab>
+      <a-tab-panel slot="panel" id="tab-panel-1">
+        <h3>Tab panel 1</h3>
+        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Assumenda, laborum? Quas enim totam animi harum, ipsam dolores quo placeat laboriosam rem architecto hic, autem natus cum in ipsum? Quas, maxime!</p>
+      </a-tab-panel>
 
-    <a-tab slot="tab">Tab 2</a-tab>
-    <a-tab-panel slot="panel">Content for tab panel 2</a-tab-panel>
+      <a-tab id="tab-2" slot="tab" role="heading">Tab 2</a-tab>
+      <a-tab-panel slot="panel" id="tab-panel-2">
+        <h3>Tab panel 2</h3>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Non possimus ut neque corporis? Esse obcaecati quisquam a quibusdam, inventore est. Dolor libero hic quidem expedita unde quo. Et, ea officia.</p>
+      </a-tab-panel>
 
-    <a-tab slot="tab">Tab 3</a-tab>
-    <a-tab-panel slot="panel">Content for tab panel 3</a-tab-panel>
+      <a-tab id="tab-3" slot="tab" role="heading" disabled>Tab 3 (disabled)</a-tab>
+      <a-tab-panel slot="panel" id="tab-panel-3">
+        <h3>Tab panel 3</h3>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam sapiente quibusdam corrupti quae laboriosam quis quam inventore quod, error sint consectetur nemo, sequi, odit recusandae corporis repellat aliquid. Soluta, excepturi!</p>
+      </a-tab-panel>
 
-    <a-tab slot="tab">Tab 4</a-tab>
-    <a-tab-panel slot="panel">Content for tab panel 4</a-tab-panel>
+      <a-tab id="tab-4" slot="tab" role="heading">Tab 4</a-tab>
+      <a-tab-panel slot="panel" id="tab-panel-4">
+        <h3>Tab panel 4</h3>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis autem sunt possimus id maxime sed enim architecto saepe voluptates, voluptatum odit porro animi! Vitae, temporibus. Nihil minima aperiam odio quod.</p>
+      </a-tab-panel>
+    </a-tab-group>
+  </div>
 
-    <a-tab slot="tab">Tab 5</a-tab>
-    <a-tab-panel slot="panel">Content for tab panel 5</a-tab-panel>
+  <details open>
+    <summary>Customise tab group</summary>
 
-    <a-tab slot="tab">Tab 6</a-tab>
-    <a-tab-panel slot="panel">Content for tab panel 6</a-tab-panel>
+    <form>
+      <fieldset>
+        <legend>Attributes</legend>
+        <div class="form-row">
+          <div class="form-col">
+            <label for="placement">placement</label>
+            <select id="placement" name="placement">
+              <option value="top">Top</option>
+              <option value="bottom">Bottom</option>
+              <option value="start">Start</option>
+              <option value="end">End</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <div>
+              <input type="checkbox" id="no-scroll-controls" name="no-scroll-controls">
+              <label for="no-scroll-controls">no-scroll-controls</label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
 
-    <a-tab slot="tab">Tab 7</a-tab>
-    <a-tab-panel slot="panel">Content for tab panel 7</a-tab-panel>
+      <div class="form-row">
+        <div class="form-col">
+          <div>
+            <input type="checkbox" id="custom-style" name="custom-style">
+            <label for="custom-style">With custom style</label>
+          </div>
+        </div>
+      </div>
 
-    <a-tab slot="tab">Tab 8</a-tab>
-    <a-tab-panel slot="panel">Content for tab panel 8</a-tab-panel>
-
-    <a-tab slot="tab">Tab 9</a-tab>
-    <a-tab-panel slot="panel">Content for tab panel 9</a-tab-panel>
-
-    <a-tab slot="tab">Tab 10</a-tab>
-    <a-tab-panel slot="panel">Content for tab panel 10</a-tab-panel>
-
-    <a-tab slot="tab">Tab 11</a-tab>
-    <a-tab-panel slot="panel">Content for tab panel 11</a-tab-panel>
-
-    <a-tab slot="tab">Tab 12</a-tab>
-    <a-tab-panel slot="panel">Content for tab panel 12</a-tab-panel>
-
-    <a-tab slot="tab">Tab 13</a-tab>
-    <a-tab-panel slot="panel">Content for tab panel 13</a-tab-panel>
-  </a-tab-group>
+      <button type="button" id="add-tab-button">Add tab</button>
+      <button type="button" id="remove-tab-button">Remove tab</button>
+    </form>
+  </details>
 
   <h2>Source</h2>
-  <p>Source code and documentation can be found in <a href="https://github.com/georapbox/a-tab-group"
-      target="_blank" rel="noreferrer noopener">Github repository</a>.</p>
+  <p>Source code and documentation can be found in <a href="https://github.com/georapbox/a-tab-group" target="_blank" rel="noreferrer noopener">Github repository</a>.</p>
 
   <h2>License</h2>
   <p>Licensed under the <a href="https://georapbox.mit-license.org/@2023" target="_blank" rel="noreferrer noopener">The MIT License (MIT)</a></p>

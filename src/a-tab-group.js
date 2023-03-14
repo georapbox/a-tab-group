@@ -32,7 +32,7 @@ template.innerHTML = /* html */`
 
     :host {
       --selected-tab-color: #0d6efd;
-      --scroll-buttons-width: 35px;
+      --scroll-buttons-width: 40px;
 
       display: block;
       box-sizing: border-box;
@@ -143,7 +143,6 @@ template.innerHTML = /* html */`
     }
 
     :host([placement="start"]) ::slotted(a-tab) {
-      width: 100%;
       max-width: 200px;
       white-space: normal;
     }
@@ -168,7 +167,6 @@ template.innerHTML = /* html */`
     }
 
     :host([placement="end"]) ::slotted(a-tab) {
-      width: 100%;
       max-width: 200px;
       white-space: normal;
     }
@@ -295,6 +293,8 @@ class TabGroup extends HTMLElement {
         navContainer.classList.toggle('tab-group__nav--scrollable', isElementScrollable);
       });
     }
+
+    this.#syncNav();
   }
 
   disconnectedCallback() {
