@@ -177,7 +177,7 @@ template.innerHTML = /* html */`
   <div part="base" class="tab-group">
     <div class="tab-group__nav">
       <button type="button" part="scroll-button scroll-button--start" class="tab-group__scroll-button tab-group__scroll-button--start" aria-label="Scroll to start">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
           <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
         </svg>
       </button>
@@ -187,7 +187,7 @@ template.innerHTML = /* html */`
       </div>
 
       <button type="button" part="scroll-button scroll-button--end" class="tab-group__scroll-button tab-group__scroll-button--end" aria-label="Scroll to end">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
           <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
         </svg>
       </button>
@@ -211,6 +211,7 @@ template.innerHTML = /* html */`
  * @csspart scroll-button - The scroll button.
  * @csspart scroll-button--start - The scroll button for the start.
  * @csspart scroll-button--end - The scroll button for the end.
+ * @csspart scroll-button-icon - The scroll button icon.
  * @csspart tabs - The container of the tabs.
  * @csspart panels - The container of the tab panels.
  *
