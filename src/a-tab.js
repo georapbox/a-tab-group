@@ -15,10 +15,6 @@ let tabCounter = 0;
  *
  * @property {boolean} disabled - Whether the tab is disabled.
  * @attribute {boolean} disabled - Whether the tab is disabled.
- *
- * @csspart tab - The tab.
- * @csspart tab--selected - The selected tab.
- * @csspart tab--disabled - The disabled tab.
  */
 class Tab extends HTMLElement {
   constructor() {
@@ -33,13 +29,11 @@ class Tab extends HTMLElement {
     if (name === 'selected' && oldValue !== newValue) {
       this.setAttribute('aria-selected', this.selected);
       this.setAttribute('tabindex', this.selected ? 0 : -1);
-      this.part.toggle('tab--selected', this.selected);
     }
 
     if (name === 'disabled' && oldValue !== newValue) {
       this.setAttribute('aria-disabled', this.disabled);
       this.setAttribute('tabindex', this.disabled ? -1 : 0);
-      this.part.toggle('tab--disabled', this.disabled);
     }
   }
 
@@ -48,7 +42,6 @@ class Tab extends HTMLElement {
     this.#upgradeProperty('disabled');
 
     this.setAttribute('role', 'tab');
-    this.part.add('tab');
 
     if (!this.id) {
       this.id = `a-tab-generated-${tabCounter++}`;

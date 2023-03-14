@@ -31,19 +31,23 @@ template.innerHTML = /* html */`
     }
 
     :host {
-      display: flex;
-      flex-wrap: wrap;
+      --selected-tab-color: #0ea5e9;
+
+      display: block;
       box-sizing: border-box;
     }
 
     .base {
+      display: flex;
       width: 100%;
     }
 
     .tabs-container {
       display: flex;
       overflow-x: auto;
-      border-bottom: 1px solid #e4e4e7;
+      border-width: 0 0 1px 0;
+      border-style: solid;
+      border-color: #e4e4e7;
       scrollbar-width: none;
     }
 
@@ -52,7 +56,7 @@ template.innerHTML = /* html */`
     }
 
     .tab-panels-container {
-      padding: 1rem 0;
+      padding-block: 1rem;
     }
 
     ::slotted(a-tab) {
@@ -68,7 +72,7 @@ template.innerHTML = /* html */`
     }
 
     ::slotted(a-tab[selected]) {
-      color: #0ea5e9;
+      color: var(--selected-tab-color);
     }
 
     ::slotted(a-tab[disabled]) {
@@ -79,6 +83,57 @@ template.innerHTML = /* html */`
     ::slotted(tab-panel) {
       display: block;
       font-size: 1rem;
+    }
+
+    /* Start placement */
+    .base,
+    :host([placement="top"]) .base {
+      flex-direction: column;
+    }
+
+    /* Bottom placement */
+    :host([placement="bottom"]) .base {
+      flex-direction: column;
+    }
+
+    :host([placement="bottom"]) .tabs-container {
+      border-width: 1px 0 0 0;
+      order: 1;
+    }
+
+    /* Start placement */
+    :host([placement="start"]) .base {
+      flex-direction: row;
+    }
+
+    :host([placement="start"]) .tabs-container {
+      border-width: 0 1px 0 0;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    :host([placement="start"]) .tab-panels-container {
+      flex: 1;
+      padding-inline: 1rem;
+      padding-block: 0;
+    }
+
+    /* End placement */
+    :host([placement="end"]) .base {
+      flex-direction: row;
+    }
+
+    :host([placement="end"]) .tabs-container {
+      border-width: 0 0 0 1px;
+      flex-direction: column;
+      align-items: flex-start;
+      order: 1;
+    }
+
+    :host([placement="end"]) .tab-panels-container {
+      flex: 1;
+      padding-inline: 1rem;
+      padding-block: 0;
     }
   </style>
 
@@ -93,10 +148,8 @@ template.innerHTML = /* html */`
 `;
 
 /**
- * `TabGroup` is a container element for tabs and panels.
- *
+ * Container element for tabs and panels.
  * All children of `<a-tab-group>` should be either `<a-tab>` or `<a-tab-panel>`.
- * This element is stateless, meaning that no values are cached and therefore, changes during runtime work.
  *
  * @slot tab - Contains the `<a-tab>` elements.
  * @slot panel - Contains the `<a-tab-panel>` elements.
@@ -118,7 +171,17 @@ class TabGroup extends HTMLElement {
     }
   }
 
+  get placement() {
+    return this.getAttribute('placement');
+  }
+
+  set placement(value) {
+    this.setAttribute('placement', value);
+  }
+
   connectedCallback() {
+    this.#upgradeProperty('placement');
+
     this.#tabSlot = this.shadowRoot.querySelector('slot[name=tab]');
     this.#panelSlot = this.shadowRoot.querySelector('slot[name=panel]');
 
@@ -141,7 +204,7 @@ class TabGroup extends HTMLElement {
 
   /**
    * Links up tabs with their adjacent panels using `aria-controls` and `aria-labelledby`.
-   * Additionally, the method makes sure only one tab is active.
+   * This method makes sure only one tab is active at a time.
    */
   #linkPanels() {
     const tabs = this.#allTabs();
@@ -150,44 +213,40 @@ class TabGroup extends HTMLElement {
     tabs.forEach(tab => {
       const panel = tab.nextElementSibling;
 
-      if (panel.tagName.toLowerCase() !== 'a-tab-panel') {
-        console.error(`Tab #${tab.id} is not a sibling of a <a-tab-panel>`);
-        return;
+      if (!panel || panel.tagName.toLowerCase() !== 'a-tab-panel') {
+        throw new Error(`Tab #${tab.id} is not a sibling of a <a-tab-panel>`);
       }
 
       tab.setAttribute('aria-controls', panel.id);
       panel.setAttribute('aria-labelledby', tab.id);
     });
 
-    // The element checks if any of the tabs have been marked as selected.
-    // If not, the first tab is now selected.
-    const selectedTab = tabs.find(tab => tab.selected) || tabs[0];
+    // Get the selected tab, or the first tab if none are selected.
+    const selectedTab = tabs.find(tab => tab.selected) || tabs.find(tab => !tab.disabled);
 
-    // Next, switch to the selected tab. `selectTab()` takes care of
-    // marking all other tabs as deselected and hiding all other panels.
-    this.selectTab(selectedTab);
+    this.#selectTab(selectedTab);
   }
 
   /**
-   * Returns all the panels in the tab panel.
+   * Get all panels in the tab group.
    *
-   * @returns {HTMLElement[]} All the panels in the tab panel.
+   * @returns {HTMLElement[]} All the panels in the tab group.
    */
   #allPanels() {
     return Array.from(this.querySelectorAll('a-tab-panel'));
   }
 
   /**
-   * Returns all the tabs in the tab panel.
+   * Get all tabs in the tab group.
    *
-   * @returns {HTMLElement[]} All the tabs in the tab panel.
+   * @returns {HTMLElement[]} All the tabs in the tab group.
    */
   #allTabs() {
     return Array.from(this.querySelectorAll('a-tab'));
   }
 
   /**
-   * Returns the panel that the given tab controls.
+   * Get the panel for the given tab.
    *
    * @param {HTMLElement} tab The tab whose panel is to be returned.
    * @returns {HTMLElement} The panel controlled by the given tab.
@@ -198,47 +257,64 @@ class TabGroup extends HTMLElement {
   }
 
   /**
-   * Returns the tab that comes before the currently selected
-   * one, wrapping around when reaching the first one.
+   * Get the first non-disabled tab in the tab group.
+   *
+   * @returns {HTMLElement} The first tab in the tab group.
+   */
+  #firstTab() {
+    const tabs = this.#allTabs();
+    return tabs.find(tab => !tab.disabled);
+  }
+
+  /**
+   * Get the last non-disabled tab in the tab group.
+   *
+   * @returns {HTMLElement} The last tab in the tab group.
+   */
+  #lastTab() {
+    const tabs = this.#allTabs();
+
+    for (let i = tabs.length - 1; i >= 0; i--) {
+      if (!tabs[i].disabled) {
+        return tabs[i];
+      }
+    }
+  }
+
+  /**
+   * Get the tab that comes before the currently selected one, wrapping around when reaching the first tab.
+   * If the currently selected tab is disabled, the method will skip it.
    *
    * @returns {HTMLElement} The previous tab.
    */
   #prevTab() {
     const tabs = this.#allTabs();
-    // Find the index of the currently selected element and subtracts one to get the index of the previous element.
-    const newIdx = tabs.findIndex(tab => tab.selected) - 1;
+    let newIdx = tabs.findIndex(tab => tab.selected) - 1;
+
+    // Keep looping until we find a non-disabled tab.
+    while (tabs[(newIdx + tabs.length) % tabs.length].disabled) {
+      newIdx--;
+    }
+
     // Add `tabs.length` to make sure the index is a positive number and get the modulus to wrap around if necessary.
     return tabs[(newIdx + tabs.length) % tabs.length];
   }
 
   /**
-   * Gets the first tab in the tab panel.
-   *
-   * @returns {HTMLElement} The first tab.
-   */
-  #firstTab() {
-    return this.#allTabs()[0];
-  }
-
-  /**
-   * Gets the last tab in the tab panel.
-   *
-   * @returns {HTMLElement} The last tab.
-   */
-  #lastTab() {
-    const tabs = this.#allTabs();
-    return tabs[tabs.length - 1];
-  }
-
-  /**
-   * Gets the tab that comes after the currently selected one,
-   * wrapping around when reaching the last tab.
+   * Get the tab that comes after the currently selected one, wrapping around when reaching the last tab.
+   * If the currently selected tab is disabled, the method will skip it.
    *
    * @returns {HTMLElement} The next tab.
    */
   #nextTab() {
     const tabs = this.#allTabs();
-    const newIdx = tabs.findIndex(tab => tab.selected) + 1;
+    let newIdx = tabs.findIndex(tab => tab.selected) + 1;
+
+    // Keep looping until we find a non-disabled tab.
+    while (tabs[newIdx % tabs.length].disabled) {
+      newIdx++;
+    }
+
     return tabs[newIdx % tabs.length];
   }
 
@@ -281,18 +357,11 @@ class TabGroup extends HTMLElement {
     }
 
     // The browser might have some native functionality bound to the arrow keys, home or end.
-    // The element calls `preventDefault()` to prevent the browser from taking any actions.
+    // `preventDefault()` is called to prevent the browser from taking any actions.
     evt.preventDefault();
 
     // Select the new tab, that has been determined in the switch-case.
-    const isNewTabSelected = this.selectTab(tab);
-
-    if (isNewTabSelected) {
-      this.dispatchEvent(new Event('a-tab-group:change', {
-        bubbles: true,
-        composed: true
-      }));
-    }
+    this.selectTab(tab);
   };
 
   /**
@@ -304,19 +373,12 @@ class TabGroup extends HTMLElement {
     // Ignore clicks that weren't on a tab element.
     const tab = evt.target.closest('[role="tab"]');
 
-    if (!tab) {
+    if (!tab || tab.disabled || tab.selected) {
       return;
     }
 
     // If it was on a tab element, though, select that tab.
-    const isNewTabSelected = this.selectTab(tab);
-
-    if (isNewTabSelected) {
-      this.dispatchEvent(new Event('a-tab-group:change', {
-        bubbles: true,
-        composed: true
-      }));
-    }
+    this.selectTab(tab);
   };
 
   /**
@@ -324,11 +386,15 @@ class TabGroup extends HTMLElement {
    * This is called every time the user adds or removes a tab or panel.
    */
   #onSlotChange = () => {
-    this.#linkPanels();
+    try {
+      this.#linkPanels();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   /**
-   * Marks all tabs as deselected and hides all the panels.
+   * Marks all tabs as unselected and hides all the panels.
    * This is called every time the user selects a new tab.
    */
   #reset() {
@@ -344,12 +410,13 @@ class TabGroup extends HTMLElement {
    * Additionally, it unhides the panel corresponding to the given tab.
    *
    * @param {HTMLElement} newTab
-   * @returns {boolean} `true` if the tab was successfully selected, `false` otherwise.
    */
-  selectTab(newTab) {
-    if (!newTab || newTab.selected || newTab.disabled) {
-      // If the tab is already selected or disabled abort.
-      return false;
+  #selectTab(newTab) {
+    // Unselect all tabs and hide all panels.
+    this.#reset();
+
+    if (!newTab) {
+      return;
     }
 
     // Get the panel that the `newTab` is associated with.
@@ -357,21 +424,30 @@ class TabGroup extends HTMLElement {
 
     // If that panel doesn’t exist, abort.
     if (!newPanel) {
-      return false;
+      return;
     }
-
-    // Deselect all tabs and hide all panels.
-    this.#reset();
 
     newTab.selected = true;
     newPanel.hidden = false;
-
-    return true;
   }
 
   /**
-   * Marks the tab as selected by its index.
-   * Additionally, it unhides the panel corresponding to the given tab.
+   * https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
+   * This is to safe guard against cases where, for instance, a framework may have added the element to the page and set a
+   * value on one of its properties, but lazy loaded its definition. Without this guard, the upgraded element would miss that
+   * property and the instance property would prevent the class property setter from ever being called.
+   */
+  #upgradeProperty(prop) {
+    if (Object.prototype.hasOwnProperty.call(this, prop)) {
+      const value = this[prop];
+      delete this[prop];
+      this[prop] = value;
+    }
+  }
+
+  /**
+   * Selects the tab at the given index.
+   * If the tab at the given index is disabled or already selected, this method does nothing.
    *
    * @param {Number} index The index of the tab to be selected.
    */
@@ -379,8 +455,38 @@ class TabGroup extends HTMLElement {
     const tabs = this.#allTabs();
     const tab = tabs[index];
 
-    if (tab) {
-      this.selectTab(tab);
+    if (tab && !tab.disabled && !tab.selected) {
+      this.#selectTab(tab);
+
+      this.dispatchEvent(new CustomEvent('a-tab-group:change', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          tabId: tab.id,
+          panelId: this.#panelForTab(tab)?.id
+        }
+      }));
+    }
+  }
+
+  /**
+   * Selects the given tab.
+   * If the given tab is disabled or already selected, this method does nothing.
+   *
+   * @param {HTMLElement} tab The tab to be selected.
+   */
+  selectTab(tab) {
+    if (tab && !tab.disabled && !tab.selected) {
+      this.#selectTab(tab);
+
+      this.dispatchEvent(new CustomEvent('a-tab-group:change', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          tabId: tab.id,
+          panelId: this.#panelForTab(tab)?.id
+        }
+      }));
     }
   }
 }
