@@ -31,9 +31,10 @@ template.innerHTML = /* html */`
     }
 
     :host {
-      --tabs-scroll-behavior: smooth;
       --selected-tab-color: #0d6efd;
+      --selected-tab-bg-color: transparent;
       --scroll-buttons-width: 40px;
+      --tabs-scroll-behavior: smooth;
 
       display: block;
       box-sizing: border-box;
@@ -102,6 +103,7 @@ template.innerHTML = /* html */`
 
     ::slotted(a-tab[selected]) {
       color: var(--selected-tab-color);
+      background-color: var(--selected-tab-bg-color);
     }
 
     ::slotted(a-tab[disabled]) {
@@ -216,7 +218,9 @@ template.innerHTML = /* html */`
  * @csspart panels - The container of the tab panels.
  *
  * @cssproperty --selected-tab-color - The color of the selected tab.
+ * @cssproperty --selected-tab-bg-color - The background color of the selected tab.
  * @cssproperty --scroll-buttons-width - The width of the scroll buttons.
+ * @cssproperty --tabs-scroll-behavior - The scroll behavior of the tabs.
  *
  * @event a-tab-group:change - Fired when the selected tab changes.
  */
