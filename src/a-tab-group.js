@@ -31,39 +31,66 @@ template.innerHTML = /* html */`
     }
 
     :host {
-      --selected-tab-color: #0ea5e9;
+      --selected-tab-color: #0d6efd;
+      --scroll-buttons-width: 35px;
 
       display: block;
       box-sizing: border-box;
     }
 
-    .base {
+    .tab-group__nav {
+      position: relative;
+    }
+
+    .tab-group__nav--scrollable {
+      padding: 0 var(--scroll-buttons-width);
+    }
+
+    .tab-group__scroll-button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      width: var(--scroll-buttons-width);
+      height: 100%;
+      z-index: 1;
+      background-color: transparent;
+      border: 0;
+      cursor: pointer;
+    }
+
+    .tab-group__scroll-button--start {
+      left: 0;
+    }
+
+    .tab-group__scroll-button--end {
+      right: 0;
+    }
+
+    .tab-group {
       display: flex;
       width: 100%;
     }
 
-    .tabs-container {
+    .tab-group__tabs {
       display: flex;
       overflow-x: auto;
-      border-width: 0 0 1px 0;
-      border-style: solid;
-      border-color: #e4e4e7;
       scrollbar-width: none;
     }
 
-    .tabs-container::-webkit-scrollbar {
+    .tab-group__tabs::-webkit-scrollbar {
       display: none;
     }
 
-    .tab-panels-container {
-      padding-block: 1rem;
+    .tab-group__panels {
+      padding: 1rem 0;
     }
 
     ::slotted(a-tab) {
       position: relative;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       padding: 0.75rem 1rem;
       font-size: 1rem;
       white-space: nowrap;
@@ -85,63 +112,88 @@ template.innerHTML = /* html */`
       font-size: 1rem;
     }
 
-    /* Start placement */
-    .base,
-    :host([placement="top"]) .base {
+    /* placement = top */
+    .tab-group,
+    :host([placement="top"]) .tab-group {
       flex-direction: column;
     }
 
-    /* Bottom placement */
-    :host([placement="bottom"]) .base {
+    /* placement = bottom */
+    :host([placement="bottom"]) .tab-group {
       flex-direction: column;
     }
 
-    :host([placement="bottom"]) .tabs-container {
-      border-width: 1px 0 0 0;
+    :host([placement="bottom"]) .tab-group__nav {
       order: 1;
     }
 
-    /* Start placement */
-    :host([placement="start"]) .base {
+    /* placement = start */
+    :host([placement="start"]) .tab-group {
       flex-direction: row;
     }
 
-    :host([placement="start"]) .tabs-container {
-      border-width: 0 1px 0 0;
+    :host([placement="start"]) .tab-group__tabs {
       flex-direction: column;
       align-items: flex-start;
     }
 
-    :host([placement="start"]) .tab-panels-container {
+    :host([placement="start"]) .tab-group__panels {
       flex: 1;
-      padding-inline: 1rem;
-      padding-block: 0;
+      padding: 0 1rem;
     }
 
-    /* End placement */
-    :host([placement="end"]) .base {
+    :host([placement="start"]) ::slotted(a-tab) {
+      width: 100%;
+      max-width: 200px;
+      white-space: normal;
+    }
+
+    /* placement = end */
+    :host([placement="end"]) .tab-group {
       flex-direction: row;
     }
 
-    :host([placement="end"]) .tabs-container {
-      border-width: 0 0 0 1px;
-      flex-direction: column;
-      align-items: flex-start;
+    :host([placement="end"]) .tab-group__nav {
       order: 1;
     }
 
-    :host([placement="end"]) .tab-panels-container {
+    :host([placement="end"]) .tab-group__tabs {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    :host([placement="end"]) .tab-group__panels {
       flex: 1;
-      padding-inline: 1rem;
-      padding-block: 0;
+      padding: 0 1rem;
+    }
+
+    :host([placement="end"]) ::slotted(a-tab) {
+      width: 100%;
+      max-width: 200px;
+      white-space: normal;
     }
   </style>
 
-  <div part="base" class="base">
-    <div part="tabs-container" class="tabs-container">
-      <slot name="tab"></slot>
+  <div part="base" class="tab-group">
+    <div class="tab-group__nav">
+      <button type="button" part="scroll-button scroll-button--start" class="tab-group__scroll-button tab-group__scroll-button--start" aria-label="Scroll to start">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+        </svg>
+      </button>
+
+      <div part="tabs" class="tab-group__tabs">
+        <slot name="tab"></slot>
+      </div>
+
+      <button type="button" part="scroll-button scroll-button--end" class="tab-group__scroll-button tab-group__scroll-button--end" aria-label="Scroll to end">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+        </svg>
+      </button>
     </div>
-    <div part="tab-panels-container" class="tab-panels-container">
+
+    <div part="panels" class="tab-group__panels">
       <slot name="panel"></slot>
     </div>
   </div>
@@ -155,12 +207,20 @@ template.innerHTML = /* html */`
  * @slot panel - Contains the `<a-tab-panel>` elements.
  *
  * @csspart base - The component's base wrapper.
- * @csspart tabs-container - The container of the tabs.
- * @csspart tab-panels-container - The container of the tab panels.
+ * @csspart nav - The navigation cotainer.
+ * @csspart scroll-button - The scroll button.
+ * @csspart scroll-button--start - The scroll button for the start.
+ * @csspart scroll-button--end - The scroll button for the end.
+ * @csspart tabs - The container of the tabs.
+ * @csspart panels - The container of the tab panels.
+ *
+ * @cssproperty --selected-tab-color - The color of the selected tab.
+ * @cssproperty --scroll-buttons-width - The width of the scroll buttons.
+ *
+ * @event a-tab-group:change - Fired when the selected tab changes.
  */
 class TabGroup extends HTMLElement {
-  #tabSlot;
-  #panelSlot;
+  #resizeObserver;
 
   constructor() {
     super();
@@ -168,6 +228,20 @@ class TabGroup extends HTMLElement {
     if (!this.shadowRoot) {
       this.attachShadow({ mode: 'open' });
       this.shadowRoot.appendChild(template.content.cloneNode(true));
+    }
+  }
+
+  static get observedAttributes() {
+    return ['placement', 'no-scroll-controls'];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === 'placement' && oldValue !== newValue) {
+      this.#syncNav();
+    }
+
+    if (name === 'no-scroll-controls' && oldValue !== newValue) {
+      this.#syncNav();
     }
   }
 
@@ -179,27 +253,80 @@ class TabGroup extends HTMLElement {
     this.setAttribute('placement', value);
   }
 
+  get noScrollControls() {
+    return this.hasAttribute('no-scroll-controls');
+  }
+
+  set noScrollControls(value) {
+    if (value) {
+      this.setAttribute('no-scroll-controls', '');
+    } else {
+      this.removeAttribute('no-scroll-controls');
+    }
+  }
+
   connectedCallback() {
     this.#upgradeProperty('placement');
+    this.#upgradeProperty('noScrollControls');
 
-    this.#tabSlot = this.shadowRoot.querySelector('slot[name=tab]');
-    this.#panelSlot = this.shadowRoot.querySelector('slot[name=panel]');
+    const tabSlot = this.shadowRoot.querySelector('slot[name=tab]');
+    const panelSlot = this.shadowRoot.querySelector('slot[name=panel]');
+    const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
+    const navContainer = this.shadowRoot.querySelector('.tab-group__nav');
+    const scrollButtons = this.shadowRoot.querySelectorAll('.tab-group__scroll-button');
 
-    this.#tabSlot.addEventListener('slotchange', this.#onSlotChange);
-    this.#panelSlot.addEventListener('slotchange', this.#onSlotChange);
+    tabSlot.addEventListener('slotchange', this.#onSlotChange);
+    panelSlot.addEventListener('slotchange', this.#onSlotChange);
+    tabsContainer.addEventListener('click', this.#onTabClick);
+    scrollButtons.forEach(el => el.addEventListener('click', this.#onScrollButtonClick));
     this.addEventListener('keydown', this.#onKeyDown);
-    this.addEventListener('click', this.#onClick);
 
     if (!this.hasAttribute('role')) {
       this.setAttribute('role', 'tablist');
     }
+
+    if ('ResizeObserver' in window) {
+      this.#resizeObserver = new ResizeObserver(entries => {
+        const entry = entries?.[0];
+        const targetElement = entry?.target;
+        const isElementScrollable = targetElement?.scrollWidth > (entry?.borderBoxSize?.[0]?.inlineSize || targetElement?.clientWidth);
+        scrollButtons.forEach(el => el.hidden = !isElementScrollable);
+        navContainer.classList.toggle('tab-group__nav--scrollable', isElementScrollable);
+      });
+    }
   }
 
   disconnectedCallback() {
-    this.#tabSlot.removeEventListener('slotchange', this.#onSlotChange);
-    this.#panelSlot.removeEventListener('slotchange', this.#onSlotChange);
+    const tabSlot = this.shadowRoot.querySelector('slot[name=tab]');
+    const panelSlot = this.shadowRoot.querySelector('slot[name=panel]');
+    const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
+    const scrollButtons = this.shadowRoot.querySelectorAll('.tab-group__scroll-button');
+
+    tabSlot.removeEventListener('slotchange', this.#onSlotChange);
+    panelSlot.removeEventListener('slotchange', this.#onSlotChange);
+    tabsContainer.removeEventListener('click', this.#onTabClick);
+    scrollButtons.forEach(el => el.removeEventListener('click', this.#onScrollButtonClick));
     this.removeEventListener('keydown', this.#onKeyDown);
-    this.removeEventListener('click', this.#onClick);
+    this.#stopResizeObserver();
+  }
+
+  #startResizeObserver() {
+    if (!this.#resizeObserver) {
+      return;
+    }
+
+    const scrollElement = this.shadowRoot.querySelector('.tab-group__tabs');
+
+    this.#resizeObserver.unobserve(scrollElement);
+    this.#resizeObserver.observe(scrollElement);
+  }
+
+  #stopResizeObserver() {
+    if (!this.#resizeObserver) {
+      return;
+    }
+
+    this.#resizeObserver.disconnect();
   }
 
   /**
@@ -369,7 +496,7 @@ class TabGroup extends HTMLElement {
    *
    * @param {MouseEvent} evt The click event.
    */
-  #onClick = evt => {
+  #onTabClick = evt => {
     // Ignore clicks that weren't on a tab element.
     const tab = evt.target.closest('[role="tab"]');
 
@@ -382,12 +509,36 @@ class TabGroup extends HTMLElement {
   };
 
   /**
+   * Handles the scroll button click event.
+   *
+   * @param {MouseEvent} evt The click event.
+   */
+  #onScrollButtonClick = evt => {
+    const scrollButton = evt.target.closest('.tab-group__scroll-button');
+
+    if (!scrollButton) {
+      return;
+    }
+
+    const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
+    const direction = scrollButton.classList.contains('tab-group__scroll-button--start') ? 'start' : 'end';
+    const scrollAmount = 200;
+    const left = direction === 'start' ? -scrollAmount : scrollAmount;
+
+    tabsContainer.scrollBy({
+      left,
+      behavior: 'smooth'
+    });
+  };
+
+  /**
    * Handles the slotchange event on the tab group.
    * This is called every time the user adds or removes a tab or panel.
    */
   #onSlotChange = () => {
     try {
       this.#linkPanels();
+      this.#syncNav();
     } catch (err) {
       console.error(err);
     }
@@ -429,6 +580,32 @@ class TabGroup extends HTMLElement {
 
     newTab.selected = true;
     newPanel.hidden = false;
+  }
+
+  /**
+   * Syncs the tab group navigation with the current state of the tab group.
+   *
+   * This is called every time the user:
+   * - adds or removes a tab or panel
+   * - changes the placement of the tabs
+   * - enables or disables the scroll controls
+   *
+   * If the tabs container is scrollable and the scroll controls are enabled,
+   * the scroll buttons are displayed and the resize observer is started,
+   * otherwise they are hidden and the resize observer is stopped.
+   */
+  #syncNav() {
+    const navContainer = this.shadowRoot.querySelector('.tab-group__nav');
+    const scrollButtons = this.shadowRoot.querySelectorAll('.tab-group__scroll-button');
+
+    if (this.noScrollControls || this.placement === 'start' || this.placement === 'end') {
+      this.#stopResizeObserver();
+      scrollButtons.forEach(el => el.hidden = true);
+      navContainer.classList.remove('tab-group__nav--scrollable');
+    } else {
+      this.#startResizeObserver();
+      scrollButtons.forEach(el => el.hidden = false);
+    }
   }
 
   /**
