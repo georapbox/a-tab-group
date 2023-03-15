@@ -91,7 +91,6 @@ template.innerHTML = /* html */`
     }
 
     ::slotted(a-tab) {
-      position: relative;
       display: inline-flex;
       align-items: center;
       padding: 0.75rem 1rem;
@@ -184,7 +183,7 @@ template.innerHTML = /* html */`
         </svg>
       </button>
 
-      <div part="tabs" class="tab-group__tabs">
+      <div part="tabs" class="tab-group__tabs" role="tablist">
         <slot name="tab"></slot>
       </div>
 
@@ -278,17 +277,13 @@ class TabGroup extends HTMLElement {
     const panelSlot = this.shadowRoot.querySelector('slot[name=panel]');
     const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
     const navContainer = this.shadowRoot.querySelector('.tab-group__nav');
-    const scrollButtons = this.shadowRoot.querySelectorAll('.tab-group__scroll-button');
+    const scrollButtons = Array.from(this.shadowRoot.querySelectorAll('.tab-group__scroll-button'));
 
     tabSlot.addEventListener('slotchange', this.#onSlotChange);
     panelSlot.addEventListener('slotchange', this.#onSlotChange);
     tabsContainer.addEventListener('click', this.#onTabClick);
+    tabsContainer.addEventListener('keydown', this.#onKeyDown);
     scrollButtons.forEach(el => el.addEventListener('click', this.#onScrollButtonClick));
-    this.addEventListener('keydown', this.#onKeyDown);
-
-    if (!this.hasAttribute('role')) {
-      this.setAttribute('role', 'tablist');
-    }
 
     if ('ResizeObserver' in window) {
       this.#resizeObserver = new ResizeObserver(entries => {
@@ -301,19 +296,21 @@ class TabGroup extends HTMLElement {
     }
 
     this.#syncNav();
+
+    this.hidden = this.#allTabs().length === 0;
   }
 
   disconnectedCallback() {
     const tabSlot = this.shadowRoot.querySelector('slot[name=tab]');
     const panelSlot = this.shadowRoot.querySelector('slot[name=panel]');
     const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
-    const scrollButtons = this.shadowRoot.querySelectorAll('.tab-group__scroll-button');
+    const scrollButtons = Array.from(this.shadowRoot.querySelectorAll('.tab-group__scroll-button'));
 
     tabSlot.removeEventListener('slotchange', this.#onSlotChange);
     panelSlot.removeEventListener('slotchange', this.#onSlotChange);
     tabsContainer.removeEventListener('click', this.#onTabClick);
+    tabsContainer.removeEventListener('keydown', this.#onKeyDown);
     scrollButtons.forEach(el => el.removeEventListener('click', this.#onScrollButtonClick));
-    this.removeEventListener('keydown', this.#onKeyDown);
     this.#stopResizeObserver();
   }
 
@@ -342,6 +339,9 @@ class TabGroup extends HTMLElement {
    */
   #linkPanels() {
     const tabs = this.#allTabs();
+
+    // Hide the tab group if there are no tabs.
+    this.hidden = tabs.length === 0;
 
     // Give each panel a `aria-labelledby` attribute that refers to the tab that controls it.
     tabs.forEach(tab => {
@@ -605,7 +605,7 @@ class TabGroup extends HTMLElement {
    */
   #syncNav() {
     const navContainer = this.shadowRoot.querySelector('.tab-group__nav');
-    const scrollButtons = this.shadowRoot.querySelectorAll('.tab-group__scroll-button');
+    const scrollButtons = Array.from(this.shadowRoot.querySelectorAll('.tab-group__scroll-button'));
 
     if (this.noScrollControls || this.placement === 'start' || this.placement === 'end') {
       this.#stopResizeObserver();
