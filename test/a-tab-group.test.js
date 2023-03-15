@@ -387,6 +387,37 @@ describe('a-tab-group', () => {
     expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
   });
 
+  it('should select a tab when focusing on it and pressing "Enter" or "Space" keys', async () => {
+    const el = await fixture(html`
+      <a-tab-group>
+        <a-tab slot="tab" role="heading" selected>Tab 1</a-tab>
+        <a-tab-panel slot="panel">Panel 1</a-tab-panel>
+        <a-tab slot="tab" role="heading">Tab 2</a-tab>
+        <a-tab-panel slot="panel">Panel 2</a-tab-panel>
+        <a-tab slot="tab" role="heading">Tab 3</a-tab>
+        <a-tab-panel slot="panel">Panel 3</a-tab-panel>
+      </a-tab-group>
+    `);
+
+    // Tab 1 should be selected by default
+    expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+    expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
+
+    // Tab 2 should be selected when pressing "Enter" key
+    await triggerFocusFor(el.querySelectorAll('a-tab')[1]);
+    await sendKeys({ press: 'Enter' });
+
+    expect(el.querySelectorAll('a-tab')[1].selected).to.be.true;
+    expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.false;
+
+    // Tab 3 should be selected when pressing "Space" key
+    await triggerFocusFor(el.querySelectorAll('a-tab')[2]);
+    await sendKeys({ press: 'Space' });
+
+    expect(el.querySelectorAll('a-tab')[2].selected).to.be.true;
+    expect(el.querySelectorAll('a-tab-panel')[2].hidden).to.be.false;
+  });
+
   /**
    * Events
    */

@@ -10,7 +10,9 @@ const KEYCODE = {
   RIGHT: 'ArrowRight',
   UP: 'ArrowUp',
   HOME: 'Home',
-  END: 'End'
+  END: 'End',
+  ENTER: 'Enter',
+  SPACE: 'Space'
 };
 
 const template = document.createElement('template');
@@ -33,11 +35,18 @@ template.innerHTML = /* html */`
     :host {
       --selected-tab-color: #0d6efd;
       --selected-tab-bg-color: transparent;
-      --scroll-buttons-width: 40px;
+      --focus-box-shadow-color: #9bc0fe;
+      --focus-box-shadow: 0 0 0 0.25rem var(--focus-box-shadow-color);
       --tabs-scroll-behavior: smooth;
+      --scroll-buttons-width: 40px;
 
       display: block;
       box-sizing: border-box;
+    }
+
+    .tab-group {
+      display: flex;
+      width: 100%;
     }
 
     .tab-group__nav {
@@ -53,12 +62,13 @@ template.innerHTML = /* html */`
       justify-content: center;
       align-items: center;
       position: absolute;
-      top: 0;
+      top: 0.25rem;
       width: var(--scroll-buttons-width);
-      height: 100%;
+      height: calc(100% - 0.5rem);
       z-index: 1;
       background-color: transparent;
       border: 0;
+      outline: 0;
       cursor: pointer;
     }
 
@@ -70,13 +80,13 @@ template.innerHTML = /* html */`
       right: 0;
     }
 
-    .tab-group {
-      display: flex;
-      width: 100%;
+    .tab-group__scroll-button:focus-visible {
+      box-shadow: var(--focus-box-shadow);
     }
 
     .tab-group__tabs {
       display: flex;
+      padding: 0.25rem;
       overflow-x: auto;
       scroll-behavior: var(--tabs-scroll-behavior);
       scrollbar-width: none;
@@ -93,11 +103,16 @@ template.innerHTML = /* html */`
     ::slotted(a-tab) {
       display: inline-flex;
       align-items: center;
-      padding: 0.75rem 1rem;
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.25rem;
       font-size: 1rem;
       white-space: nowrap;
-      outline: none;
+      outline: 0;
       cursor: pointer;
+    }
+
+    ::slotted(a-tab:focus-visible) {
+      box-shadow: var(--focus-box-shadow);
     }
 
     ::slotted(a-tab[selected]) {
@@ -218,8 +233,10 @@ template.innerHTML = /* html */`
  *
  * @cssproperty --selected-tab-color - The color of the selected tab.
  * @cssproperty --selected-tab-bg-color - The background color of the selected tab.
- * @cssproperty --scroll-buttons-width - The width of the scroll buttons.
+ * @cssproperty --focus-box-shadow-color - The color of the box shadow of the focused tab.
+ * @cssproperty --focus-box-shadow - The box shadow of the focused tab.
  * @cssproperty --tabs-scroll-behavior - The scroll behavior of the tabs.
+ * @cssproperty --scroll-buttons-width - The width of the scroll buttons.
  *
  * @event a-tab-group:change - Fired when the selected tab changes.
  */
@@ -485,6 +502,10 @@ class TabGroup extends HTMLElement {
       case KEYCODE.END:
         tab = this.#lastTab();
         break;
+      case KEYCODE.ENTER:
+      case KEYCODE.SPACE:
+        tab = evt.target;
+        break;
       // Any other key press is ignored and passed back to the browser.
       default:
         return;
@@ -497,7 +518,9 @@ class TabGroup extends HTMLElement {
     // Select the new tab, that has been determined in the switch-case.
     this.selectTab(tab);
 
-    tab.scrollIntoView();
+    if (this.placement === 'top' || this.placement === 'bottom') {
+      tab.scrollIntoView();
+    }
   };
 
   /**
@@ -664,6 +687,8 @@ class TabGroup extends HTMLElement {
   selectTab(tab) {
     if (tab && !tab.disabled && !tab.selected) {
       this.#selectTab(tab);
+
+      tab.focus();
 
       this.dispatchEvent(new CustomEvent('a-tab-group:change', {
         bubbles: true,

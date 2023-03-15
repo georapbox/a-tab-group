@@ -28,7 +28,6 @@ class Tab extends HTMLElement {
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'selected' && oldValue !== newValue) {
       this.setAttribute('aria-selected', this.selected);
-      this.setAttribute('tabindex', this.selected ? 0 : -1);
     }
 
     if (name === 'disabled' && oldValue !== newValue) {
@@ -48,7 +47,7 @@ class Tab extends HTMLElement {
     }
 
     this.setAttribute('aria-selected', 'false');
-    this.setAttribute('tabindex', -1);
+    this.setAttribute('tabindex', this.disabled ? -1 : 0);
   }
 
   get selected() {

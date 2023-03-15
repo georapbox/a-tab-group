@@ -49,10 +49,6 @@ body:not(.js) a-tab-group:not(:defined) {
   min-height: 200px;
 }
 
-a-tab-group {
-  --selected-tab-color: var(--links);
-}
-
 a-tab-panel h3 {
   margin-top: 0;
 }
@@ -75,6 +71,10 @@ a-tab-group.custom-style {
 }
 
 @media (prefers-color-scheme: dark) {
+  a-tab-group {
+    --focus-box-shadow-color: #2d5494;
+  }
+
   a-tab-group.custom-style {
     --tab-group-bg-color: var(--background);
   }
@@ -104,8 +104,7 @@ a-tab-group[placement="end"].custom-style::part(panels) {
 }
 
 a-tab-group.custom-style a-tab {
-  border-radius: 4px;
-  padding: 0.5rem 1.5rem;
+  margin: 0 0.25rem;
 }
 
 a-tab-group.custom-style a-tab[selected] {
