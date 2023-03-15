@@ -8,6 +8,18 @@
   box-sizing: border-box;
 }
 
+body.js details {
+  display: none;
+}
+
+body.js a-tab-group:not(:defined) {
+  display: block;
+}
+
+body:not(.js) a-tab-group:not(:defined) {
+  display: none;
+}
+
 @media screen and (max-width: 768px) {
   form {
     flex-direction: column;
@@ -33,12 +45,8 @@
   margin-right: 0;
 }
 
-.tabs-container {
-  min-height: 190px;
-}
-
-a-tab-group:not(:defined) {
-  display: none;
+.tabs-container:not(.js) {
+  min-height: 200px;
 }
 
 a-tab-group {
