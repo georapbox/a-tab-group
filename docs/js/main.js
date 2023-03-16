@@ -49,6 +49,10 @@ import(componentUrl).then(() => {
       tabGroup.setAttribute('placement', evt.target.value);
     }
 
+    if (evt.target.name === 'scroll-distance') {
+      tabGroup.setAttribute('scroll-distance', evt.target.value);
+    }
+
     if (evt.target.name === 'no-scroll-controls') {
       tabGroup.toggleAttribute('no-scroll-controls', evt.target.checked);
     }

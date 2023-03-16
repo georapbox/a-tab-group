@@ -50,6 +50,18 @@ describe('a-tab-group', () => {
     expect(el).to.have.attribute('no-scroll-controls');
   });
 
+  it('reflects attribute "scroll-distance" to property "scrollDistance"', async () => {
+    const el = await fixture(html`<a-tab-group scroll-distance="100"></a-tab-group>`);
+    expect(el.scrollDistance).to.equal(100);
+  });
+
+  it('reflects property "scrollDistance" to attribute "scroll-distance"', async () => {
+    const el = await fixture(html`<a-tab-group></a-tab-group>`);
+    el.scrollDistance = 100;
+    await elementUpdated(el);
+    expect(el.getAttribute('scroll-distance')).to.equal('100');
+  });
+
   /**
    * Tabs/panels
    */
@@ -416,6 +428,23 @@ describe('a-tab-group', () => {
 
     expect(el.querySelectorAll('a-tab')[2].selected).to.be.true;
     expect(el.querySelectorAll('a-tab-panel')[2].hidden).to.be.false;
+  });
+
+  it('should select the first non-disabled tab if a tab is disabled but also selected', async () => {
+    const el = await fixture(html`
+      <a-tab-group>
+        <a-tab slot="tab" role="heading" disabled selected>Tab 1</a-tab>
+        <a-tab-panel slot="panel">Panel 1</a-tab-panel>
+        <a-tab slot="tab" role="heading">Tab 2</a-tab>
+        <a-tab-panel slot="panel">Panel 2</a-tab-panel>
+        <a-tab slot="tab" role="heading">Tab 3</a-tab>
+        <a-tab-panel slot="panel">Panel 3</a-tab-panel>
+      </a-tab-group>
+    `);
+
+    // Tab 1 is disabled, so tab 2 should be selected
+    expect(el.querySelectorAll('a-tab')[1].selected).to.be.true;
+    expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.false;
   });
 
   /**

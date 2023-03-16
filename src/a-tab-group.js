@@ -269,6 +269,14 @@ class TabGroup extends HTMLElement {
     }
   }
 
+  get scrollDistance() {
+    return Math.abs(this.getAttribute('scroll-distance'));
+  }
+
+  set scrollDistance(value) {
+    this.setAttribute('scroll-distance', Math.abs(value));
+  }
+
   connectedCallback() {
     this.#upgradeProperty('placement');
     this.#upgradeProperty('noScrollControls');
@@ -537,7 +545,7 @@ class TabGroup extends HTMLElement {
 
     const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
     const direction = scrollButton.classList.contains('tab-group__scroll-button--start') ? 'start' : 'end';
-    const scrollAmount = 200;
+    const scrollAmount = this.scrollDistance || 200;
     const left = direction === 'start' ? -scrollAmount : scrollAmount;
 
     tabsContainer.scrollBy({

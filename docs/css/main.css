@@ -41,6 +41,7 @@ body:not(.js) a-tab-group:not(:defined) {
 }
 
 .form-col input[type="text"],
+.form-col input[type="number"],
 .form-col select {
   margin-right: 0;
 }
