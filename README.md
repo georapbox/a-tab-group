@@ -51,6 +51,63 @@ The component will throw an error if a `<a-tab>` is not a sibling of a `<a-tab-p
 
 By default, the component comes with the bare minimum styling. However, you can customise the styles of the various elements of the component using either [CSS Parts](#css-parts) or [CSS Custom Properties](#css-custom-properties).
 
+Below is an example of how you can customise the styles of the component using CSS Custom Properties and CSS Parts.
+
+```css
+/* Style tab group */
+a-tab-group {
+  --selected-tab-color: #ffffff;
+  --selected-tab-bg-color: #0d6efd;
+  --scroll-button-inline-offset: 0.25rem;
+
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+/* Style scroll buttons */
+a-tab-group::part(scroll-button) {
+  border-radius: 0.25rem;
+}
+
+/* Style tabs container */
+a-tab-group::part(tabs) {
+  padding: 0.5rem;
+}
+
+/* Style tab panels container */
+a-tab-group::part(panels) {
+  padding: 1rem;
+  border-width: 1px 0 0 0;
+  border-style: solid;
+  border-color: #dee2e6;
+}
+
+a-tab-group[placement="bottom"]::part(panels) {
+  border-width: 0 0 1px 0;
+}
+
+a-tab-group[placement="start"]::part(panels) {
+  border-width: 0 0 0 1px;
+}
+
+a-tab-group[placement="end"]::part(panels) {
+  border-width: 0 1px 0 0;
+}
+
+/* Style tabs */
+a-tab-group a-tab {
+  margin: 0 0.25rem;
+  border-radius: 0.25rem;
+}
+
+a-tab-group[placement="start"] a-tab,
+a-tab-group[placement="end"] a-tab {
+  justify-content: center;
+}
+```
+
 ## API
 
 ### Properties
@@ -66,7 +123,7 @@ By default, the component comes with the bare minimum styling. However, you can 
 
 | Name | Reflects | Type | Required | Default | Description |
 | ---- | -------- | ---- | -------- | ------- | ----------- |
-| `selected` | ✓ | Boolean | - | `false` | Determines if a tab is selected. Only one tab is selected at a time. If more than one tab is marked as selected, only the first one will be actually selected. If no tab is marked as selected, the first non-disabled tab will be selected by default. If a disabled tab is marked as selected, it will be ignored and the first non-disabled tab will be selected. |
+| `selected` | ✓ | Boolean | - | `false` | Determines if a tab is selected. Only one tab is selected at a time. If more than one tab is marked as selected, only the first one will be actually selected. If no tab is marked as selected, the first non-disabled tab will be selected by default. If a disabled tab is marked as selected, it will be ignored and the first non-disabled tab will be selected. It is highly recommended to set this property manually only during the initial render. If you need to programmatically select a tab, use the `selectTab` or `selectTabByIndex` methods instead, that will automatically update the `selected` property and link the tab to its corresponding tab panel. |
 | `disabled` | ✓ | Boolean | - | `false` | Determines if a tab is disabled. Disabled tabs cannot be selected. |
 
 ### Slots

@@ -13,7 +13,9 @@ function randomText() {
     'Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore ipsam suscipit dicta odio fugiat libero voluptates rerum ea doloremque quia dignissimos, quasi mollitia atque saepe. Quae sed accusantium accusamus atque!',
     'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Doloribus animi quod dolore, consequatur tenetur provident enim maiores eveniet ipsa dolorum est. Saepe nam officiis modi, illo nostrum quibusdam autem eligendi.',
     'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut minus nostrum necessitatibus magni unde delectus commodi labore facere consectetur. Doloremque labore iure fugiat omnis nam recusandae, minus provident temporibus sed.',
-    'Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi consectetur nulla, vero doloremque nam autem fugiat praesentium deleniti officiis reprehenderit harum aliquam iure impedit similique saepe nemo. Eligendi, nobis porro.'
+    'Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi consectetur nulla, vero doloremque nam autem fugiat praesentium deleniti officiis reprehenderit harum aliquam iure impedit similique saepe nemo. Eligendi, nobis porro.',
+    'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Officia facere ipsum corrupti fugiat repudiandae rerum vel explicabo! Voluptate corrupti voluptatibus consequuntur neque. Provident, quos illum! Ratione dolorem architecto totam quo.',
+    'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Est iste, odio quasi dolorum neque aperiam, at suscipit blanditiis earum id qui et dolorem aut enim possimus. Beatae incidunt in culpa.'
   ];
 
   return texts[Math.floor(Math.random() * texts.length)];
