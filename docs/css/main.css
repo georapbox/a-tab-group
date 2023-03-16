@@ -63,6 +63,7 @@ a-tab-group.custom-style {
   --selected-tab-bg-color: var(--links);
   --tab-group-border-color: var(--border);
   --tab-group-bg-color: #ffffff;
+  --scroll-button-inline-offset: 0.25rem;
 
   border: 1px solid var(--tab-group-border-color);
   border-radius: 4px;
@@ -78,6 +79,10 @@ a-tab-group.custom-style {
   a-tab-group.custom-style {
     --tab-group-bg-color: var(--background);
   }
+}
+
+a-tab-group.custom-style::part(scroll-button) {
+  border-radius: 0.25rem;
 }
 
 a-tab-group.custom-style::part(tabs) {
@@ -105,6 +110,7 @@ a-tab-group[placement="end"].custom-style::part(panels) {
 
 a-tab-group.custom-style a-tab {
   margin: 0 0.25rem;
+  border-radius: 0.25rem;
 }
 
 a-tab-group.custom-style a-tab[selected] {
@@ -119,8 +125,4 @@ a-tab-group[placement="end"].custom-style a-tab {
 
 a-tab-group.custom-style a-tab-panel * {
   color: var(--panels-color);
-}
-
-a-tab-group.custom-style::part(scroll-button) {
-  background-color: var(--tab-group-bg-color);
 }

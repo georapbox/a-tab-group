@@ -38,7 +38,9 @@ template.innerHTML = /* html */`
       --focus-box-shadow-color: #9bc0fe;
       --focus-box-shadow: 0 0 0 0.25rem var(--focus-box-shadow-color);
       --tabs-scroll-behavior: smooth;
-      --scroll-buttons-width: 40px;
+      --scroll-button-width: 34px;
+      --scroll-button-height: 34px;
+      --scroll-button-inline-offset: 0rem;
 
       display: block;
       box-sizing: border-box;
@@ -54,7 +56,7 @@ template.innerHTML = /* html */`
     }
 
     .tab-group__nav--scrollable {
-      padding: 0 var(--scroll-buttons-width);
+      padding: 0 calc(var(--scroll-button-width) + var(--scroll-button-inline-offset));
     }
 
     .tab-group__scroll-button {
@@ -62,22 +64,24 @@ template.innerHTML = /* html */`
       justify-content: center;
       align-items: center;
       position: absolute;
-      top: 0.25rem;
-      width: var(--scroll-buttons-width);
-      height: calc(100% - 0.5rem);
+      top: 50%;
+      transform: translateY(-50%);
+      width: var(--scroll-button-width);
+      height: var(--scroll-button-height);
       z-index: 1;
       background-color: transparent;
       border: 0;
       outline: 0;
       cursor: pointer;
+      transition: color 0.15s ease-in-out, background-color .15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     }
 
     .tab-group__scroll-button--start {
-      left: 0;
+      left: var(--scroll-button-inline-offset);
     }
 
     .tab-group__scroll-button--end {
-      right: 0;
+      right: var(--scroll-button-inline-offset);
     }
 
     .tab-group__scroll-button:focus-visible {
@@ -104,11 +108,11 @@ template.innerHTML = /* html */`
       display: inline-flex;
       align-items: center;
       padding: 0.375rem 0.75rem;
-      border-radius: 0.25rem;
       font-size: 1rem;
       white-space: nowrap;
       outline: 0;
       cursor: pointer;
+      transition: color 0.15s ease-in-out, background-color .15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     }
 
     ::slotted(a-tab:focus-visible) {
@@ -218,27 +222,6 @@ template.innerHTML = /* html */`
 /**
  * Container element for tabs and panels.
  * All children of `<a-tab-group>` should be either `<a-tab>` or `<a-tab-panel>`.
- *
- * @slot tab - Contains the `<a-tab>` elements.
- * @slot panel - Contains the `<a-tab-panel>` elements.
- *
- * @csspart base - The component's base wrapper.
- * @csspart nav - The navigation cotainer.
- * @csspart scroll-button - The scroll button.
- * @csspart scroll-button--start - The scroll button for the start.
- * @csspart scroll-button--end - The scroll button for the end.
- * @csspart scroll-button-icon - The scroll button icon.
- * @csspart tabs - The container of the tabs.
- * @csspart panels - The container of the tab panels.
- *
- * @cssproperty --selected-tab-color - The color of the selected tab.
- * @cssproperty --selected-tab-bg-color - The background color of the selected tab.
- * @cssproperty --focus-box-shadow-color - The color of the box shadow of the focused tab.
- * @cssproperty --focus-box-shadow - The box shadow of the focused tab.
- * @cssproperty --tabs-scroll-behavior - The scroll behavior of the tabs.
- * @cssproperty --scroll-buttons-width - The width of the scroll buttons.
- *
- * @event a-tab-group:change - Fired when the selected tab changes.
  */
 class TabGroup extends HTMLElement {
   #resizeObserver;
@@ -352,7 +335,7 @@ class TabGroup extends HTMLElement {
 
   /**
    * Links up tabs with their adjacent panels using `aria-controls` and `aria-labelledby`.
-   * This method makes sure only one tab is active at a time.
+   * This method makes sure only one tab is selected at a time.
    */
   #linkPanels() {
     const tabs = this.#allTabs();
@@ -372,10 +355,10 @@ class TabGroup extends HTMLElement {
       panel.setAttribute('aria-labelledby', tab.id);
     });
 
-    // Get the selected tab, or the first tab if none are selected.
-    const selectedTab = tabs.find(tab => tab.selected) || tabs.find(tab => !tab.disabled);
+    // Get the selected non-disabled tab, or the first non-disabled tab.
+    const tab = tabs.find(tab => tab.selected && !tab.disabled) || tabs.find(tab => !tab.disabled);
 
-    this.#selectTab(selectedTab);
+    this.#selectTab(tab);
   }
 
   /**
