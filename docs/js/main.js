@@ -3,7 +3,7 @@ const componentUrl = isLocalhost ? '../../dist/a-tab-group.js' : '../lib/a-tab-g
 const form = document.querySelector('form');
 const addTabButton = document.getElementById('add-tab-button');
 const removeTabButton = document.getElementById('remove-tab-button');
-const tabGroup = document.querySelector('a-tab-group');
+const tabGroupEl = document.querySelector('a-tab-group');
 const consoleEl = document.getElementById('console');
 
 function randomText() {
@@ -26,13 +26,13 @@ function createTab(id) {
   tab.id = `tab-${id}`;
   tab.setAttribute('slot', 'tab');
   tab.textContent = `Tab ${id}`;
-  tabGroup.appendChild(tab);
+  tabGroupEl.appendChild(tab);
 
   const panel = document.createElement('a-tab-panel');
   panel.id = `tab-panel-${id}`;
   panel.setAttribute('slot', 'panel');
   panel.innerHTML = `<h3>Tab panel ${id}</h3><p>${randomText()}</p>`;
-  tabGroup.appendChild(panel);
+  tabGroupEl.appendChild(panel);
 }
 
 function removeTab(id) {
@@ -46,19 +46,19 @@ function removeTab(id) {
 import(componentUrl).then(() => {
   form.addEventListener('input', evt => {
     if (evt.target.name === 'placement') {
-      tabGroup.setAttribute('placement', evt.target.value);
+      tabGroupEl.setAttribute('placement', evt.target.value);
     }
 
     if (evt.target.name === 'scroll-distance') {
-      tabGroup.setAttribute('scroll-distance', evt.target.value);
+      tabGroupEl.setAttribute('scroll-distance', evt.target.value);
     }
 
     if (evt.target.name === 'no-scroll-controls') {
-      tabGroup.toggleAttribute('no-scroll-controls', evt.target.checked);
+      tabGroupEl.toggleAttribute('no-scroll-controls', evt.target.checked);
     }
 
     if (evt.target.name === 'custom-style') {
-      tabGroup.classList.toggle('custom-style', evt.target.checked);
+      tabGroupEl.classList.toggle('custom-style', evt.target.checked);
     }
   });
 

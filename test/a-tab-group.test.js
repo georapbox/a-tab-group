@@ -1,10 +1,16 @@
 import { elementUpdated, expect, fixture, fixtureCleanup, html, oneEvent, triggerFocusFor } from '@open-wc/testing';
 import { sendKeys } from '@web/test-runner-commands';
+import { spy } from 'sinon';
 import '../src/a-tab-group.js';
 
 describe('a-tab-group', () => {
+  beforeEach(() => {
+    spy(console, 'error');
+  });
+
   afterEach(() => {
     fixtureCleanup();
+    console.error.restore();
   });
 
   /**
@@ -470,5 +476,18 @@ describe('a-tab-group', () => {
       tabId: 'tab-2',
       panelId: 'panel-2'
     });
+  });
+
+  /**
+   * Errors
+   */
+  it('should log an error if a tab is not a sibling of a tab-panel element', async () => {
+    await fixture(html`
+      <a-tab-group>
+        <a-tab id="orphan-tab" slot="tab" role="heading">Tab 1</a-tab>
+      </a-tab-group>
+    `);
+
+    expect(console.error).to.have.been.calledOnceWithExactly('Tab #orphan-tab is not a sibling of a <a-tab-panel>');
   });
 });

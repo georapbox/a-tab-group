@@ -29,7 +29,7 @@ import './node_modules/@georapbox/a-tab-group/dist/a-tab-group.js';
 
 All children of `<a-tab-group>` should be either `<a-tab>` or `<a-tab-panel>`. 
 The `<a-tab>` elements should be placed in the `tab` slot, and the `<a-tab-panel>` elements should be placed in the `panel` slot.
-The component will throw an error if a `<a-tab>` is not a sibling of a `<a-tab-panel>`.
+The component will log an error if a `<a-tab>` is not a sibling of a `<a-tab-panel>`.
 
 ```html
 <a-tab-group>
@@ -164,8 +164,20 @@ a-tab-group[placement="end"] a-tab {
 
 | Name | Type | Description | Arguments |
 | ---- | ---- | ----------- | --------- |
-| `selectTab` | Prototype | Selects the given tab. If the given tab is disabled or already selected, this method does nothing. | `tab: HTMLElement` |
-| `selectTabByIndex` | Prototype | Selects the tab at the given index. If the tab at the given index is disabled or already selected, this method does nothing. | `index: String` |
+| `selectTab`<sup>1</sup> | Prototype | Selects the given tab. If the given tab is disabled or already selected, this method does nothing. | `tab: HTMLElement` |
+| `selectTabByIndex`<sup>1</sup> | Prototype | Selects the tab at the given index. If the tab at the given index is disabled or already selected, this method does nothing. | `index: String` |
+
+<sup>1</sup> These methods are only available after the component has been defined. If you need to call these methods before the component has been defined, you can use the `whenDefined` method of the custom elements registry. For example:
+
+```js
+Promise.all([
+  customElements.whenDefined('a-tab-group'),
+  customElements.whenDefined('a-tab'),
+  customElements.whenDefined('a-tab-panel')
+]).then(() => {
+  /* call methods here */
+});
+```
 
 ### Events
 

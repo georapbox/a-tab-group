@@ -356,7 +356,7 @@ class TabGroup extends HTMLElement {
       const panel = tab.nextElementSibling;
 
       if (!panel || panel.tagName.toLowerCase() !== 'a-tab-panel') {
-        throw new Error(`Tab #${tab.id} is not a sibling of a <a-tab-panel>`);
+        return console.error(`Tab #${tab.id} is not a sibling of a <a-tab-panel>`);
       }
 
       tab.setAttribute('aria-controls', panel.id);
@@ -559,12 +559,8 @@ class TabGroup extends HTMLElement {
    * This is called every time the user adds or removes a tab or panel.
    */
   #onSlotChange = () => {
-    try {
-      this.#linkPanels();
-      this.#syncNav();
-    } catch (err) {
-      console.error(err);
-    }
+    this.#linkPanels();
+    this.#syncNav();
   };
 
   /**
