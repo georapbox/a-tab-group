@@ -23,29 +23,35 @@
 
   <div class="tabs-container">
     <a-tab-group>
-      <a-tab id="tab-1" slot="tab" role="heading">Tab 1</a-tab>
-      <a-tab-panel slot="panel" id="tab-panel-1">
-        <h3>Tab panel 1</h3>
-        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Assumenda, laborum? Quas enim totam animi harum, ipsam dolores quo placeat laboriosam rem architecto hic, autem natus cum in ipsum? Quas, maxime!</p>
-      </a-tab-panel>
+      <a-tab slot="tab" role="heading">Tab 1</a-tab>
+      <a-tab-panel slot="panel">This is the tab panel for "Tab 1".</a-tab-panel>
 
-      <a-tab id="tab-2" slot="tab" role="heading">Tab 2</a-tab>
-      <a-tab-panel slot="panel" id="tab-panel-2">
-        <h3>Tab panel 2</h3>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Non possimus ut neque corporis? Esse obcaecati quisquam a quibusdam, inventore est. Dolor libero hic quidem expedita unde quo. Et, ea officia.</p>
-      </a-tab-panel>
+      <a-tab slot="tab" role="heading">Tab 2</a-tab>
+      <a-tab-panel slot="panel">This is the tab panel for "Tab 2".</a-tab-panel>
 
-      <a-tab id="tab-3" slot="tab" role="heading" disabled>Tab 3 (disabled)</a-tab>
-      <a-tab-panel slot="panel" id="tab-panel-3">
-        <h3>Tab panel 3</h3>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam sapiente quibusdam corrupti quae laboriosam quis quam inventore quod, error sint consectetur nemo, sequi, odit recusandae corporis repellat aliquid. Soluta, excepturi!</p>
-      </a-tab-panel>
+      <a-tab slot="tab" role="heading">Tab 3</a-tab>
+      <a-tab-panel slot="panel">This is the tab panel for "Tab 3".</a-tab-panel>
 
-      <a-tab id="tab-4" slot="tab" role="heading">Tab 4</a-tab>
-      <a-tab-panel slot="panel" id="tab-panel-4">
-        <h3>Tab panel 4</h3>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis autem sunt possimus id maxime sed enim architecto saepe voluptates, voluptatum odit porro animi! Vitae, temporibus. Nihil minima aperiam odio quod.</p>
-      </a-tab-panel>
+      <a-tab slot="tab" role="heading" disabled>Disabled 1</a-tab>
+      <a-tab-panel slot="panel">This is the tab panel for "Disabled 1".</a-tab-panel>
+
+      <a-tab slot="tab" role="heading" closable>Closable 1</a-tab>
+      <a-tab-panel slot="panel">This is the tab panel for "Closable 1".</a-tab-panel>
+
+      <a-tab slot="tab" role="heading" disabled>Disabled 2</a-tab>
+      <a-tab-panel slot="panel">This is the tab panel for "Disabled 2".</a-tab-panel>
+
+      <a-tab slot="tab" role="heading" closable>Closable 2</a-tab>
+      <a-tab-panel slot="panel">This is the tab panel for "Closable 2".</a-tab-panel>
+
+      <a-tab slot="tab" role="heading" disabled closable>Closable & disabled</a-tab>
+      <a-tab-panel slot="panel">This is the tab panel for "Closable & disabled".</a-tab-panel>
+
+      <a-tab slot="tab" role="heading">Tab 4</a-tab>
+      <a-tab-panel slot="panel">This is the tab panel for "Tab 4".</a-tab-panel>
+
+      <a-tab slot="tab" role="heading">Tab 5</a-tab>
+      <a-tab-panel slot="panel">This is the tab panel for "Tab 5".</a-tab-panel>
     </a-tab-group>
   </div>
 
@@ -88,9 +94,6 @@
           </div>
         </div>
       </div>
-
-      <button type="button" id="add-tab-button">Add tab</button>
-      <button type="button" id="remove-tab-button">Remove tab</button>
     </form>
   </details>
 

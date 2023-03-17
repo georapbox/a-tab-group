@@ -94,6 +94,15 @@ textarea {
     transform var(--animation-duration) ease;
 }
 
+select {
+  transition:
+    background-color var(--animation-duration) linear,
+    border-color var(--animation-duration) linear,
+    color var(--animation-duration) linear,
+    box-shadow var(--animation-duration) linear,
+    transform var(--animation-duration) ease;
+}
+
 h1 {
   font-size: 2.2rem;
   margin-top: 0;

@@ -47,7 +47,7 @@ body:not(.js) a-tab-group:not(:defined) {
 }
 
 .tabs-container:not(.js) {
-  min-height: 200px;
+  min-height: 110px;
 }
 
 a-tab-panel h3 {
@@ -110,11 +110,22 @@ a-tab-group[placement="end"].custom-style::part(panels) {
 }
 
 a-tab-group.custom-style a-tab {
-  margin: 0 0.25rem;
+
   border-radius: 0.25rem;
+}
+
+a-tab-group[placement="top"].custom-style a-tab,
+a-tab-group[placement="bottom"].custom-style a-tab {
+  margin: 0 0.25rem;
+  justify-content: center;
 }
 
 a-tab-group[placement="start"].custom-style a-tab,
 a-tab-group[placement="end"].custom-style a-tab {
+  margin: 0.25rem 0;
   justify-content: center;
+}
+
+a-tab-group.custom-style a-tab[selected]::part(close-button) {
+  color: var(--selected-tab-color);
 }
