@@ -1,5 +1,22 @@
 let tabCounter = 0;
 
+const template = document.createElement('template');
+
+template.innerHTML = /* html */`
+  <style>
+    .close-button {
+      padding: 0.25rem;
+      border: 0;
+      background-color: transparent;
+      line-height: 0;
+      outline: 0;
+      cursor: pointer;
+    }
+  </style>
+
+  <slot></slot>
+`;
+
 /**
  * `Tab` is a tab for a `<a-tab-group>` tab panel.
  * `<a-tab>` should always be used with `role=heading` in the markup so that the
@@ -9,20 +26,19 @@ let tabCounter = 0;
  * using that panel's ID as the value for the `aria-controls` attribute.
  *
  * A `<a-tab>` will automatically generate a unique ID if none is specified.
- *
- * @property {boolean} selected - Whether the tab is selected.
- * @attribute {boolean} selected - Whether the tab is selected.
- *
- * @property {boolean} disabled - Whether the tab is disabled.
- * @attribute {boolean} disabled - Whether the tab is disabled.
  */
 class Tab extends HTMLElement {
   constructor() {
     super();
+
+    if (!this.shadowRoot) {
+      this.attachShadow({ mode: 'open' });
+      this.shadowRoot.appendChild(template.content.cloneNode(true));
+    }
   }
 
   static get observedAttributes() {
-    return ['selected', 'disabled'];
+    return ['selected', 'disabled', 'closable'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -33,6 +49,23 @@ class Tab extends HTMLElement {
     if (name === 'disabled' && oldValue !== newValue) {
       this.setAttribute('aria-disabled', this.disabled);
       this.setAttribute('tabindex', this.disabled ? -1 : 0);
+    }
+
+    if (name === 'closable' && oldValue !== newValue) {
+      if (this.closable) {
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'close-button';
+        closeButton.part = 'close-button';
+        closeButton.setAttribute('aria-label', 'Close');
+        closeButton.setAttribute('tabindex', '-1');
+        closeButton.innerHTML = /* html */`<svg part="close-button-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>`;
+        this.shadowRoot.appendChild(closeButton);
+        closeButton.addEventListener('click', this.#onCloseButtonClick);
+      } else {
+        const closeButton = this.shadowRoot.querySelector('.close-button');
+        closeButton?.remove();
+      }
     }
   }
 
@@ -48,6 +81,11 @@ class Tab extends HTMLElement {
 
     this.setAttribute('aria-selected', 'false');
     this.setAttribute('tabindex', this.disabled ? -1 : 0);
+  }
+
+  disconnectedCallback() {
+    const closeButton = this.shadowRoot.querySelector('.close-button');
+    closeButton?.removeEventListener('click', this.#onCloseButtonClick);
   }
 
   get selected() {
@@ -73,6 +111,28 @@ class Tab extends HTMLElement {
       this.removeAttribute('disabled');
     }
   }
+
+  get closable() {
+    return this.hasAttribute('closable');
+  }
+
+  set closable(value) {
+    if (value) {
+      this.setAttribute('closable', '');
+    } else {
+      this.removeAttribute('closable');
+    }
+  }
+
+  #onCloseButtonClick = evt => {
+    evt.stopPropagation();
+
+    this.dispatchEvent(new CustomEvent('a-tab-group:tab-close', {
+      bubbles: true,
+      composed: true,
+      detail: { tabId: this.id }
+    }));
+  };
 
   /**
    * https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties

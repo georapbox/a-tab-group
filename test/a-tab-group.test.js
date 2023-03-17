@@ -135,7 +135,7 @@ describe('a-tab-group', () => {
   });
 
   /**
-   * Navigation
+   * Tabs selection
    */
   it('should select tab on click', async () => {
     const el = await fixture(html`
@@ -454,9 +454,33 @@ describe('a-tab-group', () => {
   });
 
   /**
+   * Tabs close
+   */
+  it('should remove a tab and its panel when clicking on the close button', async () => {
+    const el = await fixture(html`
+      <a-tab-group>
+        <a-tab slot="tab" role="heading" selected>Tab 1</a-tab>
+        <a-tab-panel slot="panel">Panel 1</a-tab-panel>
+        <a-tab slot="tab" role="heading" closable>Tab 2</a-tab>
+        <a-tab-panel slot="panel">Panel 2</a-tab-panel>
+        <a-tab slot="tab" role="heading">Tab 3</a-tab>
+        <a-tab-panel slot="panel">Panel 3</a-tab-panel>
+      </a-tab-group>
+    `);
+
+    expect(el.querySelectorAll('a-tab').length).to.equal(3);
+    expect(el.querySelectorAll('a-tab-panel').length).to.equal(3);
+
+    el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.close-button').click();
+
+    expect(el.querySelectorAll('a-tab').length).to.equal(2);
+    expect(el.querySelectorAll('a-tab-panel').length).to.equal(2);
+  });
+
+  /**
    * Events
    */
-  it('should fire "a-tab-group:change" event on tab click', async () => {
+  it('should fire "a-tab-group:tab-change" event on tab click', async () => {
     const el = await fixture(html`
       <a-tab-group>
         <a-tab id="tab-1" slot="tab" role="heading" selected>Tab 1</a-tab>
@@ -466,16 +490,32 @@ describe('a-tab-group', () => {
       </a-tab-group>
     `);
 
-    const listener = oneEvent(el, 'a-tab-group:change');
+    const listener = oneEvent(el, 'a-tab-group:tab-change');
 
     el.querySelectorAll('a-tab')[1].click();
 
     const { detail } = await listener;
 
-    expect(detail).to.deep.equal({
-      tabId: 'tab-2',
-      panelId: 'panel-2'
-    });
+    expect(detail).to.deep.equal({ tabId: 'tab-2' });
+  });
+
+  it('should fire "a-tab-group:tab-close" event on close button click', async () => {
+    const el = await fixture(html`
+      <a-tab-group>
+        <a-tab id="tab-1" slot="tab" role="heading" selected>Tab 1</a-tab>
+        <a-tab-panel id="panel-1" slot="panel">Panel 1</a-tab-panel>
+        <a-tab id="tab-2" slot="tab" role="heading" closable>Tab 2</a-tab>
+        <a-tab-panel id="panel-2" slot="panel">Panel 2</a-tab-panel>
+      </a-tab-group>
+    `);
+
+    const listener = oneEvent(el, 'a-tab-group:tab-close');
+
+    el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.close-button').click();
+
+    const { detail } = await listener;
+
+    expect(detail).to.deep.equal({ tabId: 'tab-2' });
   });
 
   /**

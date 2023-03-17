@@ -98,13 +98,23 @@ a-tab-group[placement="end"]::part(panels) {
 
 /* Style tabs */
 a-tab-group a-tab {
-  margin: 0 0.25rem;
   border-radius: 0.25rem;
+}
+
+a-tab-group[placement="top"] a-tab,
+a-tab-group[placement="bottom"] a-tab {
+  margin: 0 0.25rem;
+  justify-content: center;
 }
 
 a-tab-group[placement="start"] a-tab,
 a-tab-group[placement="end"] a-tab {
+  margin: 0.25rem 0;
   justify-content: center;
+}
+
+a-tab-group a-tab[selected]::part(close-button) {
+  color: var(--selected-tab-color);
 }
 ```
 
@@ -126,6 +136,7 @@ a-tab-group[placement="end"] a-tab {
 | ---- | -------- | ---- | -------- | ------- | ----------- |
 | `selected` | ✓ | Boolean | - | `false` | Determines if a tab is selected. Only one tab is selected at a time. If more than one tab is marked as selected, only the first one will be actually selected. If no tab is marked as selected, the first non-disabled tab will be selected by default. If a disabled tab is marked as selected, it will be ignored and the first non-disabled tab will be selected. It is highly recommended to set this property manually only during the initial render. If you need to programmatically select a tab, use the `selectTab` or `selectTabByIndex` methods instead, that will automatically update the `selected` property and link the tab to its corresponding tab panel. |
 | `disabled` | ✓ | Boolean | - | `false` | Determines if a tab is disabled. Disabled tabs cannot be selected. |
+| `closable` | ✓ | Boolean | - | `false` | Determines if a tab is closable. |
 
 ### Slots
 
@@ -146,6 +157,8 @@ a-tab-group[placement="end"] a-tab {
 | `scroll-button-icon` | The scroll button icon. |
 | `tabs` | The container that wraps the tabs. |
 | `panels` | The container that wraps the tab panels. |
+| `close-button` | The close button of a tab. |
+| `close-button-icon` | The close button icon. |
 
 ### CSS Custom Properties
 
@@ -183,7 +196,8 @@ Promise.all([
 
 | Name | Description | Event Detail |
 | ---- | ----------- | ------------ |
-| `a-tab-group:change` | Emitted when the selected tab changes. | `{tabId: String, panelId: String}` |
+| `a-tab-group:tab-change` | Emitted when the selected tab changes. | `{tabId: String}` |
+| `a-tab-group:tab-close` | Emitted when a tab is close. | `{tabId: String}` |
 
 ## Changelog
 

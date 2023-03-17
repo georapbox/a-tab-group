@@ -73,7 +73,6 @@ template.innerHTML = /* html */`
       border: 0;
       outline: 0;
       cursor: pointer;
-      transition: color 0.15s ease-in-out, background-color .15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     }
 
     .tab-group__scroll-button--start {
@@ -107,12 +106,12 @@ template.innerHTML = /* html */`
     ::slotted(a-tab) {
       display: inline-flex;
       align-items: center;
+      gap: 0.5rem;
       padding: 0.375rem 0.75rem;
       font-size: 1rem;
       white-space: nowrap;
       outline: 0;
       cursor: pointer;
-      transition: color 0.15s ease-in-out, background-color .15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     }
 
     ::slotted(a-tab:focus-visible) {
@@ -164,11 +163,6 @@ template.innerHTML = /* html */`
       padding: 0 1rem;
     }
 
-    :host([placement="start"]) ::slotted(a-tab) {
-      max-width: 200px;
-      white-space: normal;
-    }
-
     /* placement = end */
     :host([placement="end"]) .tab-group {
       flex-direction: row;
@@ -186,11 +180,6 @@ template.innerHTML = /* html */`
     :host([placement="end"]) .tab-group__panels {
       flex: 1;
       padding: 0 1rem;
-    }
-
-    :host([placement="end"]) ::slotted(a-tab) {
-      max-width: 200px;
-      white-space: normal;
     }
   </style>
 
@@ -292,6 +281,7 @@ class TabGroup extends HTMLElement {
     tabsContainer.addEventListener('click', this.#onTabClick);
     tabsContainer.addEventListener('keydown', this.#onKeyDown);
     scrollButtons.forEach(el => el.addEventListener('click', this.#onScrollButtonClick));
+    this.addEventListener('a-tab-group:tab-close', this.#onTabClose);
 
     if ('ResizeObserver' in window) {
       this.#resizeObserver = new ResizeObserver(entries => {
@@ -319,6 +309,7 @@ class TabGroup extends HTMLElement {
     tabsContainer.removeEventListener('click', this.#onTabClick);
     tabsContainer.removeEventListener('keydown', this.#onKeyDown);
     scrollButtons.forEach(el => el.removeEventListener('click', this.#onScrollButtonClick));
+    this.removeEventListener('a-tab-group:tab-close', this.#onTabClose);
     this.#stopResizeObserver();
   }
 
@@ -555,6 +546,21 @@ class TabGroup extends HTMLElement {
   };
 
   /**
+   * Handles the tab close button click event.
+   *
+   * @param {MouseEvent} evt The click event.
+   */
+  #onTabClose = evt => {
+    const tab = evt.target;
+    const panel = this.#panelForTab(tab);
+
+    if (tab && panel.tagName.toLowerCase() === 'a-tab-panel') {
+      panel.remove();
+      tab.remove();
+    }
+  };
+
+  /**
    * Handles the slotchange event on the tab group.
    * This is called every time the user adds or removes a tab or panel.
    */
@@ -654,13 +660,10 @@ class TabGroup extends HTMLElement {
     if (tab && !tab.disabled && !tab.selected) {
       this.#selectTab(tab);
 
-      this.dispatchEvent(new CustomEvent('a-tab-group:change', {
+      this.dispatchEvent(new CustomEvent('a-tab-group:tab-change', {
         bubbles: true,
         composed: true,
-        detail: {
-          tabId: tab.id,
-          panelId: this.#panelForTab(tab)?.id
-        }
+        detail: { tabId: tab.id }
       }));
     }
   }
@@ -677,13 +680,10 @@ class TabGroup extends HTMLElement {
 
       tab.focus();
 
-      this.dispatchEvent(new CustomEvent('a-tab-group:change', {
+      this.dispatchEvent(new CustomEvent('a-tab-group:tab-change', {
         bubbles: true,
         composed: true,
-        detail: {
-          tabId: tab.id,
-          panelId: this.#panelForTab(tab)?.id
-        }
+        detail: { tabId: tab.id }
       }));
     }
   }
