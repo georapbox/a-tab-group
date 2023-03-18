@@ -23,12 +23,12 @@ import(componentUrl).then(() => {
     }
   });
 
-  document.addEventListener('a-tab-group:tab-change', evt => {
-    consoleEl.innerHTML = `a-tab-group:tab-change -> ${JSON.stringify(evt.detail)}`;
+  document.addEventListener('a-tab-select', evt => {
+    consoleEl.innerHTML = `a-tab-select -> ${JSON.stringify(evt.detail)}`;
   });
 
-  document.addEventListener('a-tab-group:tab-close', evt => {
-    consoleEl.innerHTML = `a-tab-group:tab-close -> ${JSON.stringify(evt.detail)}`;
+  document.addEventListener('a-tab-close', evt => {
+    consoleEl.innerHTML = `a-tab-close -> ${JSON.stringify(evt.detail)}`;
   });
 }).catch(err => {
   console.error(err);

@@ -23,6 +23,8 @@ describe('a-tab-group', () => {
         <a-tab-panel slot="panel">Panel 1</a-tab-panel>
         <a-tab slot="tab" role="heading" disabled>Tab 2</a-tab>
         <a-tab-panel slot="panel">Panel 2</a-tab-panel>
+        <a-tab slot="tab" role="heading" closable>Tab 3</a-tab>
+        <a-tab-panel slot="panel">Panel 3</a-tab-panel>
       </a-tab-group>
     `);
 
@@ -471,7 +473,7 @@ describe('a-tab-group', () => {
     expect(el.querySelectorAll('a-tab').length).to.equal(3);
     expect(el.querySelectorAll('a-tab-panel').length).to.equal(3);
 
-    el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.close-button').click();
+    el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.close-tab').click();
 
     expect(el.querySelectorAll('a-tab').length).to.equal(2);
     expect(el.querySelectorAll('a-tab-panel').length).to.equal(2);
@@ -480,7 +482,7 @@ describe('a-tab-group', () => {
   /**
    * Events
    */
-  it('should fire "a-tab-group:tab-change" event on tab click', async () => {
+  it('should fire "a-tab-select" event on tab click', async () => {
     const el = await fixture(html`
       <a-tab-group>
         <a-tab id="tab-1" slot="tab" role="heading" selected>Tab 1</a-tab>
@@ -490,7 +492,7 @@ describe('a-tab-group', () => {
       </a-tab-group>
     `);
 
-    const listener = oneEvent(el, 'a-tab-group:tab-change');
+    const listener = oneEvent(el, 'a-tab-select');
 
     el.querySelectorAll('a-tab')[1].click();
 
@@ -499,7 +501,7 @@ describe('a-tab-group', () => {
     expect(detail).to.deep.equal({ tabId: 'tab-2' });
   });
 
-  it('should fire "a-tab-group:tab-close" event on close button click', async () => {
+  it('should fire "a-tab-close" event on close button click', async () => {
     const el = await fixture(html`
       <a-tab-group>
         <a-tab id="tab-1" slot="tab" role="heading" selected>Tab 1</a-tab>
@@ -509,9 +511,9 @@ describe('a-tab-group', () => {
       </a-tab-group>
     `);
 
-    const listener = oneEvent(el, 'a-tab-group:tab-close');
+    const listener = oneEvent(el, 'a-tab-close');
 
-    el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.close-button').click();
+    el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.close-tab').click();
 
     const { detail } = await listener;
 

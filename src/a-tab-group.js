@@ -281,7 +281,7 @@ class TabGroup extends HTMLElement {
     tabsContainer.addEventListener('click', this.#onTabClick);
     tabsContainer.addEventListener('keydown', this.#onKeyDown);
     scrollButtons.forEach(el => el.addEventListener('click', this.#onScrollButtonClick));
-    this.addEventListener('a-tab-group:tab-close', this.#onTabClose);
+    this.addEventListener('a-tab-close', this.#onTabClose);
 
     if ('ResizeObserver' in window) {
       this.#resizeObserver = new ResizeObserver(entries => {
@@ -309,7 +309,7 @@ class TabGroup extends HTMLElement {
     tabsContainer.removeEventListener('click', this.#onTabClick);
     tabsContainer.removeEventListener('keydown', this.#onKeyDown);
     scrollButtons.forEach(el => el.removeEventListener('click', this.#onScrollButtonClick));
-    this.removeEventListener('a-tab-group:tab-close', this.#onTabClose);
+    this.removeEventListener('a-tab-close', this.#onTabClose);
     this.#stopResizeObserver();
   }
 
@@ -660,7 +660,7 @@ class TabGroup extends HTMLElement {
     if (tab && !tab.disabled && !tab.selected) {
       this.#selectTab(tab);
 
-      this.dispatchEvent(new CustomEvent('a-tab-group:tab-change', {
+      this.dispatchEvent(new CustomEvent('a-tab-select', {
         bubbles: true,
         composed: true,
         detail: { tabId: tab.id }
@@ -680,7 +680,7 @@ class TabGroup extends HTMLElement {
 
       tab.focus();
 
-      this.dispatchEvent(new CustomEvent('a-tab-group:tab-change', {
+      this.dispatchEvent(new CustomEvent('a-tab-select', {
         bubbles: true,
         composed: true,
         detail: { tabId: tab.id }

@@ -126,6 +126,6 @@ a-tab-group[placement="end"].custom-style a-tab {
   justify-content: center;
 }
 
-a-tab-group.custom-style a-tab[selected]::part(close-button) {
+a-tab-group.custom-style a-tab[selected]::part(close-tab) {
   color: var(--selected-tab-color);
 }

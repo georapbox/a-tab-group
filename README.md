@@ -113,7 +113,7 @@ a-tab-group[placement="end"] a-tab {
   justify-content: center;
 }
 
-a-tab-group a-tab[selected]::part(close-button) {
+a-tab-group a-tab[selected]::part(close-tab) {
   color: var(--selected-tab-color);
 }
 ```
@@ -157,8 +157,8 @@ a-tab-group a-tab[selected]::part(close-button) {
 | `scroll-button-icon` | The scroll button icon. |
 | `tabs` | The container that wraps the tabs. |
 | `panels` | The container that wraps the tab panels. |
-| `close-button` | The close button of a tab. |
-| `close-button-icon` | The close button icon. |
+| `close-tab` | The close tab button. |
+| `close-tab-icon` | The close tab icon. |
 
 ### CSS Custom Properties
 
@@ -196,8 +196,8 @@ Promise.all([
 
 | Name | Description | Event Detail |
 | ---- | ----------- | ------------ |
-| `a-tab-group:tab-change` | Emitted when the selected tab changes. | `{tabId: String}` |
-| `a-tab-group:tab-close` | Emitted when a tab is close. | `{tabId: String}` |
+| `a-tab-select` | Emitted when a tab is selected (not in the initial render). | `{tabId: String}` |
+| `a-tab-close` | Emitted when a tab is closed. | `{tabId: String}` |
 
 ## Changelog
 
