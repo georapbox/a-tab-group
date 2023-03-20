@@ -33,7 +33,7 @@ template.innerHTML = /* html */`
     }
 
     :host {
-      --selected-tab-color: #0d6efd;
+      --selected-tab-color: #005fcc;
       --selected-tab-bg-color: transparent;
       --tabs-scroll-behavior: smooth;
       --scroll-button-width: 34px;

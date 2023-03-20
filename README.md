@@ -57,7 +57,7 @@ Below is an example of how you can customise the styles of the component using C
 /* Style tab group */
 a-tab-group {
   --selected-tab-color: #ffffff;
-  --selected-tab-bg-color: #0d6efd;
+  --selected-tab-bg-color: #005fcc;
   --scroll-button-inline-offset: 0.25rem;
 
   border: 1px solid #dee2e6;
@@ -165,7 +165,7 @@ a-tab-group a-tab[selected]::part(close-tab) {
 
 | Name | Description | Default |
 | ---- | ----------- | ------- |
-| `--selected-tab-color` | The color of the selected tab. | `#0d6efd` |
+| `--selected-tab-color` | The color of the selected tab. | `#005fcc` |
 | `--selected-tab-bg-color` | The background color of the selected tab. | `transparent` |
 | `--tabs-scroll-behavior` | The scroll behavior of the tabs. | `smooth` |
 | `--scroll-button-width` | The width of the scroll buttons. | `34px` |

@@ -8,16 +8,21 @@
   box-sizing: border-box;
 }
 
-body.js details {
+body.no-js details {
   display: none;
 }
 
-body.js a-tab-group:not(:defined) {
+body.no-js a-tab-group:not(:defined) {
   display: block;
 }
 
-body:not(.js) a-tab-group:not(:defined) {
+body:not(.no-js) a-tab-group:not(:defined) {
   display: none;
+}
+
+body.no-js a-tab,
+body.no-js a-tab-panel {
+  display: block;
 }
 
 @media screen and (max-width: 768px) {
@@ -46,14 +51,14 @@ body:not(.js) a-tab-group:not(:defined) {
   margin-right: 0;
 }
 
-.tabs-container:not(.js) {
+.tabs-container:not(.no-js) {
   min-height: 110px;
 }
 
 /* Component custom style */
 a-tab-group.custom-style {
   --selected-tab-color: var(--background-body);
-  --selected-tab-bg-color: var(--links);
+  --selected-tab-bg-color: #005fcc;
   --tab-group-border-color: var(--border);
   --tab-group-bg-color: #ffffff;
   --scroll-button-inline-offset: 0.25rem;
@@ -65,12 +70,6 @@ a-tab-group.custom-style {
   border-radius: 0.25rem;
   background-color: var(--tab-group-bg-color);
   overflow: hidden;
-}
-
-@media (prefers-color-scheme: dark) {
-  a-tab-group.custom-style {
-    --tab-group-bg-color: var(--background);
-  }
 }
 
 a-tab-group.custom-style::part(scroll-button) {
@@ -119,4 +118,16 @@ a-tab-group[placement="end"].custom-style a-tab {
 
 a-tab-group.custom-style a-tab[selected]::part(close-tab) {
   color: var(--selected-tab-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  a-tab-group {
+    --selected-tab-color: #99c8ff;
+  }
+
+  a-tab-group.custom-style {
+    --selected-tab-bg-color: #99c8ff;
+    --tab-group-bg-color: #202125;
+    --tab-group-border-color: #494c50;
+  }
 }
