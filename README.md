@@ -128,7 +128,7 @@ a-tab-group a-tab[selected]::part(close-tab) {
 | ---- | -------- | ---- | -------- | ------- | ----------- |
 | `placement` | ✓ | `'top' \| 'bottom' \| 'start' \| 'end'` | - | `'top'` | The placement of the tabs. |
 | `noScrollControls`<br>*`no-scroll-controls`* | ✓ | Boolean | - | `false` | Disables the scroll buttons that appear when tabs overflow. |
-| `scrollDistance`<br>*`scroll-distance`* | ✓ | Number | - | `null` | The distance to scroll when the scroll buttons are clicked. The default value is `200px` if it is not provided, or if the value is `0`. |
+| `scrollDistance`<br>*`scroll-distance`* | ✓ | Number | - | `200` | The distance to scroll when the scroll buttons are clicked. It fallsback to the default value if not provided, or its value is `0`. |
 | `activation` | ✓ | `'auto' \| 'manual'` | - | `'auto'` | If set to `'auto'`, navigating the tabs using the keyboard (`Left`, `Right`, `Up`, `Down` arrow keys) will automatically select the tab. If set to `'manual'`, the tab will receive focus but will not be selected until the user presses the `Enter` or `Space` key. |
 
 #### Properties for tabs
@@ -167,12 +167,10 @@ a-tab-group a-tab[selected]::part(close-tab) {
 | ---- | ----------- | ------- |
 | `--selected-tab-color` | The color of the selected tab. | `#0d6efd` |
 | `--selected-tab-bg-color` | The background color of the selected tab. | `transparent` |
-| `--focus-box-shadow-color` | The color of the box shadow of the focused tab. | `#9bc0fe` |
-| `--focus-box-shadow` | The box shadow of the focused tab. | `0 0 0 0.25rem var(--focus-box-shadow-color)` |
 | `--tabs-scroll-behavior` | The scroll behavior of the tabs. | `smooth` |
 | `--scroll-button-width` | The width of the scroll buttons. | `34px` |
 | `--scroll-button-height` | The height of the scroll buttons. | `34px` |
-| `--scroll-button-inline-offset` | This is the value of the `left` property for the start button and the `right` property for the end button. | `0rem` |
+| `--scroll-button-inline-offset` | This is the value of the `left` property for the start scroll button and the `right` property for the end scroll button. | `0rem` |
 
 ### Methods
 

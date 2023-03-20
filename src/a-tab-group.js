@@ -35,8 +35,6 @@ template.innerHTML = /* html */`
     :host {
       --selected-tab-color: #0d6efd;
       --selected-tab-bg-color: transparent;
-      --focus-box-shadow-color: #9bc0fe;
-      --focus-box-shadow: 0 0 0 0.25rem var(--focus-box-shadow-color);
       --tabs-scroll-behavior: smooth;
       --scroll-button-width: 34px;
       --scroll-button-height: 34px;
@@ -71,7 +69,6 @@ template.innerHTML = /* html */`
       z-index: 1;
       background-color: transparent;
       border: 0;
-      outline: 0;
       cursor: pointer;
     }
 
@@ -81,10 +78,6 @@ template.innerHTML = /* html */`
 
     .tab-group__scroll-button--end {
       right: var(--scroll-button-inline-offset);
-    }
-
-    .tab-group__scroll-button:focus-visible {
-      box-shadow: var(--focus-box-shadow);
     }
 
     .tab-group__tabs {
@@ -110,12 +103,7 @@ template.innerHTML = /* html */`
       padding: 0.375rem 0.75rem;
       font-size: 1rem;
       white-space: nowrap;
-      outline: 0;
       cursor: pointer;
-    }
-
-    ::slotted(a-tab:focus-visible) {
-      box-shadow: var(--focus-box-shadow);
     }
 
     ::slotted(a-tab[selected]) {
@@ -128,9 +116,12 @@ template.innerHTML = /* html */`
       cursor: not-allowed;
     }
 
-    ::slotted(tab-panel) {
-      display: block;
+    ::slotted(a-tab-panel) {
       font-size: 1rem;
+    }
+
+    ::slotted(a-tab-panel:not([hidden])) {
+      display: block;
     }
 
     /* placement = top */
@@ -259,8 +250,7 @@ class TabGroup extends HTMLElement {
 
     this.#syncNav();
     this.hidden = this.#allTabs().length === 0;
-    this.placement = this.placement || 'top';
-    this.activation = this.activation || 'auto';
+    this.placement = this.placement || 'top'; // Set by default to `top` to reflect the default value in the CSS.
   }
 
   disconnectedCallback() {
@@ -309,19 +299,19 @@ class TabGroup extends HTMLElement {
   }
 
   get scrollDistance() {
-    return Math.abs(this.getAttribute('scroll-distance'));
+    return Math.abs(this.getAttribute('scroll-distance')) || 200;
   }
 
   set scrollDistance(value) {
-    this.setAttribute('scroll-distance', Math.abs(value));
+    this.setAttribute('scroll-distance', Math.abs(value) || 200);
   }
 
   get activation() {
-    return this.getAttribute('activation');
+    return this.getAttribute('activation') || 'auto';
   }
 
   set activation(value) {
-    this.setAttribute('activation', value);
+    this.setAttribute('activation', value || 'auto');
   }
 
   #startResizeObserver() {
@@ -473,7 +463,7 @@ class TabGroup extends HTMLElement {
    */
   #onKeyDown = evt => {
     // Ignore any key presses that have a modifier.
-    if (evt.target.getAttribute('role') !== 'tab') {
+    if (evt.target.tagName.toLowerCase() !== 'a-tab') {
       return;
     }
 
@@ -516,10 +506,6 @@ class TabGroup extends HTMLElement {
     // The browser might have some native functionality bound to the arrow keys, home or end.
     // `preventDefault()` is called to prevent the browser from taking any actions.
     evt.preventDefault();
-
-    if (this.placement === 'top' || this.placement === 'bottom') {
-      tab.scrollIntoView();
-    }
   };
 
   /**
@@ -546,7 +532,7 @@ class TabGroup extends HTMLElement {
 
     const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
     const direction = scrollButton.classList.contains('tab-group__scroll-button--start') ? 'start' : 'end';
-    const scrollAmount = this.scrollDistance || 200;
+    const scrollAmount = this.scrollDistance;
     const left = direction === 'start' ? -scrollAmount : scrollAmount;
 
     tabsContainer.scrollBy({
