@@ -532,12 +532,9 @@ class TabGroup extends HTMLElement {
 
     const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
     const direction = scrollButton.classList.contains('tab-group__scroll-button--start') ? 'start' : 'end';
-    const scrollAmount = this.scrollDistance;
-    const left = direction === 'start' ? -scrollAmount : scrollAmount;
 
     tabsContainer.scrollBy({
-      left,
-      behavior: 'smooth'
+      left: direction === 'start' ? -this.scrollDistance : this.scrollDistance
     });
   };
 

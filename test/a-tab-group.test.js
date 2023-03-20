@@ -1,4 +1,4 @@
-import { elementUpdated, expect, fixture, fixtureCleanup, html, oneEvent, triggerFocusFor } from '@open-wc/testing';
+import { aTimeout, elementUpdated, expect, fixture, fixtureCleanup, html, oneEvent, triggerFocusFor } from '@open-wc/testing';
 import { sendKeys } from '@web/test-runner-commands';
 import { spy } from 'sinon';
 import '../src/a-tab-group.js';
@@ -6,6 +6,19 @@ import '../src/a-tab-group.js';
 describe('a-tab-group', () => {
   beforeEach(() => {
     spy(console, 'error');
+
+    // Disable ResizeObserver loop limit exceeded error.
+    // https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded/64197640#64197640
+    const errorHandler = window.onerror;
+    window.onerror = (event, source, lineno, colno, error) => {
+      if (event.includes('ResizeObserver')) {
+        return true;
+      } else if (errorHandler) {
+        return errorHandler(event, source, lineno, colno, error);
+      } else {
+        return true;
+      }
+    };
   });
 
   afterEach(() => {
@@ -58,6 +71,13 @@ describe('a-tab-group', () => {
     expect(el).to.have.attribute('no-scroll-controls');
   });
 
+  it('should remove attribute "no-scroll-controls" if property "noScrollControls" is false', async () => {
+    const el = await fixture(html`<a-tab-group no-scroll-controls></a-tab-group>`);
+    el.noScrollControls = false;
+    await elementUpdated(el);
+    expect(el).to.not.have.attribute('no-scroll-controls');
+  });
+
   it('reflects attribute "scroll-distance" to property "scrollDistance"', async () => {
     const el = await fixture(html`<a-tab-group scroll-distance="100"></a-tab-group>`);
     expect(el.scrollDistance).to.equal(100);
@@ -70,6 +90,13 @@ describe('a-tab-group', () => {
     expect(el.getAttribute('scroll-distance')).to.equal('100');
   });
 
+  it('if "scrollDistance" property is falsy, it should be set to 200', async () => {
+    const el = await fixture(html`<a-tab-group></a-tab-group>`);
+    el.scrollDistance = null;
+    await elementUpdated(el);
+    expect(el.scrollDistance).to.equal(200);
+  });
+
   it('reflects attribute "activation" to property "activation"', async () => {
     const el = await fixture(html`<a-tab-group activation="manual"></a-tab-group>`);
     expect(el.activation).to.equal('manual');
@@ -80,6 +107,13 @@ describe('a-tab-group', () => {
     el.activation = 'manual';
     await elementUpdated(el);
     expect(el.getAttribute('activation')).to.equal('manual');
+  });
+
+  it('if "activation" property is falsy, it should be set to "auto"', async () => {
+    const el = await fixture(html`<a-tab-group></a-tab-group>`);
+    el.activation = null;
+    await elementUpdated(el);
+    expect(el.activation).to.equal('auto');
   });
 
   /**
@@ -275,7 +309,7 @@ describe('a-tab-group', () => {
     expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.true;
   });
 
-  it('should cycle through tabs and select them when pressing "ArrowRight" or "ArrowDown" keys, omitting disabled tabs, when activation is "auto"', async () => {
+  it('cycle through tabs using "Right" and "Down" arrow keys when activation is "auto"', async () => {
     const el = await fixture(html`
       <a-tab-group>
         <a-tab slot="tab" role="heading" selected>Tab 1</a-tab>
@@ -314,7 +348,7 @@ describe('a-tab-group', () => {
     expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
   });
 
-  it('should cycle through tabs but not select them when pressing "ArrowRight" or "ArrowDown" keys, omitting disabled tabs, when activation is "manual"', async () => {
+  it('cycle through tabs using "Right" and "Down" arrow keys when activation is "manual"', async () => {
     const el = await fixture(html`
       <a-tab-group activation="manual">
         <a-tab slot="tab" role="heading" selected>Tab 1</a-tab>
@@ -348,7 +382,7 @@ describe('a-tab-group', () => {
     expect(el.querySelectorAll('a-tab')[3].selected).to.be.false;
     expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.true;
 
-    // Pressing down arrow key should focus but not select tab 1
+    // Pressing down arrow key should focus back on tab 1
     await sendKeys({ press: 'ArrowDown' });
 
     expect(el.querySelectorAll('a-tab')[0].matches(':focus')).to.be.true;
@@ -356,7 +390,7 @@ describe('a-tab-group', () => {
     expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
   });
 
-  it('should cycle through tabs when pressing "ArrowLeft" or "ArrowUp" keys', async () => {
+  it('cycle through tabs using "Left" and "Up" arrow keys when activation is "auto"', async () => {
     const el = await fixture(html`
       <a-tab-group>
         <a-tab slot="tab" role="heading">Tab 1</a-tab>
@@ -374,7 +408,7 @@ describe('a-tab-group', () => {
     expect(el.querySelectorAll('a-tab')[3].selected).to.be.true;
     expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
 
-    await triggerFocusFor(el.querySelectorAll('a-tab')[0]);
+    await triggerFocusFor(el.querySelectorAll('a-tab')[3]);
 
     // Pressing left arrow key should select tab 2 (tab 3 is disabled)
     await sendKeys({ press: 'ArrowLeft' });
@@ -391,6 +425,48 @@ describe('a-tab-group', () => {
     // Pressing up arrow key should select tab 4 again
     await sendKeys({ press: 'ArrowUp' });
 
+    expect(el.querySelectorAll('a-tab')[3].selected).to.be.true;
+    expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
+  });
+
+  it('cycle through tabs using "Left" and "Up" arrow keys when activation is "manual"', async () => {
+    const el = await fixture(html`
+      <a-tab-group activation="manual">
+        <a-tab slot="tab" role="heading">Tab 1</a-tab>
+        <a-tab-panel slot="panel">Panel 1</a-tab-panel>
+        <a-tab slot="tab" role="heading">Tab 2</a-tab>
+        <a-tab-panel slot="panel">Panel 2</a-tab-panel>
+        <a-tab slot="tab" role="heading" disabled>Tab 3</a-tab>
+        <a-tab-panel slot="panel">Panel 3</a-tab-panel>
+        <a-tab slot="tab" role="heading" selected>Tab 4</a-tab>
+        <a-tab-panel slot="panel">Panel 4</a-tab-panel>
+      </a-tab-group>
+    `);
+
+    // Tab 4 should be selected by default
+    expect(el.querySelectorAll('a-tab')[3].selected).to.be.true;
+    expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
+
+    await triggerFocusFor(el.querySelectorAll('a-tab')[3]);
+
+    // Pressing left arrow key should focus but not select tab 2 (tab 3 is disabled)
+    await sendKeys({ press: 'ArrowLeft' });
+
+    expect(el.querySelectorAll('a-tab')[1].matches(':focus')).to.be.true;
+    expect(el.querySelectorAll('a-tab')[1].selected).to.be.false;
+    expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.true;
+
+    // Pressing left arrow key should focus but not select tab 1
+    await sendKeys({ press: 'ArrowLeft' });
+
+    expect(el.querySelectorAll('a-tab')[0].matches(':focus')).to.be.true;
+    expect(el.querySelectorAll('a-tab')[0].selected).to.be.false;
+    expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.true;
+
+    // Pressing up arrow key should focus back on tab 4
+    await sendKeys({ press: 'ArrowUp' });
+
+    expect(el.querySelectorAll('a-tab')[3].matches(':focus')).to.be.true;
     expect(el.querySelectorAll('a-tab')[3].selected).to.be.true;
     expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
   });
@@ -461,6 +537,42 @@ describe('a-tab-group', () => {
     expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
   });
 
+  it('should focus on the first and last non-disabled tabs when pressing "Home" and "End" keys respectively with activation "manual"', async () => {
+    const el = await fixture(html`
+      <a-tab-group activation="manual">
+        <a-tab slot="tab" role="heading" disabled>Tab 1</a-tab>
+        <a-tab-panel slot="panel">Panel 1</a-tab-panel>
+        <a-tab slot="tab" role="heading">Tab 2</a-tab>
+        <a-tab-panel slot="panel">Panel 2</a-tab-panel>
+        <a-tab slot="tab" role="heading" selected>Tab 3</a-tab>
+        <a-tab-panel slot="panel">Panel 3</a-tab-panel>
+        <a-tab slot="tab" role="heading">Tab 4</a-tab>
+        <a-tab-panel slot="panel">Panel 4</a-tab-panel>
+        <a-tab slot="tab" role="heading" disabled>Tab 5</a-tab>
+        <a-tab-panel slot="panel">Panel 5</a-tab-panel>
+      </a-tab-group>
+    `);
+
+    // Tab 3 should be selected by default
+    expect(el.querySelectorAll('a-tab')[2].selected).to.be.true;
+    expect(el.querySelectorAll('a-tab-panel')[2].hidden).to.be.false;
+
+    await triggerFocusFor(el.querySelectorAll('a-tab')[0]);
+    await sendKeys({ press: 'Home' });
+
+    // Tab 1 is disabled, so tab 2 should be focused
+    expect(el.querySelectorAll('a-tab')[1].matches(':focus')).to.be.true;
+    expect(el.querySelectorAll('a-tab')[1].selected).to.be.false;
+    expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.true;
+
+    await sendKeys({ press: 'End' });
+
+    // Tab 5 is disabled, so tab 4 should be focused
+    expect(el.querySelectorAll('a-tab')[3].matches(':focus')).to.be.true;
+    expect(el.querySelectorAll('a-tab')[3].selected).to.be.false;
+    expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.true;
+  });
+
   it('should select a tab when focusing on it and pressing "Enter" or "Space" keys', async () => {
     const el = await fixture(html`
       <a-tab-group>
@@ -490,6 +602,30 @@ describe('a-tab-group', () => {
 
     expect(el.querySelectorAll('a-tab')[2].selected).to.be.true;
     expect(el.querySelectorAll('a-tab-panel')[2].hidden).to.be.false;
+  });
+
+  it('should ignore any other key press', async () => {
+    const el = await fixture(html`
+      <a-tab-group>
+        <a-tab slot="tab" role="heading" selected>Tab 1</a-tab>
+        <a-tab-panel slot="panel">Panel 1</a-tab-panel>
+        <a-tab slot="tab" role="heading">Tab 2</a-tab>
+        <a-tab-panel slot="panel">Panel 2</a-tab-panel>
+        <a-tab slot="tab" role="heading">Tab 3</a-tab>
+        <a-tab-panel slot="panel">Panel 3</a-tab-panel>
+      </a-tab-group>
+    `);
+
+    // Tab 1 should be selected by default
+    expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+    expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
+
+    // Tab 1 should still be selected when pressing "A" key
+    await triggerFocusFor(el.querySelectorAll('a-tab')[0]);
+    await sendKeys({ press: 'A' });
+
+    expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+    expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
   });
 
   it('should select the first non-disabled tab if a tab is disabled but also selected', async () => {
@@ -531,6 +667,59 @@ describe('a-tab-group', () => {
 
     expect(el.querySelectorAll('a-tab').length).to.equal(2);
     expect(el.querySelectorAll('a-tab-panel').length).to.equal(2);
+  });
+
+  it('should display scroll buttons if tabs overflow', async () => {
+    const el = await fixture(html`
+      <a-tab-group style="width: 100px;">
+        <a-tab slot="tab" role="heading" selected>Tab 1</a-tab>
+        <a-tab-panel slot="panel">Panel 1</a-tab-panel>
+        <a-tab slot="tab" role="heading" closable>Tab 2</a-tab>
+        <a-tab-panel slot="panel">Panel 2</a-tab-panel>
+        <a-tab slot="tab" role="heading">Tab 3</a-tab>
+        <a-tab-panel slot="panel">Panel 3</a-tab-panel>
+      </a-tab-group>
+    `);
+
+    const scrollButtons = el.shadowRoot.querySelectorAll('.tab-group__scroll-button');
+    scrollButtons.forEach((button) => {
+      expect(button.hidden).to.be.false;
+    });
+  });
+
+  it('should not display scroll buttons if tabs overflow when "no-scroll-controls" is set', async () => {
+    const el = await fixture(html`
+      <a-tab-group no-scroll-controls style="width: 100px;">
+        <a-tab slot="tab" role="heading" selected>Tab 1</a-tab>
+        <a-tab-panel slot="panel">Panel 1</a-tab-panel>
+        <a-tab slot="tab" role="heading" closable>Tab 2</a-tab>
+        <a-tab-panel slot="panel">Panel 2</a-tab-panel>
+        <a-tab slot="tab" role="heading">Tab 3</a-tab>
+        <a-tab-panel slot="panel">Panel 3</a-tab-panel>
+      </a-tab-group>
+    `);
+
+    const scrollButtons = el.shadowRoot.querySelectorAll('.tab-group__scroll-button');
+    scrollButtons.forEach((button) => expect(button.hidden).to.be.true);
+  });
+
+  it('should scroll tabs towards on scroll button click', async () => {
+    const el = await fixture(html`
+      <a-tab-group style="width: 100px; --scroll-behavior: auto;">
+        <a-tab slot="tab" role="heading" selected>Tab 1</a-tab>
+        <a-tab-panel slot="panel">Panel 1</a-tab-panel>
+        <a-tab slot="tab" role="heading" closable>Tab 2</a-tab>
+        <a-tab-panel slot="panel">Panel 2</a-tab-panel>
+        <a-tab slot="tab" role="heading">Tab 3</a-tab>
+        <a-tab-panel slot="panel">Panel 3</a-tab-panel>
+      </a-tab-group>
+    `);
+
+    const scrollButton = el.shadowRoot.querySelector('.tab-group__scroll-button--end');
+    scrollButton.click();
+    await aTimeout(250); // Wait for scroll to finish.
+    const tabsContainer = el.shadowRoot.querySelector('.tab-group__tabs');
+    expect(tabsContainer.scrollLeft).to.be.greaterThan(0);
   });
 
   /**

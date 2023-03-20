@@ -122,7 +122,7 @@ a-tab-group a-tab[selected]::part(close-tab) {
 
 ### Properties
 
-#### Properties for tab group
+#### &lt;a-tab-group&gt; properties
 
 | Name | Reflects | Type | Required | Default | Description |
 | ---- | -------- | ---- | -------- | ------- | ----------- |
@@ -131,7 +131,7 @@ a-tab-group a-tab[selected]::part(close-tab) {
 | `scrollDistance`<br>*`scroll-distance`* | ✓ | Number | - | `200` | The distance to scroll when the scroll buttons are clicked. It fallsback to the default value if not provided, or its value is `0`. |
 | `activation` | ✓ | `'auto' \| 'manual'` | - | `'auto'` | If set to `'auto'`, navigating the tabs using the keyboard (`Left`, `Right`, `Up`, `Down` arrow keys) will automatically select the tab. If set to `'manual'`, the tab will receive focus but will not be selected until the user presses the `Enter` or `Space` key. |
 
-#### Properties for tabs
+#### &lt;a-tab&gt; properties
 
 | Name | Reflects | Type | Required | Default | Description |
 | ---- | -------- | ---- | -------- | ------- | ----------- |
@@ -179,7 +179,7 @@ a-tab-group a-tab[selected]::part(close-tab) {
 | `selectTab`<sup>1</sup> | Prototype | Selects the given tab. If the given tab is disabled or already selected, this method does nothing. | `tab: HTMLElement` |
 | `selectTabByIndex`<sup>1</sup> | Prototype | Selects the tab at the given index. If the tab at the given index is disabled or already selected, this method does nothing. | `index: String` |
 
-<sup>1</sup> These methods are only available after the component has been defined. If you need to call these methods before the component has been defined, you can use the `whenDefined` method of the custom elements registry. For example:
+<sup>1</sup> These methods are only available after the component has been defined. If you need to call these methods before the component has been defined, you can use the `whenDefined` method of the `CustomElementRegistry` interface. For example:
 
 ```js
 Promise.all([
