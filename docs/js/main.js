@@ -10,6 +10,10 @@ import(componentUrl).then(() => {
       tabGroupEl.setAttribute('placement', evt.target.value);
     }
 
+    if (evt.target.name === 'activation') {
+      tabGroupEl.setAttribute('activation', evt.target.value);
+    }
+
     if (evt.target.name === 'scroll-distance') {
       tabGroupEl.setAttribute('scroll-distance', evt.target.value);
     }

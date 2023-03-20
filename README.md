@@ -129,6 +129,7 @@ a-tab-group a-tab[selected]::part(close-tab) {
 | `placement` | ✓ | `'top' \| 'bottom' \| 'start' \| 'end'` | - | `'top'` | The placement of the tabs. |
 | `noScrollControls`<br>*`no-scroll-controls`* | ✓ | Boolean | - | `false` | Disables the scroll buttons that appear when tabs overflow. |
 | `scrollDistance`<br>*`scroll-distance`* | ✓ | Number | - | `null` | The distance to scroll when the scroll buttons are clicked. The default value is `200px` if it is not provided, or if the value is `0`. |
+| `activation` | ✓ | `'auto' \| 'manual'` | - | `'auto'` | If set to `'auto'`, navigating the tabs using the keyboard (`Left`, `Right`, `Up`, `Down` arrow keys) will automatically select the tab. If set to `'manual'`, the tab will receive focus but will not be selected until the user presses the `Enter` or `Space` key. |
 
 #### Properties for tabs
 

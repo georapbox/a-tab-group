@@ -215,6 +215,10 @@ template.innerHTML = /* html */`
 class TabGroup extends HTMLElement {
   #resizeObserver;
 
+  static get observedAttributes() {
+    return ['placement', 'no-scroll-controls'];
+  }
+
   constructor() {
     super();
 
@@ -224,8 +228,54 @@ class TabGroup extends HTMLElement {
     }
   }
 
-  static get observedAttributes() {
-    return ['placement', 'no-scroll-controls'];
+  connectedCallback() {
+    this.#upgradeProperty('placement');
+    this.#upgradeProperty('noScrollControls');
+    this.#upgradeProperty('scrollDistance');
+    this.#upgradeProperty('activation');
+
+    const tabSlot = this.shadowRoot.querySelector('slot[name=tab]');
+    const panelSlot = this.shadowRoot.querySelector('slot[name=panel]');
+    const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
+    const navContainer = this.shadowRoot.querySelector('.tab-group__nav');
+    const scrollButtons = Array.from(this.shadowRoot.querySelectorAll('.tab-group__scroll-button'));
+
+    tabSlot.addEventListener('slotchange', this.#onSlotChange);
+    panelSlot.addEventListener('slotchange', this.#onSlotChange);
+    tabsContainer.addEventListener('click', this.#onTabClick);
+    tabsContainer.addEventListener('keydown', this.#onKeyDown);
+    scrollButtons.forEach(el => el.addEventListener('click', this.#onScrollButtonClick));
+    this.addEventListener('a-tab-close', this.#onTabClose);
+
+    if ('ResizeObserver' in window) {
+      this.#resizeObserver = new ResizeObserver(entries => {
+        const entry = entries?.[0];
+        const targetElement = entry?.target;
+        const isElementScrollable = targetElement?.scrollWidth > (entry?.borderBoxSize?.[0]?.inlineSize || targetElement?.clientWidth);
+        scrollButtons.forEach(el => el.hidden = !isElementScrollable);
+        navContainer.classList.toggle('tab-group__nav--scrollable', isElementScrollable);
+      });
+    }
+
+    this.#syncNav();
+    this.hidden = this.#allTabs().length === 0;
+    this.placement = this.placement || 'top';
+    this.activation = this.activation || 'auto';
+  }
+
+  disconnectedCallback() {
+    const tabSlot = this.shadowRoot.querySelector('slot[name=tab]');
+    const panelSlot = this.shadowRoot.querySelector('slot[name=panel]');
+    const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
+    const scrollButtons = Array.from(this.shadowRoot.querySelectorAll('.tab-group__scroll-button'));
+
+    tabSlot.removeEventListener('slotchange', this.#onSlotChange);
+    panelSlot.removeEventListener('slotchange', this.#onSlotChange);
+    tabsContainer.removeEventListener('click', this.#onTabClick);
+    tabsContainer.removeEventListener('keydown', this.#onKeyDown);
+    scrollButtons.forEach(el => el.removeEventListener('click', this.#onScrollButtonClick));
+    this.removeEventListener('a-tab-close', this.#onTabClose);
+    this.#stopResizeObserver();
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -266,51 +316,12 @@ class TabGroup extends HTMLElement {
     this.setAttribute('scroll-distance', Math.abs(value));
   }
 
-  connectedCallback() {
-    this.#upgradeProperty('placement');
-    this.#upgradeProperty('noScrollControls');
-
-    const tabSlot = this.shadowRoot.querySelector('slot[name=tab]');
-    const panelSlot = this.shadowRoot.querySelector('slot[name=panel]');
-    const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
-    const navContainer = this.shadowRoot.querySelector('.tab-group__nav');
-    const scrollButtons = Array.from(this.shadowRoot.querySelectorAll('.tab-group__scroll-button'));
-
-    tabSlot.addEventListener('slotchange', this.#onSlotChange);
-    panelSlot.addEventListener('slotchange', this.#onSlotChange);
-    tabsContainer.addEventListener('click', this.#onTabClick);
-    tabsContainer.addEventListener('keydown', this.#onKeyDown);
-    scrollButtons.forEach(el => el.addEventListener('click', this.#onScrollButtonClick));
-    this.addEventListener('a-tab-close', this.#onTabClose);
-
-    if ('ResizeObserver' in window) {
-      this.#resizeObserver = new ResizeObserver(entries => {
-        const entry = entries?.[0];
-        const targetElement = entry?.target;
-        const isElementScrollable = targetElement?.scrollWidth > (entry?.borderBoxSize?.[0]?.inlineSize || targetElement?.clientWidth);
-        scrollButtons.forEach(el => el.hidden = !isElementScrollable);
-        navContainer.classList.toggle('tab-group__nav--scrollable', isElementScrollable);
-      });
-    }
-
-    this.#syncNav();
-
-    this.hidden = this.#allTabs().length === 0;
+  get activation() {
+    return this.getAttribute('activation');
   }
 
-  disconnectedCallback() {
-    const tabSlot = this.shadowRoot.querySelector('slot[name=tab]');
-    const panelSlot = this.shadowRoot.querySelector('slot[name=panel]');
-    const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
-    const scrollButtons = Array.from(this.shadowRoot.querySelectorAll('.tab-group__scroll-button'));
-
-    tabSlot.removeEventListener('slotchange', this.#onSlotChange);
-    panelSlot.removeEventListener('slotchange', this.#onSlotChange);
-    tabsContainer.removeEventListener('click', this.#onTabClick);
-    tabsContainer.removeEventListener('keydown', this.#onKeyDown);
-    scrollButtons.forEach(el => el.removeEventListener('click', this.#onScrollButtonClick));
-    this.removeEventListener('a-tab-close', this.#onTabClose);
-    this.#stopResizeObserver();
+  set activation(value) {
+    this.setAttribute('activation', value);
   }
 
   #startResizeObserver() {
@@ -357,7 +368,7 @@ class TabGroup extends HTMLElement {
     // Get the selected non-disabled tab, or the first non-disabled tab.
     const tab = tabs.find(tab => tab.selected && !tab.disabled) || tabs.find(tab => !tab.disabled);
 
-    this.#selectTab(tab);
+    this.#markTabSelected(tab);
   }
 
   /**
@@ -422,7 +433,9 @@ class TabGroup extends HTMLElement {
    */
   #prevTab() {
     const tabs = this.#allTabs();
-    let newIdx = tabs.findIndex(tab => tab.selected) - 1;
+    let newIdx = this.activation === 'manual'
+      ? tabs.findIndex(tab => tab.matches(':focus')) - 1
+      : tabs.findIndex(tab => tab.selected) - 1;
 
     // Keep looping until we find a non-disabled tab.
     while (tabs[(newIdx + tabs.length) % tabs.length].disabled) {
@@ -441,7 +454,9 @@ class TabGroup extends HTMLElement {
    */
   #nextTab() {
     const tabs = this.#allTabs();
-    let newIdx = tabs.findIndex(tab => tab.selected) + 1;
+    let newIdx = this.activation === 'manual'
+      ? tabs.findIndex(tab => tab.matches(':focus')) + 1
+      : tabs.findIndex(tab => tab.selected) + 1;
 
     // Keep looping until we find a non-disabled tab.
     while (tabs[newIdx % tabs.length].disabled) {
@@ -473,32 +488,34 @@ class TabGroup extends HTMLElement {
       case KEYCODE.LEFT:
       case KEYCODE.UP:
         tab = this.#prevTab();
+        this.activation === 'manual' ? tab.focus() : this.selectTab(tab);
         break;
       case KEYCODE.RIGHT:
       case KEYCODE.DOWN:
         tab = this.#nextTab();
+        this.activation === 'manual' ? tab.focus() : this.selectTab(tab);
         break;
       case KEYCODE.HOME:
         tab = this.#firstTab();
+        this.activation === 'manual' ? tab.focus() : this.selectTab(tab);
         break;
       case KEYCODE.END:
         tab = this.#lastTab();
+        this.activation === 'manual' ? tab.focus() : this.selectTab(tab);
         break;
       case KEYCODE.ENTER:
       case KEYCODE.SPACE:
         tab = evt.target;
+        this.selectTab(tab);
         break;
-      // Any other key press is ignored and passed back to the browser.
       default:
+        // Any other key press is ignored and passed back to the browser.
         return;
     }
 
     // The browser might have some native functionality bound to the arrow keys, home or end.
     // `preventDefault()` is called to prevent the browser from taking any actions.
     evt.preventDefault();
-
-    // Select the new tab, that has been determined in the switch-case.
-    this.selectTab(tab);
 
     if (this.placement === 'top' || this.placement === 'bottom') {
       tab.scrollIntoView();
@@ -511,14 +528,7 @@ class TabGroup extends HTMLElement {
    * @param {MouseEvent} evt The click event.
    */
   #onTabClick = evt => {
-    // Ignore clicks that weren't on a tab element.
-    const tab = evt.target.closest('[role="tab"]');
-
-    if (!tab || tab.disabled || tab.selected) {
-      return;
-    }
-
-    // If it was on a tab element, though, select that tab.
+    const tab = evt.target.closest('a-tab');
     this.selectTab(tab);
   };
 
@@ -587,7 +597,7 @@ class TabGroup extends HTMLElement {
    *
    * @param {HTMLElement} newTab
    */
-  #selectTab(newTab) {
+  #markTabSelected(newTab) {
     // Unselect all tabs and hide all panels.
     this.#reset();
 
@@ -658,7 +668,7 @@ class TabGroup extends HTMLElement {
     const tab = tabs[index];
 
     if (tab && !tab.disabled && !tab.selected) {
-      this.#selectTab(tab);
+      this.#markTabSelected(tab);
 
       this.dispatchEvent(new CustomEvent('a-tab-select', {
         bubbles: true,
@@ -676,7 +686,7 @@ class TabGroup extends HTMLElement {
    */
   selectTab(tab) {
     if (tab && !tab.disabled && !tab.selected) {
-      this.#selectTab(tab);
+      this.#markTabSelected(tab);
 
       tab.focus();
 

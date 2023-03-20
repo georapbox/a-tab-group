@@ -28,6 +28,10 @@ template.innerHTML = /* html */`
  * A `<a-tab>` will automatically generate a unique ID if none is specified.
  */
 class Tab extends HTMLElement {
+  static get observedAttributes() {
+    return ['selected', 'disabled', 'closable'];
+  }
+
   constructor() {
     super();
 
@@ -37,8 +41,23 @@ class Tab extends HTMLElement {
     }
   }
 
-  static get observedAttributes() {
-    return ['selected', 'disabled', 'closable'];
+  connectedCallback() {
+    this.#upgradeProperty('selected');
+    this.#upgradeProperty('disabled');
+    this.#upgradeProperty('closable');
+
+    if (!this.id) {
+      this.id = `a-tab-generated-${tabCounter++}`;
+    }
+
+    this.setAttribute('role', 'tab');
+    this.setAttribute('aria-selected', 'false');
+    this.setAttribute('tabindex', this.disabled ? -1 : 0);
+  }
+
+  disconnectedCallback() {
+    const closeButton = this.shadowRoot.querySelector('.close-tab');
+    closeButton?.removeEventListener('click', this.#onCloseButtonClick);
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -56,33 +75,19 @@ class Tab extends HTMLElement {
         const closeButton = document.createElement('span');
         closeButton.className = 'close-tab';
         closeButton.part = 'close-tab';
-        closeButton.innerHTML = /* html */`<svg part="close-tab-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>`;
+        closeButton.innerHTML = /* html */`
+          <svg part="close-tab-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+          </svg>
+        `;
         this.shadowRoot.appendChild(closeButton);
         closeButton.addEventListener('click', this.#onCloseButtonClick);
       } else {
         const closeButton = this.shadowRoot.querySelector('.close-tab');
+        closeButton?.removeEventListener('click', this.#onCloseButtonClick);
         closeButton?.remove();
       }
     }
-  }
-
-  connectedCallback() {
-    this.#upgradeProperty('selected');
-    this.#upgradeProperty('disabled');
-
-    this.setAttribute('role', 'tab');
-
-    if (!this.id) {
-      this.id = `a-tab-generated-${tabCounter++}`;
-    }
-
-    this.setAttribute('aria-selected', 'false');
-    this.setAttribute('tabindex', this.disabled ? -1 : 0);
-  }
-
-  disconnectedCallback() {
-    const closeButton = this.shadowRoot.querySelector('.close-tab');
-    closeButton?.removeEventListener('click', this.#onCloseButtonClick);
   }
 
   get selected() {
@@ -121,6 +126,11 @@ class Tab extends HTMLElement {
     }
   }
 
+  /**
+   * Handles the click event on the close button.
+   *
+   * @param {MouseEvent} evt The click event.
+   */
   #onCloseButtonClick = evt => {
     evt.stopPropagation();
 
