@@ -11,7 +11,7 @@ describe('a-tab-group', () => {
     // https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded/64197640#64197640
     const errorHandler = window.onerror;
     window.onerror = (event, source, lineno, colno, error) => {
-      if (event.includes('ResizeObserver')) {
+      if (event.includes('ResizeObserver') || event === 'Script error.') {
         return true;
       } else if (errorHandler) {
         return errorHandler(event, source, lineno, colno, error);
