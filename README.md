@@ -126,10 +126,10 @@ a-tab-group a-tab[selected]::part(close-tab) {
 
 | Name | Reflects | Type | Required | Default | Description |
 | ---- | -------- | ---- | -------- | ------- | ----------- |
-| `placement` | ✓ | `'top' \| 'bottom' \| 'start' \| 'end'` | - | `'top'` | The placement of the tabs. |
+| `placement` | ✓ | `'top' \| 'bottom' \| 'start' \| 'end'` | - | `'top'` | The placement of the tabs. The placement is achieved purely with CSS, therefore when stylng the component, you should take into account the `placement` attribute if you plan to support more than one placement, eg `a-tab-group[placement="bottom"] { ... }`. |
 | `noScrollControls`<br>*`no-scroll-controls`* | ✓ | Boolean | - | `false` | Disables the scroll buttons that appear when tabs overflow. |
 | `scrollDistance`<br>*`scroll-distance`* | ✓ | Number | - | `200` | The distance to scroll when the scroll buttons are clicked. It fallsback to the default value if not provided, or its value is `0`. |
-| `activation` | ✓ | `'auto' \| 'manual'` | - | `'auto'` | If set to `'auto'`, navigating the tabs using the keyboard (`Left`, `Right`, `Up`, `Down` arrow keys) will automatically select the tab. If set to `'manual'`, the tab will receive focus but will not be selected until the user presses the `Enter` or `Space` key. |
+| `activation` | ✓ | `'auto' \| 'manual'` | - | `'auto'` | If set to `'auto'`, navigating the tabs using the keyboard (`Left`, `Right`, `Up`, `Down`, `Home`, `End` arrow keys) will automatically select the tab. If set to `'manual'`, the tab will receive focus but will not be selected until the user presses the `Enter` or `Space` key. |
 
 #### &lt;a-tab&gt; properties
 
