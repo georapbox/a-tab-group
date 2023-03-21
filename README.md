@@ -42,7 +42,7 @@ The component will log an error if a `<a-tab>` is not a sibling of a `<a-tab-pan
   <a-tab slot="tab" role="heading" disabled>Tab 3 (disabled)</a-tab>
   <a-tab-panel slot="panel">Panel 3</a-tab-panel>
 
-  <a-tab slot="tab" role="heading">Tab 4</a-tab>
+  <a-tab slot="tab" role="heading" closable>Tab 4</a-tab>
   <a-tab-panel slot="panel">Panel 4</a-tab-panel>
 </a-tab-group>
 ```
