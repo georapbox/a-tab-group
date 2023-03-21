@@ -1,6 +1,17 @@
 import './a-tab';
 import './a-tab-panel.js';
 
+const A_TAB_GROUP = 'a-tab-group';
+const A_TAB = 'a-tab';
+const A_TAB_PANEL = 'a-tab-panel';
+const DEFAULT_SCROLL_DISTANCE = 200;
+const PLACEMENT_TOP = 'top';
+const PLACEMENT_BOTTOM = 'bottom';
+const PLACEMENT_START = 'start';
+const PLACEMENT_END = 'end';
+const ACTIVATION_AUTO = 'auto';
+const ACTIVATION_MANUAL = 'manual';
+
 /**
  * Define key codes to help with handling keyboard events.
  */
@@ -124,51 +135,51 @@ template.innerHTML = /* html */`
       display: block;
     }
 
-    /* placement = top */
+    /* placement="top" */
     .tab-group,
     :host([placement="top"]) .tab-group {
       flex-direction: column;
     }
 
-    /* placement = bottom */
-    :host([placement="bottom"]) .tab-group {
+    /* placement="bottom" */
+    :host([placement="${PLACEMENT_BOTTOM}"]) .tab-group {
       flex-direction: column;
     }
 
-    :host([placement="bottom"]) .tab-group__nav {
+    :host([placement="${PLACEMENT_BOTTOM}"]) .tab-group__nav {
       order: 1;
     }
 
-    /* placement = start */
-    :host([placement="start"]) .tab-group {
+    /* placement="start" */
+    :host([placement="${PLACEMENT_START}"]) .tab-group {
       flex-direction: row;
     }
 
-    :host([placement="start"]) .tab-group__tabs {
+    :host([placement="${PLACEMENT_START}"]) .tab-group__tabs {
       flex-direction: column;
       align-items: flex-start;
     }
 
-    :host([placement="start"]) .tab-group__panels {
+    :host([placement="${PLACEMENT_START}"]) .tab-group__panels {
       flex: 1;
       padding: 0 1rem;
     }
 
-    /* placement = end */
-    :host([placement="end"]) .tab-group {
+    /* placement="end" */
+    :host([placement="${PLACEMENT_END}"]) .tab-group {
       flex-direction: row;
     }
 
-    :host([placement="end"]) .tab-group__nav {
+    :host([placement="${PLACEMENT_END}"]) .tab-group__nav {
       order: 1;
     }
 
-    :host([placement="end"]) .tab-group__tabs {
+    :host([placement="${PLACEMENT_END}"]) .tab-group__tabs {
       flex-direction: column;
       align-items: flex-start;
     }
 
-    :host([placement="end"]) .tab-group__panels {
+    :host([placement="${PLACEMENT_END}"]) .tab-group__panels {
       flex: 1;
       padding: 0 1rem;
     }
@@ -236,7 +247,7 @@ class TabGroup extends HTMLElement {
     tabsContainer.addEventListener('click', this.#onTabClick);
     tabsContainer.addEventListener('keydown', this.#onKeyDown);
     scrollButtons.forEach(el => el.addEventListener('click', this.#onScrollButtonClick));
-    this.addEventListener('a-tab-close', this.#onTabClose);
+    this.addEventListener(`${A_TAB}-close`, this.#onTabClose);
 
     if ('ResizeObserver' in window) {
       this.#resizeObserver = new ResizeObserver(entries => {
@@ -250,7 +261,7 @@ class TabGroup extends HTMLElement {
 
     this.#syncNav();
     this.hidden = this.#allTabs().length === 0;
-    this.placement = this.placement || 'top'; // Set by default to `top` to reflect the default value in the CSS.
+    this.placement = this.placement || PLACEMENT_TOP; // Set by default to `top` to reflect the default value in the CSS.
   }
 
   disconnectedCallback() {
@@ -264,7 +275,7 @@ class TabGroup extends HTMLElement {
     tabsContainer.removeEventListener('click', this.#onTabClick);
     tabsContainer.removeEventListener('keydown', this.#onKeyDown);
     scrollButtons.forEach(el => el.removeEventListener('click', this.#onScrollButtonClick));
-    this.removeEventListener('a-tab-close', this.#onTabClose);
+    this.removeEventListener(`${A_TAB}-close`, this.#onTabClose);
     this.#stopResizeObserver();
   }
 
@@ -299,19 +310,19 @@ class TabGroup extends HTMLElement {
   }
 
   get scrollDistance() {
-    return Math.abs(this.getAttribute('scroll-distance')) || 200;
+    return Math.abs(this.getAttribute('scroll-distance')) || DEFAULT_SCROLL_DISTANCE;
   }
 
   set scrollDistance(value) {
-    this.setAttribute('scroll-distance', Math.abs(value) || 200);
+    this.setAttribute('scroll-distance', Math.abs(value) || DEFAULT_SCROLL_DISTANCE);
   }
 
   get activation() {
-    return this.getAttribute('activation') || 'auto';
+    return this.getAttribute('activation') || ACTIVATION_AUTO;
   }
 
   set activation(value) {
-    this.setAttribute('activation', value || 'auto');
+    this.setAttribute('activation', value || ACTIVATION_AUTO);
   }
 
   #startResizeObserver() {
@@ -347,7 +358,7 @@ class TabGroup extends HTMLElement {
     tabs.forEach(tab => {
       const panel = tab.nextElementSibling;
 
-      if (!panel || panel.tagName.toLowerCase() !== 'a-tab-panel') {
+      if (!panel || panel.tagName.toLowerCase() !== A_TAB_PANEL) {
         return console.error(`Tab #${tab.id} is not a sibling of a <a-tab-panel>`);
       }
 
@@ -367,7 +378,7 @@ class TabGroup extends HTMLElement {
    * @returns {HTMLElement[]} All the panels in the tab group.
    */
   #allPanels() {
-    return Array.from(this.querySelectorAll('a-tab-panel'));
+    return Array.from(this.querySelectorAll(A_TAB_PANEL));
   }
 
   /**
@@ -376,7 +387,7 @@ class TabGroup extends HTMLElement {
    * @returns {HTMLElement[]} All the tabs in the tab group.
    */
   #allTabs() {
-    return Array.from(this.querySelectorAll('a-tab'));
+    return Array.from(this.querySelectorAll(A_TAB));
   }
 
   /**
@@ -423,7 +434,7 @@ class TabGroup extends HTMLElement {
    */
   #prevTab() {
     const tabs = this.#allTabs();
-    let newIdx = this.activation === 'manual'
+    let newIdx = this.activation === ACTIVATION_MANUAL
       ? tabs.findIndex(tab => tab.matches(':focus')) - 1
       : tabs.findIndex(tab => tab.selected) - 1;
 
@@ -444,7 +455,7 @@ class TabGroup extends HTMLElement {
    */
   #nextTab() {
     const tabs = this.#allTabs();
-    let newIdx = this.activation === 'manual'
+    let newIdx = this.activation === ACTIVATION_MANUAL
       ? tabs.findIndex(tab => tab.matches(':focus')) + 1
       : tabs.findIndex(tab => tab.selected) + 1;
 
@@ -463,7 +474,7 @@ class TabGroup extends HTMLElement {
    */
   #onKeyDown = evt => {
     // Ignore any key presses that have a modifier.
-    if (evt.target.tagName.toLowerCase() !== 'a-tab') {
+    if (evt.target.tagName.toLowerCase() !== A_TAB) {
       return;
     }
 
@@ -478,20 +489,20 @@ class TabGroup extends HTMLElement {
       case KEYCODE.LEFT:
       case KEYCODE.UP:
         tab = this.#prevTab();
-        this.activation === 'manual' ? tab.focus() : this.selectTab(tab);
+        this.activation === ACTIVATION_MANUAL ? tab.focus() : this.selectTab(tab);
         break;
       case KEYCODE.RIGHT:
       case KEYCODE.DOWN:
         tab = this.#nextTab();
-        this.activation === 'manual' ? tab.focus() : this.selectTab(tab);
+        this.activation === ACTIVATION_MANUAL ? tab.focus() : this.selectTab(tab);
         break;
       case KEYCODE.HOME:
         tab = this.#firstTab();
-        this.activation === 'manual' ? tab.focus() : this.selectTab(tab);
+        this.activation === ACTIVATION_MANUAL ? tab.focus() : this.selectTab(tab);
         break;
       case KEYCODE.END:
         tab = this.#lastTab();
-        this.activation === 'manual' ? tab.focus() : this.selectTab(tab);
+        this.activation === ACTIVATION_MANUAL ? tab.focus() : this.selectTab(tab);
         break;
       case KEYCODE.ENTER:
       case KEYCODE.SPACE:
@@ -514,7 +525,7 @@ class TabGroup extends HTMLElement {
    * @param {MouseEvent} evt The click event.
    */
   #onTabClick = evt => {
-    const tab = evt.target.closest('a-tab');
+    const tab = evt.target.closest(A_TAB);
     this.selectTab(tab);
   };
 
@@ -531,10 +542,10 @@ class TabGroup extends HTMLElement {
     }
 
     const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
-    const direction = scrollButton.classList.contains('tab-group__scroll-button--start') ? 'start' : 'end';
+    const direction = scrollButton.classList.contains('tab-group__scroll-button--start') ? PLACEMENT_START : PLACEMENT_END;
 
     tabsContainer.scrollBy({
-      left: direction === 'start' ? -this.scrollDistance : this.scrollDistance
+      left: direction === PLACEMENT_START ? -this.scrollDistance : this.scrollDistance
     });
   };
 
@@ -547,7 +558,7 @@ class TabGroup extends HTMLElement {
     const tab = evt.target;
     const panel = this.#panelForTab(tab);
 
-    if (tab && panel.tagName.toLowerCase() === 'a-tab-panel') {
+    if (tab && panel.tagName.toLowerCase() === A_TAB_PANEL) {
       panel.remove();
       tab.remove();
     }
@@ -616,7 +627,7 @@ class TabGroup extends HTMLElement {
     const navContainer = this.shadowRoot.querySelector('.tab-group__nav');
     const scrollButtons = Array.from(this.shadowRoot.querySelectorAll('.tab-group__scroll-button'));
 
-    if (this.noScrollControls || this.placement === 'start' || this.placement === 'end') {
+    if (this.noScrollControls || this.placement === PLACEMENT_START || this.placement === PLACEMENT_END) {
       this.#stopResizeObserver();
       scrollButtons.forEach(el => el.hidden = true);
       navContainer.classList.remove('tab-group__nav--scrollable');
@@ -653,7 +664,7 @@ class TabGroup extends HTMLElement {
     if (tab && !tab.disabled && !tab.selected) {
       this.#markTabSelected(tab);
 
-      this.dispatchEvent(new CustomEvent('a-tab-select', {
+      this.dispatchEvent(new CustomEvent(`${A_TAB}-select`, {
         bubbles: true,
         composed: true,
         detail: { tabId: tab.id }
@@ -673,7 +684,7 @@ class TabGroup extends HTMLElement {
 
       tab.focus();
 
-      this.dispatchEvent(new CustomEvent('a-tab-select', {
+      this.dispatchEvent(new CustomEvent(`${A_TAB}-select`, {
         bubbles: true,
         composed: true,
         detail: { tabId: tab.id }
@@ -682,6 +693,6 @@ class TabGroup extends HTMLElement {
   }
 }
 
-if (window.customElements && !window.customElements.get('a-tab-group')) {
-  window.customElements.define('a-tab-group', TabGroup);
+if (window.customElements && !window.customElements.get(A_TAB_GROUP)) {
+  window.customElements.define(A_TAB_GROUP, TabGroup);
 }

@@ -1,3 +1,4 @@
+const A_TAB_PANEL = 'a-tab-panel';
 let panelCounter = 0;
 
 /**
@@ -17,6 +18,6 @@ class TabPanel extends HTMLElement {
   }
 }
 
-if (window.customElements && !window.customElements.get('a-tab-panel')) {
-  window.customElements.define('a-tab-panel', TabPanel);
+if (window.customElements && !window.customElements.get(A_TAB_PANEL)) {
+  window.customElements.define(A_TAB_PANEL, TabPanel);
 }

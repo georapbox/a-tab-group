@@ -1,6 +1,6 @@
-let tabCounter = 0;
-
+const A_TAB = 'a-tab';
 const template = document.createElement('template');
+let tabCounter = 0;
 
 template.innerHTML = /* html */`
   <style>
@@ -130,7 +130,7 @@ class Tab extends HTMLElement {
   #onCloseButtonClick = evt => {
     evt.stopPropagation();
 
-    this.dispatchEvent(new CustomEvent('a-tab-close', {
+    this.dispatchEvent(new CustomEvent(`${A_TAB}-close`, {
       bubbles: true,
       composed: true,
       detail: { tabId: this.id }
@@ -152,6 +152,6 @@ class Tab extends HTMLElement {
   }
 }
 
-if (window.customElements && !window.customElements.get('a-tab')) {
-  window.customElements.define('a-tab', Tab);
+if (window.customElements && !window.customElements.get(A_TAB)) {
+  window.customElements.define(A_TAB, Tab);
 }
