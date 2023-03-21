@@ -6,24 +6,16 @@ const consoleEl = document.getElementById('console');
 
 import(componentUrl).then(() => {
   form.addEventListener('input', evt => {
-    if (evt.target.name === 'placement') {
-      tabGroupEl.setAttribute('placement', evt.target.value);
-    }
-
-    if (evt.target.name === 'activation') {
-      tabGroupEl.setAttribute('activation', evt.target.value);
-    }
-
-    if (evt.target.name === 'scroll-distance') {
-      tabGroupEl.setAttribute('scroll-distance', evt.target.value);
-    }
-
-    if (evt.target.name === 'no-scroll-controls') {
-      tabGroupEl.toggleAttribute('no-scroll-controls', evt.target.checked);
-    }
+    const field = evt.target;
 
     if (evt.target.name === 'custom-style') {
-      tabGroupEl.classList.toggle('custom-style', evt.target.checked);
+      return tabGroupEl.classList.toggle('custom-style', evt.target.checked);
+    }
+
+    if (field.type === 'checkbox') {
+      tabGroupEl.toggleAttribute(field.name, field.checked);
+    } else {
+      tabGroupEl.setAttribute(field.name, field.value);
     }
   });
 

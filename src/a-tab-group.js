@@ -473,13 +473,10 @@ class TabGroup extends HTMLElement {
    * @param {KeyboardEvent} evt The keydown event.
    */
   #onKeyDown = evt => {
-    // Ignore any key presses that have a modifier.
-    if (evt.target.tagName.toLowerCase() !== A_TAB) {
-      return;
-    }
-
-    // Don’t handle modifier shortcuts typically used by assistive technology.
-    if (evt.altKey) {
+    if (
+      evt.target.tagName.toLowerCase() !== A_TAB // Ignore any key presses that have a modifier.
+      || evt.altKey // Don’t handle modifier shortcuts typically used by assistive technology.
+    ) {
       return;
     }
 
