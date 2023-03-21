@@ -39,7 +39,8 @@ template.innerHTML = /* html */`
     }
 
     :host([hidden]),
-    [hidden] {
+    [hidden],
+    ::slotted([hidden]) {
       display: none !important;
     }
 
