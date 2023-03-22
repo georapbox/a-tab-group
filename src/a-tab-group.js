@@ -48,8 +48,8 @@ template.innerHTML = /* html */`
       --selected-tab-color: #005fcc;
       --selected-tab-bg-color: transparent;
       --tabs-scroll-behavior: smooth;
-      --scroll-button-width: 34px;
-      --scroll-button-height: 34px;
+      --scroll-button-width: 2.125em;
+      --scroll-button-height: 2.125em;
       --scroll-button-inline-offset: 0rem;
 
       display: block;
@@ -78,9 +78,10 @@ template.innerHTML = /* html */`
       transform: translateY(-50%);
       width: var(--scroll-button-width);
       height: var(--scroll-button-height);
+      border: 0;
       z-index: 1;
       background-color: transparent;
-      border: 0;
+      font-size: inherit;
       cursor: pointer;
     }
 
@@ -106,34 +107,6 @@ template.innerHTML = /* html */`
 
     .tab-group__panels {
       padding: 1rem 0;
-    }
-
-    ::slotted(a-tab) {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.375rem 0.75rem;
-      font-size: 1rem;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-
-    ::slotted(a-tab[selected]) {
-      color: var(--selected-tab-color);
-      background-color: var(--selected-tab-bg-color);
-    }
-
-    ::slotted(a-tab[disabled]) {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    ::slotted(a-tab-panel) {
-      font-size: 1rem;
-    }
-
-    ::slotted(a-tab-panel:not([hidden])) {
-      display: block;
     }
 
     /* placement="top" */
@@ -189,7 +162,7 @@ template.innerHTML = /* html */`
   <div part="base" class="tab-group">
     <div class="tab-group__nav">
       <button type="button" part="scroll-button scroll-button--start" class="tab-group__scroll-button tab-group__scroll-button--start" aria-label="Scroll to start">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
           <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
         </svg>
       </button>
@@ -199,7 +172,7 @@ template.innerHTML = /* html */`
       </div>
 
       <button type="button" part="scroll-button scroll-button--end" class="tab-group__scroll-button tab-group__scroll-button--end" aria-label="Scroll to end">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
           <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
         </svg>
       </button>

@@ -4,17 +4,38 @@ let tabCounter = 0;
 
 template.innerHTML = /* html */`
   <style>
-    .close-tab {
+    .tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 0.75rem;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    :host([disabled]) .tab {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    :host([selected]) .tab {
+      color: var(--selected-tab-color);
+      background-color: var(--selected-tab-bg-color);
+    }
+
+    .tab__close {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       padding: 0.25rem;
-      color: initial;
+      font-size: inherit;
       cursor: pointer;
     }
   </style>
 
-  <slot></slot>
+  <div part="base" class="tab">
+    <slot></slot>
+  </div>
 `;
 
 /**
@@ -56,7 +77,7 @@ class Tab extends HTMLElement {
   }
 
   disconnectedCallback() {
-    const closeButton = this.shadowRoot.querySelector('.close-tab');
+    const closeButton = this.shadowRoot.querySelector('.tab__close');
     closeButton?.removeEventListener('click', this.#onCloseButtonClick);
   }
 
@@ -73,13 +94,13 @@ class Tab extends HTMLElement {
     if (name === 'closable' && oldValue !== newValue) {
       if (this.closable) {
         const closeButton = document.createElement('span');
-        closeButton.className = 'close-tab';
+        closeButton.className = 'tab__close';
         closeButton.part = 'close-tab';
-        closeButton.innerHTML = /* html */`<svg part="close-tab-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>`;
-        this.shadowRoot.appendChild(closeButton);
+        closeButton.innerHTML = /* html */`<svg part="close-tab-icon" xmlns="http://www.w3.org/2000/svg" width="0.875em" height="0.875em" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>`;
+        this.shadowRoot.querySelector('.tab').appendChild(closeButton);
         closeButton.addEventListener('click', this.#onCloseButtonClick);
       } else {
-        const closeButton = this.shadowRoot.querySelector('.close-tab');
+        const closeButton = this.shadowRoot.querySelector('.tab__close');
         closeButton?.removeEventListener('click', this.#onCloseButtonClick);
         closeButton?.remove();
       }

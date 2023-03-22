@@ -97,20 +97,18 @@ a-tab-group[placement="end"]::part(panels) {
 }
 
 /* Style tabs */
-a-tab-group a-tab {
-  border-radius: 0.25rem;
-}
-
 a-tab-group[placement="top"] a-tab,
 a-tab-group[placement="bottom"] a-tab {
   margin: 0 0.25rem;
-  justify-content: center;
 }
 
 a-tab-group[placement="start"] a-tab,
 a-tab-group[placement="end"] a-tab {
   margin: 0.25rem 0;
-  justify-content: center;
+}
+
+a-tab-group a-tab::part(base) {
+  border-radius: 0.25rem;
 }
 
 a-tab-group a-tab[selected]::part(close-tab) {
@@ -148,9 +146,11 @@ a-tab-group a-tab[selected]::part(close-tab) {
 
 ### CSS Parts
 
+#### &lt;a-tab-group&gt; CSS Parts
+
 | Name | Description |
 | ---- | ----------- |
-| `base` | The component's base wrapper. |
+| `base` | The tab groups's base wrapper. |
 | `nav` | The tab group's navigation container. |
 | `scroll-button` | The scroll buttons that show when tabs are scrollable. |
 | `scroll-button--start` | The scroll button for scrolling towards the start. |
@@ -158,8 +158,20 @@ a-tab-group a-tab[selected]::part(close-tab) {
 | `scroll-button-icon` | The scroll button icon. |
 | `tabs` | The container that wraps the tabs. |
 | `panels` | The container that wraps the tab panels. |
+
+#### &lt;a-tab&gt; CSS Parts
+
+| Name | Description |
+| ---- | ----------- |
+| `base` | The tab's base wrapper. |
 | `close-tab` | The close tab button. |
 | `close-tab-icon` | The close tab icon. |
+
+#### &lt;a-tab-panel&gt; CSS Parts
+
+| Name | Description |
+| ---- | ----------- |
+| `base` | The tab panel's base wrapper. |
 
 ### CSS Custom Properties
 
@@ -168,8 +180,8 @@ a-tab-group a-tab[selected]::part(close-tab) {
 | `--selected-tab-color` | The color of the selected tab. | `#005fcc` |
 | `--selected-tab-bg-color` | The background color of the selected tab. | `transparent` |
 | `--tabs-scroll-behavior` | The scroll behavior of the tabs. | `smooth` |
-| `--scroll-button-width` | The width of the scroll buttons. | `34px` |
-| `--scroll-button-height` | The height of the scroll buttons. | `34px` |
+| `--scroll-button-width` | The width of the scroll buttons. | `2.125em` |
+| `--scroll-button-height` | The height of the scroll buttons. | `2.125em` |
 | `--scroll-button-inline-offset` | This is the value of the `left` property for the start scroll button and the `right` property for the end scroll button. | `0rem` |
 
 ### Methods

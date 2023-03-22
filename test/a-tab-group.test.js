@@ -334,7 +334,7 @@ describe('a-tab-group', () => {
       expect(el.querySelectorAll('a-tab').length).to.equal(3);
       expect(el.querySelectorAll('a-tab-panel').length).to.equal(3);
 
-      el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.close-tab').click();
+      el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.tab__close').click();
 
       expect(el.querySelectorAll('a-tab').length).to.equal(2);
       expect(el.querySelectorAll('a-tab-panel').length).to.equal(2);
@@ -745,7 +745,7 @@ describe('a-tab-group', () => {
       `);
 
       const listener = oneEvent(el, 'a-tab-close');
-      el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.close-tab').click();
+      el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.tab__close').click();
       const { detail } = await listener;
       expect(detail).to.deep.equal({ tabId: 'tab-2' });
     });

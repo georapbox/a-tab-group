@@ -8,7 +8,8 @@
   box-sizing: border-box;
 }
 
-body.no-js details {
+body.no-js details,
+body.no-js .nav-instructions {
   display: none;
 }
 
@@ -99,21 +100,18 @@ a-tab-group[placement="end"].custom-style::part(panels) {
   border-width: 0 1px 0 0;
 }
 
-a-tab-group.custom-style a-tab {
-
+a-tab-group.custom-style a-tab::part(base) {
   border-radius: 0.25rem;
 }
 
 a-tab-group[placement="top"].custom-style a-tab,
 a-tab-group[placement="bottom"].custom-style a-tab {
   margin: 0 0.25rem;
-  justify-content: center;
 }
 
 a-tab-group[placement="start"].custom-style a-tab,
 a-tab-group[placement="end"].custom-style a-tab {
   margin: 0.25rem 0;
-  justify-content: center;
 }
 
 a-tab-group.custom-style a-tab[selected]::part(close-tab) {
