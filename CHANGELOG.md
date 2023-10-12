@@ -3,6 +3,7 @@
 ## v1.2.0 (2023-10-12)
 
 - Add experimental view transitions on panels via `panel-transition` attribute.
+- Update dev dependencies.
 
 ## v1.1.0 (2023-03-22)
 

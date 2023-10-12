@@ -62,6 +62,8 @@
       }
     }],
     "prefer-const": ["warn"],
-    "no-extra-parens": ["warn", "all"]
+    "no-extra-parens": ["warn", "all"],
+    "wc/no-child-traversal-in-connectedcallback": "off",
+    "wc/no-child-traversal-in-attributechangedcallback": "off"
   }
 }
