@@ -690,7 +690,8 @@ class TabGroup extends HTMLElement {
     if (tab && !tab.disabled && !tab.selected) {
       this.#markTabSelected(tab);
 
-      tab.focus();
+      // Queue a microtask to ensure that the tab is focused on the next tick.
+      setTimeout(() => tab.focus(), 0);
 
       this.dispatchEvent(new CustomEvent(`${A_TAB}-select`, {
         bubbles: true,
