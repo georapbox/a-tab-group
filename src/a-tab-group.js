@@ -630,7 +630,6 @@ class TabGroup extends HTMLElement {
    * If the panel transition is enabled, the callback is called when the transition is complete.
    *
    * @param {function} [callback = () => {}]
-   * @returns {function} The `callback` function or `document.startViewTransition` if the panel transition is enabled.
    */
   #startPanelTransition(callback = () => {}) {
     const isPanelTransitionEnabled = typeof document.startViewTransition === 'function'
@@ -638,11 +637,7 @@ class TabGroup extends HTMLElement {
       && this.#shouldPanelTransitionBeEnabled
       && this.panelTransition;
 
-    if (!isPanelTransitionEnabled) {
-      return callback();
-    }
-
-    return document.startViewTransition(callback);
+    isPanelTransitionEnabled ? document.startViewTransition(callback) : callback();
   }
 
   /**
@@ -669,15 +664,7 @@ class TabGroup extends HTMLElement {
     const tabs = this.#allTabs();
     const tab = tabs[index];
 
-    if (tab && !tab.disabled && !tab.selected) {
-      this.#markTabSelected(tab);
-
-      this.dispatchEvent(new CustomEvent(`${A_TAB}-select`, {
-        bubbles: true,
-        composed: true,
-        detail: { tabId: tab.id }
-      }));
-    }
+    this.selectTab(tab);
   }
 
   /**
