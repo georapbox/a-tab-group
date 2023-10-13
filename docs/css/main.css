@@ -32,6 +32,10 @@ body.no-js a-tab-panel {
   }
 }
 
+.events-container:has(.events:empty) {
+  display: none;
+}
+
 .form-row {
   display: flex;
   flex-wrap: wrap;

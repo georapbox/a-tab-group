@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.2.0 (2023-10-12)
+## v1.2.0 (2023-10-13)
 
 - Add experimental view transitions on panels via `panel-transition` attribute.
 - Update dev dependencies.

@@ -2,7 +2,7 @@ const isLocalhost = window.location.href.includes('127.0.0.1') || window.locatio
 const componentUrl = isLocalhost ? '../../dist/a-tab-group.js' : '../lib/a-tab-group.js';
 const form = document.querySelector('form');
 const tabGroupEl = document.querySelector('a-tab-group');
-const consoleEl = document.getElementById('console');
+const eventsEl = document.getElementById('events');
 
 import(componentUrl).then(() => {
   form.addEventListener('input', evt => {
@@ -19,13 +19,14 @@ import(componentUrl).then(() => {
     }
   });
 
-  document.addEventListener('a-tab-select', evt => {
-    consoleEl.innerHTML = `a-tab-select -> ${JSON.stringify(evt.detail)}`;
-  });
+  const handleEvents = evt => {
+    eventsEl.innerHTML = `${evt.type} => ${JSON.stringify(evt.detail)}`;
+    console.log(`${evt.type} =>`, evt.detail);
+  };
 
-  document.addEventListener('a-tab-close', evt => {
-    consoleEl.innerHTML = `a-tab-close -> ${JSON.stringify(evt.detail)}`;
-  });
+  document.addEventListener('a-tab-select', handleEvents);
+
+  document.addEventListener('a-tab-close', handleEvents);
 }).catch(err => {
   console.error(err);
 });
