@@ -189,6 +189,7 @@ template.innerHTML = /* html */`
  * All children of `<a-tab-group>` should be either `<a-tab>` or `<a-tab-panel>`.
  */
 class TabGroup extends HTMLElement {
+  #shouldPanelTransitionBeEnabled = false; // Ensure that the first time a panel is shown, there will not be a transition.
   #resizeObserver;
 
   static get observedAttributes() {
@@ -209,6 +210,7 @@ class TabGroup extends HTMLElement {
     this.#upgradeProperty('noScrollControls');
     this.#upgradeProperty('scrollDistance');
     this.#upgradeProperty('activation');
+    this.#upgradeProperty('panelTransition');
 
     const tabSlot = this.shadowRoot.querySelector('slot[name=tab]');
     const panelSlot = this.shadowRoot.querySelector('slot[name=panel]');
@@ -216,12 +218,12 @@ class TabGroup extends HTMLElement {
     const navContainer = this.shadowRoot.querySelector('.tab-group__nav');
     const scrollButtons = Array.from(this.shadowRoot.querySelectorAll('.tab-group__scroll-button'));
 
-    tabSlot.addEventListener('slotchange', this.#onSlotChange);
-    panelSlot.addEventListener('slotchange', this.#onSlotChange);
-    tabsContainer.addEventListener('click', this.#onTabClick);
-    tabsContainer.addEventListener('keydown', this.#onKeyDown);
-    scrollButtons.forEach(el => el.addEventListener('click', this.#onScrollButtonClick));
-    this.addEventListener(`${A_TAB}-close`, this.#onTabClose);
+    tabSlot.addEventListener('slotchange', this.#handleSlotChange);
+    panelSlot.addEventListener('slotchange', this.#handleSlotChange);
+    tabsContainer.addEventListener('click', this.#handleTabClick);
+    tabsContainer.addEventListener('keydown', this.#handleKeyDown);
+    scrollButtons.forEach(el => el.addEventListener('click', this.#handleScrollButtonClick));
+    this.addEventListener(`${A_TAB}-close`, this.#handleTabClose);
 
     if ('ResizeObserver' in window) {
       this.#resizeObserver = new ResizeObserver(entries => {
@@ -244,12 +246,12 @@ class TabGroup extends HTMLElement {
     const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
     const scrollButtons = Array.from(this.shadowRoot.querySelectorAll('.tab-group__scroll-button'));
 
-    tabSlot.removeEventListener('slotchange', this.#onSlotChange);
-    panelSlot.removeEventListener('slotchange', this.#onSlotChange);
-    tabsContainer.removeEventListener('click', this.#onTabClick);
-    tabsContainer.removeEventListener('keydown', this.#onKeyDown);
-    scrollButtons.forEach(el => el.removeEventListener('click', this.#onScrollButtonClick));
-    this.removeEventListener(`${A_TAB}-close`, this.#onTabClose);
+    tabSlot.removeEventListener('slotchange', this.#handleSlotChange);
+    panelSlot.removeEventListener('slotchange', this.#handleSlotChange);
+    tabsContainer.removeEventListener('click', this.#handleTabClick);
+    tabsContainer.removeEventListener('keydown', this.#handleKeyDown);
+    scrollButtons.forEach(el => el.removeEventListener('click', this.#handleScrollButtonClick));
+    this.removeEventListener(`${A_TAB}-close`, this.#handleTabClose);
     this.#stopResizeObserver();
   }
 
@@ -297,6 +299,18 @@ class TabGroup extends HTMLElement {
 
   set activation(value) {
     this.setAttribute('activation', value || ACTIVATION_AUTO);
+  }
+
+  get panelTransition() {
+    return this.hasAttribute('panel-transition');
+  }
+
+  set panelTransition(value) {
+    if (value) {
+      this.setAttribute('panel-transition', '');
+    } else {
+      this.removeAttribute('panel-transition');
+    }
   }
 
   #startResizeObserver() {
@@ -446,7 +460,7 @@ class TabGroup extends HTMLElement {
    *
    * @param {KeyboardEvent} evt The keydown event.
    */
-  #onKeyDown = evt => {
+  #handleKeyDown = evt => {
     if (
       evt.target.tagName.toLowerCase() !== A_TAB // Ignore any key presses that have a modifier.
       || evt.altKey // Don’t handle modifier shortcuts typically used by assistive technology.
@@ -495,7 +509,7 @@ class TabGroup extends HTMLElement {
    *
    * @param {MouseEvent} evt The click event.
    */
-  #onTabClick = evt => {
+  #handleTabClick = evt => {
     const tab = evt.target.closest(A_TAB);
     this.selectTab(tab);
   };
@@ -505,7 +519,7 @@ class TabGroup extends HTMLElement {
    *
    * @param {MouseEvent} evt The click event.
    */
-  #onScrollButtonClick = evt => {
+  #handleScrollButtonClick = evt => {
     const scrollButton = evt.target.closest('.tab-group__scroll-button');
 
     if (!scrollButton) {
@@ -525,7 +539,7 @@ class TabGroup extends HTMLElement {
    *
    * @param {MouseEvent} evt The click event.
    */
-  #onTabClose = evt => {
+  #handleTabClose = evt => {
     const tab = evt.target;
     const panel = this.#panelForTab(tab);
 
@@ -539,7 +553,8 @@ class TabGroup extends HTMLElement {
    * Handles the slotchange event on the tab group.
    * This is called every time the user adds or removes a tab or panel.
    */
-  #onSlotChange = () => {
+  #handleSlotChange = () => {
+    this.#shouldPanelTransitionBeEnabled = false;
     this.#linkPanels();
     this.#syncNav();
   };
@@ -553,7 +568,7 @@ class TabGroup extends HTMLElement {
     const panels = this.#allPanels();
 
     tabs.forEach(tab => tab.selected = false);
-    panels.forEach(panel => panel.hidden = true);
+    this.#startPanelTransition(() => panels.forEach(panel => panel.hidden = true));
   }
 
   /**
@@ -566,7 +581,8 @@ class TabGroup extends HTMLElement {
     // Unselect all tabs and hide all panels.
     this.#reset();
 
-    if (!newTab) {
+    // If the tab doesn’t exist or is already selected, abort.
+    if (!newTab || newTab.selected) {
       return;
     }
 
@@ -579,7 +595,8 @@ class TabGroup extends HTMLElement {
     }
 
     newTab.selected = true;
-    newPanel.hidden = false;
+    this.#startPanelTransition(() => newPanel.hidden = false);
+    this.#shouldPanelTransitionBeEnabled = true;
   }
 
   /**
@@ -609,6 +626,21 @@ class TabGroup extends HTMLElement {
   }
 
   /**
+   * Starts the panel transition.
+   * If the panel transition is enabled, the callback is called when the transition is complete.
+   *
+   * @param {function} [callback = () => {}]
+   */
+  #startPanelTransition(callback = () => {}) {
+    const isPanelTransitionEnabled = typeof document.startViewTransition === 'function'
+      && window.matchMedia('(prefers-reduced-motion: no-preference)').matches
+      && this.#shouldPanelTransitionBeEnabled
+      && this.panelTransition;
+
+    isPanelTransitionEnabled ? document.startViewTransition(callback) : callback();
+  }
+
+  /**
    * https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
    * This is to safe guard against cases where, for instance, a framework may have added the element to the page and set a
    * value on one of its properties, but lazy loaded its definition. Without this guard, the upgraded element would miss that
@@ -632,15 +664,7 @@ class TabGroup extends HTMLElement {
     const tabs = this.#allTabs();
     const tab = tabs[index];
 
-    if (tab && !tab.disabled && !tab.selected) {
-      this.#markTabSelected(tab);
-
-      this.dispatchEvent(new CustomEvent(`${A_TAB}-select`, {
-        bubbles: true,
-        composed: true,
-        detail: { tabId: tab.id }
-      }));
-    }
+    this.selectTab(tab);
   }
 
   /**
@@ -653,7 +677,8 @@ class TabGroup extends HTMLElement {
     if (tab && !tab.disabled && !tab.selected) {
       this.#markTabSelected(tab);
 
-      tab.focus();
+      // Queue a microtask to ensure that the tab is focused on the next tick.
+      setTimeout(() => tab.focus(), 0);
 
       this.dispatchEvent(new CustomEvent(`${A_TAB}-select`, {
         bubbles: true,
