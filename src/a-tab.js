@@ -4,6 +4,11 @@ let tabCounter = 0;
 
 template.innerHTML = /* html */`
   <style>
+    :host {
+      display: inline-block;
+      contain: content;
+    }
+
     .tab {
       display: inline-flex;
       align-items: center;
@@ -71,6 +76,7 @@ class Tab extends HTMLElement {
       this.id = `a-tab-generated-${tabCounter++}`;
     }
 
+    this.setAttribute('slot', 'tab');
     this.setAttribute('role', 'tab');
     this.setAttribute('aria-selected', 'false');
     this.setAttribute('tabindex', this.disabled ? -1 : 0);
@@ -176,3 +182,5 @@ class Tab extends HTMLElement {
 if (window.customElements && !window.customElements.get(A_TAB)) {
   window.customElements.define(A_TAB, Tab);
 }
+
+export { Tab };

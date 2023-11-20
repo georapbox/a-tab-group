@@ -3,6 +3,13 @@ const template = document.createElement('template');
 let panelCounter = 0;
 
 template.innerHTML = /* html */`
+  <style>
+    :host {
+      display: block;
+      contain: content;
+    }
+  </style>
+
   <div part="base" class="tab-panel">
     <slot></slot>
   </div>
@@ -22,6 +29,7 @@ class TabPanel extends HTMLElement {
   }
 
   connectedCallback() {
+    this.setAttribute('slot', 'panel');
     this.setAttribute('role', 'tabpanel');
 
     if (!this.id) {
@@ -33,3 +41,5 @@ class TabPanel extends HTMLElement {
 if (window.customElements && !window.customElements.get(A_TAB_PANEL)) {
   window.customElements.define(A_TAB_PANEL, TabPanel);
 }
+
+export { TabPanel };

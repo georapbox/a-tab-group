@@ -54,6 +54,7 @@ template.innerHTML = /* html */`
 
       display: block;
       box-sizing: border-box;
+      contain: content;
     }
 
     .tab-group {
@@ -190,6 +191,8 @@ template.innerHTML = /* html */`
  */
 class TabGroup extends HTMLElement {
   #shouldPanelTransitionBeEnabled = false; // Ensure that the first time a panel is shown, there will not be a transition.
+
+  /** @type {ResizeObserver} */
   #resizeObserver;
 
   static get observedAttributes() {
@@ -200,8 +203,8 @@ class TabGroup extends HTMLElement {
     super();
 
     if (!this.shadowRoot) {
-      this.attachShadow({ mode: 'open' });
-      this.shadowRoot.appendChild(template.content.cloneNode(true));
+      const shadowRoot = this.attachShadow({ mode: 'open' });
+      shadowRoot.appendChild(template.content.cloneNode(true));
     }
   }
 
@@ -692,3 +695,5 @@ class TabGroup extends HTMLElement {
 if (window.customElements && !window.customElements.get(A_TAB_GROUP)) {
   window.customElements.define(A_TAB_GROUP, TabGroup);
 }
+
+export { TabGroup };

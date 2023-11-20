@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v1.3.0 (2023-11-XX)
+
+- Add default display values to host elements (`a-tab`, `a-tab-panel`).
+- Add `contain: content` to host elements (`a-tab-group`, `a-tab`, `a-tab-panel`) to prevent layout thrashing.
+- Provide better ergonomics for `a-tab` and `a-tab-panel` by automatically setting the `slot` attribute to `tab` and `panel` respectively, if not provided.
+
 ## v1.2.0 (2023-10-13)
 
 - Add experimental view transitions on panels via `panel-transition` attribute.
