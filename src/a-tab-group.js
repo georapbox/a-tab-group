@@ -1,4 +1,9 @@
-import './a-tab';
+// @ts-check
+
+/** @typedef {import('./a-tab').Tab} Tab */
+/** @typedef {import('./a-tab-panel').TabPanel} TabPanel */
+
+import './a-tab.js';
 import './a-tab-panel.js';
 
 const A_TAB_GROUP = 'a-tab-group';
@@ -186,18 +191,53 @@ template.innerHTML = /* html */`
 `;
 
 /**
- * Container element for tabs and panels.
- * All children of `<a-tab-group>` should be either `<a-tab>` or `<a-tab-panel>`.
+ * @summary Container element for tabs and panels. All children of <a-tab-group> should be either `<a-tab>` or `<a-tab-panel>`.
+ * @extends HTMLElement
+ *
+ * @tagname a-tab-group
+ *
+ * @property {string} placement - The placement of the tabs.
+ * @property {boolean} noScrollControls - Whether or not the scroll controls are enabled.
+ * @property {number} scrollDistance - The distance in pixels that the tabs will scroll when the scroll buttons are clicked.
+ * @property {string} activation - The activation mode of the tabs.
+ * @property {boolean} panelTransition - Whether or not the panel transition is enabled.
+ *
+ * @attribute placement - Reflects the placement property.
+ * @attribute no-scroll-controls - Reflects the noScrollControls property.
+ * @attribute scroll-distance - Reflects the scrollDistance property.
+ * @attribute activation - Reflects the activation property.
+ * @attribute panel-transition - Reflects the panelTransition property.
+ *
+ * @slot tab - Used for groupping tabs in the tab group. Must be <a-tab> elements.
+ * @slot panel - Used for groupping tab panels in the tab group. Must be <a-tab-panel> elements.
+ *
+ * @csspart base - The component's base wrapper.
+ * @csspart nav - The nav container.
+ * @csspart scroll-button - The scroll button.
+ * @csspart scroll-button--start - The scroll button for scrolling towards the start.
+ * @csspart scroll-button--end - The scroll button for scrolling towards the end.
+ * @csspart scroll-button-icon - The scroll button icon.
+ * @csspart tabs - The tabs container.
+ * @csspart panels - The panels container.
+ *
+ * @cssproperty --selected-tab-color - The color of the selected tab.
+ * @cssproperty --selected-tab-bg-color - The background color of the selected tab.
+ * @cssproperty --tabs-scroll-behavior - The scroll behavior of the tabs container.
+ * @cssproperty --scroll-button-width - The width of the scroll buttons.
+ * @cssproperty --scroll-button-height - The height of the scroll buttons.
+ * @cssproperty --scroll-button-inline-offset - The inline offset of the scroll buttons.
+ *
+ * @fires a-tab-select - Fired when a tab is selected.
+ *
+ * @method selectTabByIndex - Selects the tab at the given index.
+ * @method selectTab - Selects the given tab.
  */
 class TabGroup extends HTMLElement {
+  /** @type {boolean} */
   #shouldPanelTransitionBeEnabled = false; // Ensure that the first time a panel is shown, there will not be a transition.
 
-  /** @type {ResizeObserver} */
-  #resizeObserver;
-
-  static get observedAttributes() {
-    return ['placement', 'no-scroll-controls'];
-  }
+  /** @type {ResizeObserver | null} */
+  #resizeObserver = null;
 
   constructor() {
     super();
@@ -208,56 +248,17 @@ class TabGroup extends HTMLElement {
     }
   }
 
-  connectedCallback() {
-    this.#upgradeProperty('placement');
-    this.#upgradeProperty('noScrollControls');
-    this.#upgradeProperty('scrollDistance');
-    this.#upgradeProperty('activation');
-    this.#upgradeProperty('panelTransition');
-
-    const tabSlot = this.shadowRoot.querySelector('slot[name=tab]');
-    const panelSlot = this.shadowRoot.querySelector('slot[name=panel]');
-    const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
-    const navContainer = this.shadowRoot.querySelector('.tab-group__nav');
-    const scrollButtons = Array.from(this.shadowRoot.querySelectorAll('.tab-group__scroll-button'));
-
-    tabSlot.addEventListener('slotchange', this.#handleSlotChange);
-    panelSlot.addEventListener('slotchange', this.#handleSlotChange);
-    tabsContainer.addEventListener('click', this.#handleTabClick);
-    tabsContainer.addEventListener('keydown', this.#handleKeyDown);
-    scrollButtons.forEach(el => el.addEventListener('click', this.#handleScrollButtonClick));
-    this.addEventListener(`${A_TAB}-close`, this.#handleTabClose);
-
-    if ('ResizeObserver' in window) {
-      this.#resizeObserver = new ResizeObserver(entries => {
-        const entry = entries?.[0];
-        const targetElement = entry?.target;
-        const isElementScrollable = targetElement?.scrollWidth > (entry?.borderBoxSize?.[0]?.inlineSize || targetElement?.clientWidth);
-        scrollButtons.forEach(el => el.hidden = !isElementScrollable);
-        navContainer.classList.toggle('tab-group__nav--scrollable', isElementScrollable);
-      });
-    }
-
-    this.#syncNav();
-    this.hidden = this.#allTabs().length === 0;
-    this.placement = this.placement || PLACEMENT_TOP; // Set by default to `top` to reflect the default value in the CSS.
+  static get observedAttributes() {
+    return ['placement', 'no-scroll-controls'];
   }
 
-  disconnectedCallback() {
-    const tabSlot = this.shadowRoot.querySelector('slot[name=tab]');
-    const panelSlot = this.shadowRoot.querySelector('slot[name=panel]');
-    const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
-    const scrollButtons = Array.from(this.shadowRoot.querySelectorAll('.tab-group__scroll-button'));
-
-    tabSlot.removeEventListener('slotchange', this.#handleSlotChange);
-    panelSlot.removeEventListener('slotchange', this.#handleSlotChange);
-    tabsContainer.removeEventListener('click', this.#handleTabClick);
-    tabsContainer.removeEventListener('keydown', this.#handleKeyDown);
-    scrollButtons.forEach(el => el.removeEventListener('click', this.#handleScrollButtonClick));
-    this.removeEventListener(`${A_TAB}-close`, this.#handleTabClose);
-    this.#stopResizeObserver();
-  }
-
+  /**
+   * Lifecycle method that is called when attributes are changed, added, removed, or replaced.
+   *
+   * @param {string} name - The name of the attribute.
+   * @param {string} oldValue - The old value of the attribute.
+   * @param {string} newValue - The new value of the attribute.
+   */
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'placement' && oldValue !== newValue) {
       this.#syncNav();
@@ -268,14 +269,26 @@ class TabGroup extends HTMLElement {
     }
   }
 
+  /**
+   * @type {string | null} - The placement of the tabs.
+   * @default 'top'
+   * @attribute placement - Reflects the placement property.
+   */
   get placement() {
     return this.getAttribute('placement');
   }
 
   set placement(value) {
-    this.setAttribute('placement', value);
+    if (value != null) {
+      this.setAttribute('placement', value);
+    }
   }
 
+  /**
+   * @type {boolean} - Whether or not the scroll controls are enabled.
+   * @default false
+   * @attribute no-scroll-controls - Reflects the noScrollControls property.
+   */
   get noScrollControls() {
     return this.hasAttribute('no-scroll-controls');
   }
@@ -288,14 +301,25 @@ class TabGroup extends HTMLElement {
     }
   }
 
+  /**
+   * @type {number} - The distance in pixels that the tabs will scroll when the scroll buttons are clicked.
+   * @default 200
+   * @attribute scroll-distance - Reflects the scrollDistance property.
+   */
   get scrollDistance() {
-    return Math.abs(this.getAttribute('scroll-distance')) || DEFAULT_SCROLL_DISTANCE;
+    const value = Number(this.getAttribute('scroll-distance'));
+    return Math.abs(value) || DEFAULT_SCROLL_DISTANCE;
   }
 
   set scrollDistance(value) {
-    this.setAttribute('scroll-distance', Math.abs(value) || DEFAULT_SCROLL_DISTANCE);
+    this.setAttribute('scroll-distance', Math.abs(value).toString() || DEFAULT_SCROLL_DISTANCE.toString());
   }
 
+  /**
+   * @type {string} - The activation mode of the tabs.
+   * @default 'auto'
+   * @attribute activation - Reflects the activation property.
+   */
   get activation() {
     return this.getAttribute('activation') || ACTIVATION_AUTO;
   }
@@ -304,6 +328,11 @@ class TabGroup extends HTMLElement {
     this.setAttribute('activation', value || ACTIVATION_AUTO);
   }
 
+  /**
+   * @type {boolean} - Whether or not the panel transition is enabled.
+   * @default false
+   * @attribute panel-transition - Reflects the panelTransition property.
+   */
   get panelTransition() {
     return this.hasAttribute('panel-transition');
   }
@@ -316,15 +345,74 @@ class TabGroup extends HTMLElement {
     }
   }
 
+  /**
+   * Lifecycle method that is called when the element is first connected to the DOM.
+   */
+  connectedCallback() {
+    this.#upgradeProperty('placement');
+    this.#upgradeProperty('noScrollControls');
+    this.#upgradeProperty('scrollDistance');
+    this.#upgradeProperty('activation');
+    this.#upgradeProperty('panelTransition');
+
+    const tabSlot = this.shadowRoot?.querySelector('slot[name=tab]');
+    const panelSlot = this.shadowRoot?.querySelector('slot[name=panel]');
+    const tabsContainer = this.shadowRoot?.querySelector('.tab-group__tabs');
+    const navContainer = this.shadowRoot?.querySelector('.tab-group__nav');
+    /** @type {HTMLButtonElement[]} */
+    const scrollButtons = Array.from(this.shadowRoot?.querySelectorAll('.tab-group__scroll-button') || []);
+
+    tabSlot?.addEventListener('slotchange', this.#handleSlotChange);
+    panelSlot?.addEventListener('slotchange', this.#handleSlotChange);
+    tabsContainer?.addEventListener('click', this.#handleTabClick);
+    tabsContainer?.addEventListener('keydown', this.#handleKeyDown);
+    scrollButtons.forEach(el => el.addEventListener('click', this.#handleScrollButtonClick));
+    this.addEventListener(`${A_TAB}-close`, this.#handleTabClose);
+
+    if ('ResizeObserver' in window) {
+      this.#resizeObserver = new ResizeObserver(entries => {
+        const entry = entries?.[0];
+        const targetElement = entry?.target;
+        const isElementScrollable = targetElement?.scrollWidth > (entry?.borderBoxSize?.[0]?.inlineSize || targetElement?.clientWidth);
+        scrollButtons.forEach(el => el.hidden = !isElementScrollable);
+        navContainer?.classList.toggle('tab-group__nav--scrollable', isElementScrollable);
+      });
+    }
+
+    this.#syncNav();
+    this.hidden = this.#allTabs().length === 0;
+    this.placement = this.placement || PLACEMENT_TOP; // Set by default to `top` to reflect the default value in the CSS.
+  }
+
+  /**
+   * Lifecycle method that is called when the element is disconnected from the DOM.
+   */
+  disconnectedCallback() {
+    const tabSlot = this.shadowRoot?.querySelector('slot[name=tab]');
+    const panelSlot = this.shadowRoot?.querySelector('slot[name=panel]');
+    const tabsContainer = this.shadowRoot?.querySelector('.tab-group__tabs');
+    const scrollButtons = Array.from(this.shadowRoot?.querySelectorAll('.tab-group__scroll-button') || []);
+
+    tabSlot?.removeEventListener('slotchange', this.#handleSlotChange);
+    panelSlot?.removeEventListener('slotchange', this.#handleSlotChange);
+    tabsContainer?.removeEventListener('click', this.#handleTabClick);
+    tabsContainer?.removeEventListener('keydown', this.#handleKeyDown);
+    scrollButtons.forEach(el => el.removeEventListener('click', this.#handleScrollButtonClick));
+    this.removeEventListener(`${A_TAB}-close`, this.#handleTabClose);
+    this.#stopResizeObserver();
+  }
+
   #startResizeObserver() {
     if (!this.#resizeObserver) {
       return;
     }
 
-    const scrollElement = this.shadowRoot.querySelector('.tab-group__tabs');
+    const scrollElement = this.shadowRoot?.querySelector('.tab-group__tabs');
 
-    this.#resizeObserver.unobserve(scrollElement);
-    this.#resizeObserver.observe(scrollElement);
+    if (scrollElement) {
+      this.#resizeObserver.unobserve(scrollElement);
+      this.#resizeObserver.observe(scrollElement);
+    }
   }
 
   #stopResizeObserver() {
@@ -360,13 +448,15 @@ class TabGroup extends HTMLElement {
     // Get the selected non-disabled tab, or the first non-disabled tab.
     const tab = tabs.find(tab => tab.selected && !tab.disabled) || tabs.find(tab => !tab.disabled);
 
-    this.#markTabSelected(tab);
+    if (tab) {
+      this.#markTabSelected(tab);
+    }
   }
 
   /**
    * Get all panels in the tab group.
    *
-   * @returns {HTMLElement[]} All the panels in the tab group.
+   * @returns {TabPanel[]} All the panels in the tab group.
    */
   #allPanels() {
     return Array.from(this.querySelectorAll(A_TAB_PANEL));
@@ -375,7 +465,7 @@ class TabGroup extends HTMLElement {
   /**
    * Get all tabs in the tab group.
    *
-   * @returns {HTMLElement[]} All the tabs in the tab group.
+   * @returns {Tab[]} All the tabs in the tab group.
    */
   #allTabs() {
     return Array.from(this.querySelectorAll(A_TAB));
@@ -384,8 +474,8 @@ class TabGroup extends HTMLElement {
   /**
    * Get the panel for the given tab.
    *
-   * @param {HTMLElement} tab The tab whose panel is to be returned.
-   * @returns {HTMLElement} The panel controlled by the given tab.
+   * @param {Tab} tab The tab whose panel is to be returned.
+   * @returns {TabPanel | null} The panel controlled by the given tab.
    */
   #panelForTab(tab) {
     const panelId = tab.getAttribute('aria-controls');
@@ -395,7 +485,7 @@ class TabGroup extends HTMLElement {
   /**
    * Get the first non-disabled tab in the tab group.
    *
-   * @returns {HTMLElement} The first tab in the tab group.
+   * @returns {Tab | undefined} The first tab in the tab group.
    */
   #firstTab() {
     const tabs = this.#allTabs();
@@ -405,7 +495,7 @@ class TabGroup extends HTMLElement {
   /**
    * Get the last non-disabled tab in the tab group.
    *
-   * @returns {HTMLElement} The last tab in the tab group.
+   * @returns {Tab | undefined} The last tab in the tab group.
    */
   #lastTab() {
     const tabs = this.#allTabs();
@@ -421,7 +511,7 @@ class TabGroup extends HTMLElement {
    * Get the tab that comes before the currently selected one, wrapping around when reaching the first tab.
    * If the currently selected tab is disabled, the method will skip it.
    *
-   * @returns {HTMLElement} The previous tab.
+   * @returns {Tab} The previous tab.
    */
   #prevTab() {
     const tabs = this.#allTabs();
@@ -442,7 +532,7 @@ class TabGroup extends HTMLElement {
    * Get the tab that comes after the currently selected one, wrapping around when reaching the last tab.
    * If the currently selected tab is disabled, the method will skip it.
    *
-   * @returns {HTMLElement} The next tab.
+   * @returns {Tab} The next tab.
    */
   #nextTab() {
     const tabs = this.#allTabs();
@@ -461,7 +551,7 @@ class TabGroup extends HTMLElement {
   /**
    * Handles key events on the tab group.
    *
-   * @param {KeyboardEvent} evt The keydown event.
+   * @param {any} evt The keydown event.
    */
   #handleKeyDown = evt => {
     if (
@@ -477,25 +567,35 @@ class TabGroup extends HTMLElement {
       case KEYCODE.LEFT:
       case KEYCODE.UP:
         tab = this.#prevTab();
-        this.activation === ACTIVATION_MANUAL ? tab.focus() : this.selectTab(tab);
+        if (tab) {
+          this.activation === ACTIVATION_MANUAL ? tab.focus() : this.selectTab(tab);
+        }
         break;
       case KEYCODE.RIGHT:
       case KEYCODE.DOWN:
         tab = this.#nextTab();
-        this.activation === ACTIVATION_MANUAL ? tab.focus() : this.selectTab(tab);
+        if (tab) {
+          this.activation === ACTIVATION_MANUAL ? tab.focus() : this.selectTab(tab);
+        }
         break;
       case KEYCODE.HOME:
         tab = this.#firstTab();
-        this.activation === ACTIVATION_MANUAL ? tab.focus() : this.selectTab(tab);
+        if (tab) {
+          this.activation === ACTIVATION_MANUAL ? tab.focus() : this.selectTab(tab);
+        }
         break;
       case KEYCODE.END:
         tab = this.#lastTab();
-        this.activation === ACTIVATION_MANUAL ? tab.focus() : this.selectTab(tab);
+        if (tab) {
+          this.activation === ACTIVATION_MANUAL ? tab.focus() : this.selectTab(tab);
+        }
         break;
       case KEYCODE.ENTER:
       case KEYCODE.SPACE:
         tab = evt.target;
-        this.selectTab(tab);
+        if (tab) {
+          this.selectTab(tab);
+        }
         break;
       default:
         // Any other key press is ignored and passed back to the browser.
@@ -510,17 +610,26 @@ class TabGroup extends HTMLElement {
   /**
    * Handles click events on the tab group.
    *
-   * @param {MouseEvent} evt The click event.
+   * @param {Event} evt The click event.
    */
   #handleTabClick = evt => {
-    const tab = evt.target.closest(A_TAB);
-    this.selectTab(tab);
+    /** @type {EventTarget | null} */
+    const target = evt.target;
+
+    if (target instanceof HTMLElement) {
+      /** @type {Tab | null} */
+      const tab = target?.closest(A_TAB);
+
+      if (tab) {
+        this.selectTab(tab);
+      }
+    }
   };
 
   /**
    * Handles the scroll button click event.
    *
-   * @param {MouseEvent} evt The click event.
+   * @param {any} evt The click event.
    */
   #handleScrollButtonClick = evt => {
     const scrollButton = evt.target.closest('.tab-group__scroll-button');
@@ -529,7 +638,12 @@ class TabGroup extends HTMLElement {
       return;
     }
 
-    const tabsContainer = this.shadowRoot.querySelector('.tab-group__tabs');
+    const tabsContainer = this.shadowRoot?.querySelector('.tab-group__tabs');
+
+    if (!tabsContainer) {
+      return;
+    }
+
     const direction = scrollButton.classList.contains('tab-group__scroll-button--start') ? PLACEMENT_START : PLACEMENT_END;
 
     tabsContainer.scrollBy({
@@ -540,15 +654,18 @@ class TabGroup extends HTMLElement {
   /**
    * Handles the tab close button click event.
    *
-   * @param {MouseEvent} evt The click event.
+   * @param {any} evt The click event.
    */
   #handleTabClose = evt => {
     const tab = evt.target;
     const panel = this.#panelForTab(tab);
 
-    if (tab && panel.tagName.toLowerCase() === A_TAB_PANEL) {
-      panel.remove();
+    if (tab) {
       tab.remove();
+    }
+
+    if (panel && panel.tagName.toLowerCase() === A_TAB_PANEL) {
+      panel.remove();
     }
   };
 
@@ -578,7 +695,7 @@ class TabGroup extends HTMLElement {
    * Marks the given tab as selected.
    * Additionally, it unhides the panel corresponding to the given tab.
    *
-   * @param {HTMLElement} newTab
+   * @param {Tab} newTab - The tab to be selected.
    */
   #markTabSelected(newTab) {
     // Unselect all tabs and hide all panels.
@@ -615,13 +732,15 @@ class TabGroup extends HTMLElement {
    * otherwise they are hidden and the resize observer is stopped.
    */
   #syncNav() {
-    const navContainer = this.shadowRoot.querySelector('.tab-group__nav');
-    const scrollButtons = Array.from(this.shadowRoot.querySelectorAll('.tab-group__scroll-button'));
+    const navContainer = this.shadowRoot?.querySelector('.tab-group__nav');
+
+    /** @type {HTMLButtonElement[]} */
+    const scrollButtons = Array.from(this.shadowRoot?.querySelectorAll('.tab-group__scroll-button') || []);
 
     if (this.noScrollControls || this.placement === PLACEMENT_START || this.placement === PLACEMENT_END) {
       this.#stopResizeObserver();
       scrollButtons.forEach(el => el.hidden = true);
-      navContainer.classList.remove('tab-group__nav--scrollable');
+      navContainer?.classList.remove('tab-group__nav--scrollable');
     } else {
       this.#startResizeObserver();
       scrollButtons.forEach(el => el.hidden = false);
@@ -635,25 +754,33 @@ class TabGroup extends HTMLElement {
    * @param {function} [callback = () => {}]
    */
   #startPanelTransition(callback = () => {}) {
+    // @ts-ignore
     const isPanelTransitionEnabled = typeof document.startViewTransition === 'function'
       && window.matchMedia('(prefers-reduced-motion: no-preference)').matches
       && this.#shouldPanelTransitionBeEnabled
       && this.panelTransition;
 
+    // @ts-ignore
     isPanelTransitionEnabled ? document.startViewTransition(callback) : callback();
   }
 
   /**
-   * https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
    * This is to safe guard against cases where, for instance, a framework may have added the element to the page and set a
    * value on one of its properties, but lazy loaded its definition. Without this guard, the upgraded element would miss that
    * property and the instance property would prevent the class property setter from ever being called.
+   *
+   * https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
+   *
+   * @param {'placement' | 'noScrollControls' | 'scrollDistance' | 'activation' | 'panelTransition'} prop - The property to upgrade.
    */
   #upgradeProperty(prop) {
-    if (Object.prototype.hasOwnProperty.call(this, prop)) {
-      const value = this[prop];
-      delete this[prop];
-      this[prop] = value;
+    /** @type {any} */
+    const instance = this;
+
+    if (Object.prototype.hasOwnProperty.call(instance, prop)) {
+      const value = instance[prop];
+      delete instance[prop];
+      instance[prop] = value;
     }
   }
 
@@ -674,7 +801,7 @@ class TabGroup extends HTMLElement {
    * Selects the given tab.
    * If the given tab is disabled or already selected, this method does nothing.
    *
-   * @param {HTMLElement} tab The tab to be selected.
+   * @param {Tab} tab The tab to be selected.
    */
   selectTab(tab) {
     if (tab && !tab.disabled && !tab.selected) {
