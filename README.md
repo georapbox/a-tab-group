@@ -49,95 +49,7 @@ The component will log an error if a `<a-tab>` is not a sibling of a `<a-tab-pan
 
 ### Style
 
-By default, the component comes with the bare minimum styling. However, you can customise the styles of the various elements of the component using either [CSS Parts](#css-parts) or [CSS Custom Properties](#css-custom-properties).
-
-Below is an example of how you can customise the styles of the component using CSS Custom Properties and CSS Parts.
-
-```css
-/* Style tab group */
-a-tab-group {
-  --selected-tab-color: #ffffff;
-  --selected-tab-bg-color: #005fcc;
-  --scroll-button-inline-offset: 0.25rem;
-
-  border: 1px solid #dee2e6;
-  border-radius: 0.25rem;
-  background-color: #ffffff;
-  overflow: hidden;
-}
-
-/* Style scroll buttons */
-a-tab-group::part(scroll-button) {
-  border-radius: 0.25rem;
-}
-
-/* Style tabs container */
-a-tab-group::part(tabs) {
-  padding: 0.5rem;
-}
-
-/* Style tab panels container */
-a-tab-group::part(panels) {
-  padding: 1rem;
-  border-width: 1px 0 0 0;
-  border-style: solid;
-  border-color: #dee2e6;
-}
-
-a-tab-group[placement="bottom"]::part(panels) {
-  border-width: 0 0 1px 0;
-}
-
-a-tab-group[placement="start"]::part(panels) {
-  border-width: 0 0 0 1px;
-}
-
-a-tab-group[placement="end"]::part(panels) {
-  border-width: 0 1px 0 0;
-}
-
-/* Style tabs */
-a-tab-group[placement="top"] a-tab,
-a-tab-group[placement="bottom"] a-tab {
-  margin: 0 0.25rem;
-}
-
-a-tab-group[placement="start"] a-tab,
-a-tab-group[placement="end"] a-tab {
-  margin: 0.25rem 0;
-}
-
-a-tab-group a-tab::part(base) {
-  border-radius: 0.25rem;
-}
-
-a-tab-group a-tab[selected]::part(close-tab) {
-  color: var(--selected-tab-color);
-}
-
-/* Custom view transition */
-a-tab-panel {
-  view-transition-name: a-tab-panel;
-}
-
-::view-transition-old(a-tab-panel) {
-  animation: a-tab-panel-exit 0.35s;
-}
-
-::view-transition-new(a-tab-panel) {
-  animation: a-tab-panel-enter 0.35s;
-}
-
-@keyframes a-tab-panel-enter {
-  from { opacity: 0; transform: translateX(20px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes a-tab-panel-exit {
-  from { opacity: 1; transform: translateX(0); }
-  to   { opacity: 0; transform: translateX(-20px); }
-}
-```
+By default, the component comes with the bare minimum styling. However, you can customise the styles of the various elements of the component using either [CSS Parts](#css-parts) or [CSS Custom Properties](#css-custom-properties). You can also check the [demo][demo] for a working example.
 
 ## API
 
@@ -165,8 +77,8 @@ a-tab-panel {
 
 | Name | Description |
 | ---- | ----------- |
-| `tab` | Used for groupping tabs in the tab group. Must be `<a-tab>` elements. |
-| `panel` | Used for groupping tab panels in the tab group. Must be `<a-tab-panel>` elements. |
+| `tab` | Used for groupping tabs in the tab group. Must be `<a-tab>` elements. It will be added automatically if not provided. |
+| `panel` | Used for groupping tab panels in the tab group. Must be `<a-tab-panel>` elements. It will be added automatically if not provided. |
 
 ### CSS Parts
 

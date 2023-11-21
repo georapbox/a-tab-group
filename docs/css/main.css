@@ -8,6 +8,14 @@
   box-sizing: border-box;
 }
 
+.noscript-banner {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--border-radius);
+  background-color: var(--focus);
+  text-align: center;
+}
+
 body.no-js details,
 body.no-js .nav-instructions {
   display: none;
@@ -26,14 +34,18 @@ body.no-js a-tab-panel {
   display: block;
 }
 
+.component-description p {
+  margin: 0 0 0.5rem 0;
+}
+
+.component-description p:last-child {
+  margin-bottom: 0;
+}
+
 @media screen and (max-width: 768px) {
   form {
     flex-direction: column;
   }
-}
-
-.events-container:has(.events:empty) {
-  display: none;
 }
 
 .form-row {
@@ -56,8 +68,23 @@ body.no-js a-tab-panel {
   margin-right: 0;
 }
 
-.tabs-container:not(.no-js) {
-  min-height: 110px;
+browser-window:not(.no-js) {
+  display: block;
+  min-height: 212px;
+}
+
+browser-window::part(base) {
+  border-color: var(--border);
+}
+
+browser-window::part(main) {
+  padding: 0.5rem 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  browser-window {
+    --bw-background: var(--background-alt);
+  }
 }
 
 /* Component custom style */

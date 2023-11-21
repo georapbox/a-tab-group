@@ -1,8 +1,9 @@
+import '../lib/browser-window.js';
+
 const isLocalhost = window.location.href.includes('127.0.0.1') || window.location.href.includes('localhost');
 const componentUrl = isLocalhost ? '../../dist/a-tab-group.js' : '../lib/a-tab-group.js';
 const form = document.querySelector('form');
 const tabGroupEl = document.querySelector('a-tab-group');
-const eventsEl = document.getElementById('events');
 
 import(componentUrl).then(() => {
   form.addEventListener('input', evt => {
@@ -20,7 +21,6 @@ import(componentUrl).then(() => {
   });
 
   const handleEvents = evt => {
-    eventsEl.innerHTML = `${evt.type} => ${JSON.stringify(evt.detail)}`;
     console.log(`${evt.type} =>`, evt.detail);
   };
 
