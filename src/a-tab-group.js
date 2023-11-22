@@ -35,20 +35,6 @@ const template = document.createElement('template');
 
 template.innerHTML = /* html */`
   <style>
-    *,
-    *::after,
-    *::before {
-      box-sizing: inherit;
-      margin: 0;
-      padding: 0;
-    }
-
-    :host([hidden]),
-    [hidden],
-    ::slotted([hidden]) {
-      display: none !important;
-    }
-
     :host {
       --selected-tab-color: #005fcc;
       --selected-tab-bg-color: transparent;
@@ -57,9 +43,21 @@ template.innerHTML = /* html */`
       --scroll-button-height: 2.125em;
       --scroll-button-inline-offset: 0rem;
 
-      display: block;
       box-sizing: border-box;
+      display: block;
       contain: content;
+    }
+
+    :host([hidden]),
+    [hidden],
+    ::slotted([hidden]) {
+      display: none !important;
+    }
+
+    :host *,
+    :host *::before,
+    :host *::after {
+      box-sizing: inherit;
     }
 
     .tab-group {

@@ -10,9 +10,10 @@
 
 - Add default display values to host elements (`a-tab`, `a-tab-panel`).
 - Add `contain: content` to host elements (`a-tab-group`, `a-tab`, `a-tab-panel`) to prevent layout thrashing.
-- Provide better ergonomics for `a-tab` and `a-tab-panel` by automatically setting the `slot` attribute to `tab` and `panel` respectively, if not provided.
+- Provide better ergonomics by automatically setting the `slot` attribute to `a-tab` and `a-tab-panel` respectively, if not provided.
 - Add `nav--scrollable` CSS Part to navigation container when tabs are scrollable, to allow for more specific styling.
 - Generate types declarations for the components.
+- Update dev dependencies.
 
 ## v1.2.0 (2023-10-13)
 

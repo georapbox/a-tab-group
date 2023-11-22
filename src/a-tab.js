@@ -9,8 +9,15 @@ let tabCounter = 0;
 template.innerHTML = /* html */`
   <style>
     :host {
+      box-sizing: border-box;
       display: inline-block;
       contain: content;
+    }
+
+    :host *,
+    :host *::before,
+    :host *::after {
+      box-sizing: inherit;
     }
 
     .tab {

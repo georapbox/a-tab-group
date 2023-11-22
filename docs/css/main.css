@@ -16,7 +16,7 @@
   text-align: center;
 }
 
-body.no-js details,
+body.no-js details:not(.source-code),
 body.no-js .nav-instructions {
   display: none;
 }

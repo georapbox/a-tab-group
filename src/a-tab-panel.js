@@ -9,8 +9,15 @@ let panelCounter = 0;
 template.innerHTML = /* html */`
   <style>
     :host {
+      box-sizing: border-box;
       display: block;
       contain: content;
+    }
+
+    :host *,
+    :host *::before,
+    :host *::after {
+      box-sizing: inherit;
     }
   </style>
 
