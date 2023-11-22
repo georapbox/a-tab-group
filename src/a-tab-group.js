@@ -813,10 +813,14 @@ class TabGroup extends HTMLElement {
       }));
     }
   }
+
+  static defineCustomElement(elementName = A_TAB_GROUP) {
+    if (typeof window !== 'undefined' && !window.customElements.get(elementName)) {
+      window.customElements.define(elementName, TabGroup);
+    }
+  }
 }
 
-if (window.customElements && !window.customElements.get(A_TAB_GROUP)) {
-  window.customElements.define(A_TAB_GROUP, TabGroup);
-}
+TabGroup.defineCustomElement();
 
 export { TabGroup };

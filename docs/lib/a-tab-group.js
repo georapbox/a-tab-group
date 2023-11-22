@@ -1,5 +1,14 @@
-/** @typedef {import('./a-tab').Tab} Tab *//** @typedef {import('./a-tab-panel').TabPanel} TabPanel */
-let t="a-tab",e=document.createElement("template"),s=0;e.innerHTML=/* html */`
+// @ts-check
+/** @typedef {import('./a-tab').Tab} Tab *//** @typedef {import('./a-tab-panel').TabPanel} TabPanel */// @ts-check
+// @ts-check
+/**
+ * Generates a unique id of the form `${prefix}-${randomString}-${suffix}`.
+ *
+ * @param {string} [prefix=''] - The prefix to use for the id.
+ * @param {string} [suffix=''] - The suffix to use for the id.
+ * @returns {string} - The unique id.
+ */let t=(t="",e="")=>{let s=Math.random().toString(36).substring(2,8);// Pseudo-random string of six alphanumeric characters.
+return`${"string"==typeof t&&""!==t?t+"-":""}${s}${"string"==typeof e&&""!==e?"-"+e:""}`},e="a-tab",s=document.createElement("template"),o=0;s.innerHTML=/* html */`
   <style>
     :host {
       display: inline-block;
@@ -61,7 +70,7 @@ let t="a-tab",e=document.createElement("template"),s=0;e.innerHTML=/* html */`
  * @slot - The tab's content.
  *
  * @fires a-tab-close - Fires when the tab's close button is clicked.
- */class o extends HTMLElement{constructor(){if(super(),!this.shadowRoot){let t=this.attachShadow({mode:"open"});t.appendChild(e.content.cloneNode(!0))}}static get observedAttributes(){return["selected","disabled","closable"]}/**
+ */class l extends HTMLElement{constructor(){if(super(),!this.shadowRoot){let t=this.attachShadow({mode:"open"});t.appendChild(s.content.cloneNode(!0))}}static get observedAttributes(){return["selected","disabled","closable"]}/**
    * Lifecycle method that is called when attributes are changed, added, removed, or replaced.
    *
    * @param {string} name - The name of the attribute.
@@ -69,7 +78,7 @@ let t="a-tab",e=document.createElement("template"),s=0;e.innerHTML=/* html */`
    * @param {string} newValue - The new value of the attribute.
    */attributeChangedCallback(t,e,s){if("selected"===t&&e!==s&&this.setAttribute("aria-selected",this.selected.toString()),"disabled"===t&&e!==s&&(this.setAttribute("aria-disabled",this.disabled.toString()),this.setAttribute("tabindex",this.disabled?"-1":"0")),"closable"===t&&e!==s){if(this.closable){let t=document.createElement("span");t.className="tab__close",t.setAttribute("part","close-tab"),t.innerHTML=/* html */'<svg part="close-tab-icon" xmlns="http://www.w3.org/2000/svg" width="0.875em" height="0.875em" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>',this.shadowRoot?.querySelector(".tab")?.appendChild(t),t.addEventListener("click",this.#t)}else{let t=this.shadowRoot?.querySelector(".tab__close");t?.removeEventListener("click",this.#t),t?.remove()}}}/**
    * Lifecycle method that is called when the element is first connected to the DOM.
-   */connectedCallback(){this.#e("selected"),this.#e("disabled"),this.#e("closable"),this.id||(this.id=`a-tab-generated-${s++}`),this.setAttribute("slot","tab"),this.setAttribute("role","tab"),this.setAttribute("aria-selected","false"),this.setAttribute("tabindex",this.disabled?"-1":"0")}/**
+   */connectedCallback(){this.#e("selected"),this.#e("disabled"),this.#e("closable"),this.id||(this.id=t("tab",(++o).toString())),this.setAttribute("slot","tab"),this.setAttribute("role","tab"),this.setAttribute("aria-selected","false"),this.setAttribute("tabindex",this.disabled?"-1":"0")}/**
    * Lifecycle method that is called when the element is disconnected from the DOM.
    */disconnectedCallback(){let t=this.shadowRoot?.querySelector(".tab__close");t?.removeEventListener("click",this.#t)}/**
    * @type {boolean} - Whether the tab is selected.
@@ -87,7 +96,7 @@ let t="a-tab",e=document.createElement("template"),s=0;e.innerHTML=/* html */`
    * Handles the click event on the close button.
    *
    * @param {Event} evt The click event.
-   */#t=e=>{e.stopPropagation(),this.dispatchEvent(new CustomEvent(`${t}-close`,{bubbles:!0,composed:!0,detail:{tabId:this.id}}))};/**
+   */#t=t=>{t.stopPropagation(),this.dispatchEvent(new CustomEvent(`${e}-close`,{bubbles:!0,composed:!0,detail:{tabId:this.id}}))};/**
    * This is to safe guard against cases where, for instance, a framework may have added the element to the page and set a
    * value on one of its properties, but lazy loaded its definition. Without this guard, the upgraded element would miss that
    * property and the instance property would prevent the class property setter from ever being called.
@@ -95,8 +104,8 @@ let t="a-tab",e=document.createElement("template"),s=0;e.innerHTML=/* html */`
    * https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
    *
    * @param {'selected' | 'disabled' | 'closable'} prop - The property to upgrade.
-   */#e(t){if(Object.prototype.hasOwnProperty.call(this,t)){let e=this[t];delete this[t],this[t]=e}}}window.customElements&&!window.customElements.get(t)&&window.customElements.define(t,o);
-let l="a-tab-panel",a=document.createElement("template"),r=0;a.innerHTML=/* html */`
+   */#e(t){if(Object.prototype.hasOwnProperty.call(this,t)){let e=this[t];delete this[t],this[t]=e}}static defineCustomElement(t=e){"undefined"==typeof window||window.customElements.get(t)||window.customElements.define(t,l)}}l.defineCustomElement();// @ts-check
+let a="a-tab-panel",r=document.createElement("template"),i=0;r.innerHTML=/* html */`
   <style>
     :host {
       display: block;
@@ -116,9 +125,9 @@ let l="a-tab-panel",a=document.createElement("template"),r=0;a.innerHTML=/* html
  * @csspart base - The component's base wrapper.
  *
  * @slot - The content of the tab panel.
- */class i extends HTMLElement{constructor(){if(super(),!this.shadowRoot){let t=this.attachShadow({mode:"open"});t.appendChild(a.content.cloneNode(!0))}}/**
+ */class n extends HTMLElement{constructor(){if(super(),!this.shadowRoot){let t=this.attachShadow({mode:"open"});t.appendChild(r.content.cloneNode(!0))}}/**
    * Lifecycle method that is called when the element is first connected to the DOM.
-   */connectedCallback(){this.setAttribute("slot","panel"),this.setAttribute("role","tabpanel"),this.id||(this.id=`a-tab-panel-generated-${r++}`)}}window.customElements&&!window.customElements.get(l)&&window.customElements.define(l,i);let n="a-tab-group",c="a-tab",d="a-tab-panel",h="bottom",b="start",u="auto",p="manual",g={DOWN:"ArrowDown",LEFT:"ArrowLeft",RIGHT:"ArrowRight",UP:"ArrowUp",HOME:"Home",END:"End",ENTER:"Enter",SPACE:"Space"},m=document.createElement("template");m.innerHTML=/* html */`
+   */connectedCallback(){this.setAttribute("slot","panel"),this.setAttribute("role","tabpanel"),this.id||(this.id=t("panel",(++i).toString()))}static defineCustomElement(t=a){"undefined"==typeof window||window.customElements.get(t)||window.customElements.define(t,n)}}n.defineCustomElement();let c="a-tab-group",d="a-tab",h="a-tab-panel",b="bottom",u="start",p="auto",g="manual",m={DOWN:"ArrowDown",LEFT:"ArrowLeft",RIGHT:"ArrowRight",UP:"ArrowUp",HOME:"Home",END:"End",ENTER:"Enter",SPACE:"Space"},v=document.createElement("template");v.innerHTML=/* html */`
   <style>
     *,
     *::after,
@@ -207,25 +216,25 @@ let l="a-tab-panel",a=document.createElement("template"),r=0;a.innerHTML=/* html
     }
 
     /* placement="bottom" */
-    :host([placement="${h}"]) .tab-group {
+    :host([placement="${b}"]) .tab-group {
       flex-direction: column;
     }
 
-    :host([placement="${h}"]) .tab-group__nav {
+    :host([placement="${b}"]) .tab-group__nav {
       order: 1;
     }
 
     /* placement="start" */
-    :host([placement="${b}"]) .tab-group {
+    :host([placement="${u}"]) .tab-group {
       flex-direction: row;
     }
 
-    :host([placement="${b}"]) .tab-group__tabs {
+    :host([placement="${u}"]) .tab-group__tabs {
       flex-direction: column;
       align-items: flex-start;
     }
 
-    :host([placement="${b}"]) .tab-group__panels {
+    :host([placement="${u}"]) .tab-group__panels {
       flex: 1;
       padding: 0 1rem;
     }
@@ -251,7 +260,7 @@ let l="a-tab-panel",a=document.createElement("template"),r=0;a.innerHTML=/* html
   </style>
 
   <div part="base" class="tab-group">
-    <div class="tab-group__nav">
+    <div part="nav" class="tab-group__nav">
       <button type="button" part="scroll-button scroll-button--start" class="tab-group__scroll-button tab-group__scroll-button--start" aria-label="Scroll to start">
         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
           <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
@@ -296,6 +305,7 @@ let l="a-tab-panel",a=document.createElement("template"),r=0;a.innerHTML=/* html
  *
  * @csspart base - The component's base wrapper.
  * @csspart nav - The nav container.
+ * @csspart nav--scrollable - The nav container when it is scrollable.
  * @csspart scroll-button - The scroll button.
  * @csspart scroll-button--start - The scroll button for scrolling towards the start.
  * @csspart scroll-button--end - The scroll button for scrolling towards the end.
@@ -314,7 +324,7 @@ let l="a-tab-panel",a=document.createElement("template"),r=0;a.innerHTML=/* html
  *
  * @method selectTabByIndex - Selects the tab at the given index.
  * @method selectTab - Selects the given tab.
- */class v extends HTMLElement{/** @type {boolean} */#s=!1;/** @type {ResizeObserver | null} */#o=null;constructor(){if(super(),!this.shadowRoot){let t=this.attachShadow({mode:"open"});t.appendChild(m.content.cloneNode(!0))}}static get observedAttributes(){return["placement","no-scroll-controls"]}/**
+ */class f extends HTMLElement{/** @type {boolean} */#s=!1;/** @type {ResizeObserver | null} */#o=null;constructor(){if(super(),!this.shadowRoot){let t=this.attachShadow({mode:"open"});t.appendChild(v.content.cloneNode(!0))}}static get observedAttributes(){return["placement","no-scroll-controls"]}/**
    * Lifecycle method that is called when attributes are changed, added, removed, or replaced.
    *
    * @param {string} name - The name of the attribute.
@@ -336,29 +346,29 @@ let l="a-tab-panel",a=document.createElement("template"),r=0;a.innerHTML=/* html
    * @type {string} - The activation mode of the tabs.
    * @default 'auto'
    * @attribute activation - Reflects the activation property.
-   */get activation(){return this.getAttribute("activation")||u}set activation(t){this.setAttribute("activation",t||u)}/**
+   */get activation(){return this.getAttribute("activation")||p}set activation(t){this.setAttribute("activation",t||p)}/**
    * @type {boolean} - Whether or not the panel transition is enabled.
    * @default false
    * @attribute panel-transition - Reflects the panelTransition property.
    */get panelTransition(){return this.hasAttribute("panel-transition")}set panelTransition(t){t?this.setAttribute("panel-transition",""):this.removeAttribute("panel-transition")}/**
    * Lifecycle method that is called when the element is first connected to the DOM.
-   */connectedCallback(){this.#e("placement"),this.#e("noScrollControls"),this.#e("scrollDistance"),this.#e("activation"),this.#e("panelTransition");let t=this.shadowRoot?.querySelector("slot[name=tab]"),e=this.shadowRoot?.querySelector("slot[name=panel]"),s=this.shadowRoot?.querySelector(".tab-group__tabs"),o=this.shadowRoot?.querySelector(".tab-group__nav"),l=Array.from(this.shadowRoot?.querySelectorAll(".tab-group__scroll-button")||[]);t?.addEventListener("slotchange",this.#a),e?.addEventListener("slotchange",this.#a),s?.addEventListener("click",this.#r),s?.addEventListener("keydown",this.#i),l.forEach(t=>t.addEventListener("click",this.#n)),this.addEventListener(`${c}-close`,this.#c),"ResizeObserver"in window&&(this.#o=new ResizeObserver(t=>{let e=t?.[0],s=e?.target,a=s?.scrollWidth>(e?.borderBoxSize?.[0]?.inlineSize||s?.clientWidth);l.forEach(t=>t.hidden=!a),o?.classList.toggle("tab-group__nav--scrollable",a)})),this.#l(),this.hidden=0===this.#d().length,this.placement=this.placement||"top"}/**
+   */connectedCallback(){this.#e("placement"),this.#e("noScrollControls"),this.#e("scrollDistance"),this.#e("activation"),this.#e("panelTransition");let t=this.shadowRoot?.querySelector("slot[name=tab]"),e=this.shadowRoot?.querySelector("slot[name=panel]"),s=this.shadowRoot?.querySelector(".tab-group__tabs"),o=this.shadowRoot?.querySelector(".tab-group__nav"),l=Array.from(this.shadowRoot?.querySelectorAll(".tab-group__scroll-button")||[]);t?.addEventListener("slotchange",this.#a),e?.addEventListener("slotchange",this.#a),s?.addEventListener("click",this.#r),s?.addEventListener("keydown",this.#i),l.forEach(t=>t.addEventListener("click",this.#n)),this.addEventListener(`${d}-close`,this.#c),"ResizeObserver"in window&&(this.#o=new ResizeObserver(t=>{let e=t?.[0],s=e?.target,a=s?.scrollWidth>(e?.borderBoxSize?.[0]?.inlineSize||s?.clientWidth);l.forEach(t=>t.hidden=!a),o?.part.toggle("nav--scrollable",a),o?.classList.toggle("tab-group__nav--scrollable",a)})),this.#l(),this.hidden=0===this.#d().length,this.placement=this.placement||"top"}/**
    * Lifecycle method that is called when the element is disconnected from the DOM.
-   */disconnectedCallback(){let t=this.shadowRoot?.querySelector("slot[name=tab]"),e=this.shadowRoot?.querySelector("slot[name=panel]"),s=this.shadowRoot?.querySelector(".tab-group__tabs"),o=Array.from(this.shadowRoot?.querySelectorAll(".tab-group__scroll-button")||[]);t?.removeEventListener("slotchange",this.#a),e?.removeEventListener("slotchange",this.#a),s?.removeEventListener("click",this.#r),s?.removeEventListener("keydown",this.#i),o.forEach(t=>t.removeEventListener("click",this.#n)),this.removeEventListener(`${c}-close`,this.#c),this.#h()}#b(){if(!this.#o)return;let t=this.shadowRoot?.querySelector(".tab-group__tabs");t&&(this.#o.unobserve(t),this.#o.observe(t))}#h(){this.#o&&this.#o.disconnect()}/**
+   */disconnectedCallback(){let t=this.shadowRoot?.querySelector("slot[name=tab]"),e=this.shadowRoot?.querySelector("slot[name=panel]"),s=this.shadowRoot?.querySelector(".tab-group__tabs"),o=Array.from(this.shadowRoot?.querySelectorAll(".tab-group__scroll-button")||[]);t?.removeEventListener("slotchange",this.#a),e?.removeEventListener("slotchange",this.#a),s?.removeEventListener("click",this.#r),s?.removeEventListener("keydown",this.#i),o.forEach(t=>t.removeEventListener("click",this.#n)),this.removeEventListener(`${d}-close`,this.#c),this.#h()}#b(){if(!this.#o)return;let t=this.shadowRoot?.querySelector(".tab-group__tabs");t&&(this.#o.unobserve(t),this.#o.observe(t))}#h(){this.#o&&this.#o.disconnect()}/**
    * Links up tabs with their adjacent panels using `aria-controls` and `aria-labelledby`.
    * This method makes sure only one tab is selected at a time.
    */#u(){let t=this.#d();// Hide the tab group if there are no tabs.
 this.hidden=0===t.length,// Give each panel a `aria-labelledby` attribute that refers to the tab that controls it.
-t.forEach(t=>{let e=t.nextElementSibling;if(!e||e.tagName.toLowerCase()!==d)return console.error(`Tab #${t.id} is not a sibling of a <a-tab-panel>`);t.setAttribute("aria-controls",e.id),e.setAttribute("aria-labelledby",t.id)});// Get the selected non-disabled tab, or the first non-disabled tab.
+t.forEach(t=>{let e=t.nextElementSibling;if(!e||e.tagName.toLowerCase()!==h)return console.error(`Tab #${t.id} is not a sibling of a <a-tab-panel>`);t.setAttribute("aria-controls",e.id),e.setAttribute("aria-labelledby",t.id)});// Get the selected non-disabled tab, or the first non-disabled tab.
 let e=t.find(t=>t.selected&&!t.disabled)||t.find(t=>!t.disabled);e&&this.#p(e)}/**
    * Get all panels in the tab group.
    *
    * @returns {TabPanel[]} All the panels in the tab group.
-   */#g(){return Array.from(this.querySelectorAll(d))}/**
+   */#g(){return Array.from(this.querySelectorAll(h))}/**
    * Get all tabs in the tab group.
    *
    * @returns {Tab[]} All the tabs in the tab group.
-   */#d(){return Array.from(this.querySelectorAll(c))}/**
+   */#d(){return Array.from(this.querySelectorAll(d))}/**
    * Get the panel for the given tab.
    *
    * @param {Tab} tab The tab whose panel is to be returned.
@@ -376,36 +386,36 @@ let e=t.find(t=>t.selected&&!t.disabled)||t.find(t=>!t.disabled);e&&this.#p(e)}/
    * If the currently selected tab is disabled, the method will skip it.
    *
    * @returns {Tab} The previous tab.
-   */#w(){let t=this.#d(),e=this.activation===p?t.findIndex(t=>t.matches(":focus"))-1:t.findIndex(t=>t.selected)-1;// Keep looping until we find a non-disabled tab.
+   */#w(){let t=this.#d(),e=this.activation===g?t.findIndex(t=>t.matches(":focus"))-1:t.findIndex(t=>t.selected)-1;// Keep looping until we find a non-disabled tab.
 for(;t[(e+t.length)%t.length].disabled;)e--;// Add `tabs.length` to make sure the index is a positive number and get the modulus to wrap around if necessary.
 return t[(e+t.length)%t.length]}/**
    * Get the tab that comes after the currently selected one, wrapping around when reaching the last tab.
    * If the currently selected tab is disabled, the method will skip it.
    *
    * @returns {Tab} The next tab.
-   */#_(){let t=this.#d(),e=this.activation===p?t.findIndex(t=>t.matches(":focus"))+1:t.findIndex(t=>t.selected)+1;// Keep looping until we find a non-disabled tab.
+   */#_(){let t=this.#d(),e=this.activation===g?t.findIndex(t=>t.matches(":focus"))+1:t.findIndex(t=>t.selected)+1;// Keep looping until we find a non-disabled tab.
 for(;t[e%t.length].disabled;)e++;return t[e%t.length]}/**
    * Handles key events on the tab group.
    *
    * @param {any} evt The keydown event.
-   */#i=t=>{let e;if(t.target.tagName.toLowerCase()===c// Ignore any key presses that have a modifier.
+   */#i=t=>{let e;if(t.target.tagName.toLowerCase()===d// Ignore any key presses that have a modifier.
 &&!t.altKey// Don’t handle modifier shortcuts typically used by assistive technology.
-){switch(t.code){case g.LEFT:case g.UP:(e=this.#w())&&(this.activation===p?e.focus():this.selectTab(e));break;case g.RIGHT:case g.DOWN:(e=this.#_())&&(this.activation===p?e.focus():this.selectTab(e));break;case g.HOME:(e=this.#v())&&(this.activation===p?e.focus():this.selectTab(e));break;case g.END:(e=this.#f())&&(this.activation===p?e.focus():this.selectTab(e));break;case g.ENTER:case g.SPACE:(e=t.target)&&this.selectTab(e);break;default:// Any other key press is ignored and passed back to the browser.
+){switch(t.code){case m.LEFT:case m.UP:(e=this.#w())&&(this.activation===g?e.focus():this.selectTab(e));break;case m.RIGHT:case m.DOWN:(e=this.#_())&&(this.activation===g?e.focus():this.selectTab(e));break;case m.HOME:(e=this.#v())&&(this.activation===g?e.focus():this.selectTab(e));break;case m.END:(e=this.#f())&&(this.activation===g?e.focus():this.selectTab(e));break;case m.ENTER:case m.SPACE:(e=t.target)&&this.selectTab(e);break;default:// Any other key press is ignored and passed back to the browser.
 return}// The browser might have some native functionality bound to the arrow keys, home or end.
 // `preventDefault()` is called to prevent the browser from taking any actions.
 t.preventDefault()}};/**
    * Handles click events on the tab group.
    *
-   * @param {Event} evt The click event.
-   */#r=t=>{/** @type {EventTarget | null} */let e=t.target;if(e instanceof HTMLElement){/** @type {Tab | null} */let t=e?.closest(c);t&&this.selectTab(t)}};/**
+   * @param {any} evt The click event.
+   */#r=t=>{let e=t.target.closest(d);e&&this.selectTab(e)};/**
    * Handles the scroll button click event.
    *
    * @param {any} evt The click event.
-   */#n=t=>{let e=t.target.closest(".tab-group__scroll-button");if(!e)return;let s=this.shadowRoot?.querySelector(".tab-group__tabs");if(!s)return;let o=e.classList.contains("tab-group__scroll-button--start")?b:"end";s.scrollBy({left:o===b?-this.scrollDistance:this.scrollDistance})};/**
+   */#n=t=>{let e=t.target.closest(".tab-group__scroll-button");if(!e)return;let s=this.shadowRoot?.querySelector(".tab-group__tabs");if(!s)return;let o=e.classList.contains("tab-group__scroll-button--start")?u:"end";s.scrollBy({left:o===u?-this.scrollDistance:this.scrollDistance})};/**
    * Handles the tab close button click event.
    *
    * @param {any} evt The click event.
-   */#c=t=>{let e=t.target,s=this.#m(e);e&&e.remove(),s&&s.tagName.toLowerCase()===d&&s.remove()};/**
+   */#c=t=>{let e=t.target,s=this.#m(e);e&&e.remove(),s&&s.tagName.toLowerCase()===h&&s.remove()};/**
    * Handles the slotchange event on the tab group.
    * This is called every time the user adds or removes a tab or panel.
    */#a=()=>{this.#s=!1,this.#u(),this.#l()};/**
@@ -430,7 +440,7 @@ let e=this.#m(t);e&&(t.selected=!0,this.#E(()=>e.hidden=!1),this.#s=!0)}/**
    * If the tabs container is scrollable and the scroll controls are enabled,
    * the scroll buttons are displayed and the resize observer is started,
    * otherwise they are hidden and the resize observer is stopped.
-   */#l(){let t=this.shadowRoot?.querySelector(".tab-group__nav"),e=Array.from(this.shadowRoot?.querySelectorAll(".tab-group__scroll-button")||[]);this.noScrollControls||this.placement===b||"end"===this.placement?(this.#h(),e.forEach(t=>t.hidden=!0),t?.classList.remove("tab-group__nav--scrollable")):(this.#b(),e.forEach(t=>t.hidden=!1))}/**
+   */#l(){let t=this.shadowRoot?.querySelector(".tab-group__nav"),e=Array.from(this.shadowRoot?.querySelectorAll(".tab-group__scroll-button")||[]);this.noScrollControls||this.placement===u||"end"===this.placement?(this.#h(),e.forEach(t=>t.hidden=!0),t?.classList.remove("tab-group__nav--scrollable")):(this.#b(),e.forEach(t=>t.hidden=!1))}/**
    * Starts the panel transition.
    * If the panel transition is enabled, the callback is called when the transition is complete.
    *
@@ -456,4 +466,4 @@ e?document.startViewTransition(t):t()}/**
    *
    * @param {Tab} tab The tab to be selected.
    */selectTab(t){!t||t.disabled||t.selected||(this.#p(t),// Queue a microtask to ensure that the tab is focused on the next tick.
-setTimeout(()=>t.focus(),0),this.dispatchEvent(new CustomEvent(`${c}-select`,{bubbles:!0,composed:!0,detail:{tabId:t.id}})))}}window.customElements&&!window.customElements.get(n)&&window.customElements.define(n,v);export{v as TabGroup};
+setTimeout(()=>t.focus(),0),this.dispatchEvent(new CustomEvent(`${d}-select`,{bubbles:!0,composed:!0,detail:{tabId:t.id}})))}static defineCustomElement(t=c){"undefined"==typeof window||window.customElements.get(t)||window.customElements.define(t,f)}}f.defineCustomElement();export{f as TabGroup};
