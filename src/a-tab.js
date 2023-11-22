@@ -1,5 +1,7 @@
 // @ts-check
 
+import { uid } from './utils/uid.js';
+
 const A_TAB = 'a-tab';
 const template = document.createElement('template');
 let tabCounter = 0;
@@ -125,7 +127,7 @@ class Tab extends HTMLElement {
     this.#upgradeProperty('closable');
 
     if (!this.id) {
-      this.id = `a-tab-generated-${tabCounter++}`;
+      this.id = uid('tab', (++tabCounter).toString());
     }
 
     this.setAttribute('slot', 'tab');
@@ -227,10 +229,14 @@ class Tab extends HTMLElement {
       instance[prop] = value;
     }
   }
+
+  static defineCustomElement(elementName = A_TAB) {
+    if (typeof window !== 'undefined' && !window.customElements.get(elementName)) {
+      window.customElements.define(elementName, Tab);
+    }
+  }
 }
 
-if (window.customElements && !window.customElements.get(A_TAB)) {
-  window.customElements.define(A_TAB, Tab);
-}
+Tab.defineCustomElement();
 
 export { Tab };

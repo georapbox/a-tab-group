@@ -1,5 +1,7 @@
 // @ts-check
 
+import { uid } from './utils/uid.js';
+
 const A_TAB_PANEL = 'a-tab-panel';
 const template = document.createElement('template');
 let panelCounter = 0;
@@ -45,13 +47,17 @@ class TabPanel extends HTMLElement {
     this.setAttribute('role', 'tabpanel');
 
     if (!this.id) {
-      this.id = `a-tab-panel-generated-${panelCounter++}`;
+      this.id = uid('panel', (++panelCounter).toString());
+    }
+  }
+
+  static defineCustomElement(elementName = A_TAB_PANEL) {
+    if (typeof window !== 'undefined' && !window.customElements.get(elementName)) {
+      window.customElements.define(elementName, TabPanel);
     }
   }
 }
 
-if (window.customElements && !window.customElements.get(A_TAB_PANEL)) {
-  window.customElements.define(A_TAB_PANEL, TabPanel);
-}
+TabPanel.defineCustomElement();
 
 export { TabPanel };
