@@ -166,7 +166,7 @@ template.innerHTML = /* html */`
   </style>
 
   <div part="base" class="tab-group">
-    <div class="tab-group__nav">
+    <div part="nav" class="tab-group__nav">
       <button type="button" part="scroll-button scroll-button--start" class="tab-group__scroll-button tab-group__scroll-button--start" aria-label="Scroll to start">
         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
           <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
@@ -213,6 +213,7 @@ template.innerHTML = /* html */`
  *
  * @csspart base - The component's base wrapper.
  * @csspart nav - The nav container.
+ * @csspart nav--scrollable - The nav container when it is scrollable.
  * @csspart scroll-button - The scroll button.
  * @csspart scroll-button--start - The scroll button for scrolling towards the start.
  * @csspart scroll-button--end - The scroll button for scrolling towards the end.
@@ -375,6 +376,7 @@ class TabGroup extends HTMLElement {
         const targetElement = entry?.target;
         const isElementScrollable = targetElement?.scrollWidth > (entry?.borderBoxSize?.[0]?.inlineSize || targetElement?.clientWidth);
         scrollButtons.forEach(el => el.hidden = !isElementScrollable);
+        navContainer?.part.toggle('nav--scrollable', isElementScrollable);
         navContainer?.classList.toggle('tab-group__nav--scrollable', isElementScrollable);
       });
     }
@@ -610,19 +612,13 @@ class TabGroup extends HTMLElement {
   /**
    * Handles click events on the tab group.
    *
-   * @param {Event} evt The click event.
+   * @param {any} evt The click event.
    */
   #handleTabClick = evt => {
-    /** @type {EventTarget | null} */
-    const target = evt.target;
+    const tab = evt.target.closest(A_TAB);
 
-    if (target instanceof HTMLElement) {
-      /** @type {Tab | null} */
-      const tab = target?.closest(A_TAB);
-
-      if (tab) {
-        this.selectTab(tab);
-      }
+    if (tab) {
+      this.selectTab(tab);
     }
   };
 
