@@ -60,18 +60,18 @@ By default, the component comes with the bare minimum styling. However, you can 
 | Name | Reflects | Type | Required | Default | Description |
 | ---- | -------- | ---- | -------- | ------- | ----------- |
 | `placement` | ✓ | `'top' \| 'bottom' \| 'start' \| 'end'` | - | `'top'` | The placement of the tabs. The placement is achieved purely with CSS, therefore when stylng the component, you should take into account the `placement` attribute if you plan to support more than one placement, eg `a-tab-group[placement="bottom"] { ... }`. |
-| `noScrollControls`<br>*`no-scroll-controls`* | ✓ | Boolean | - | `false` | Disables the scroll buttons that appear when tabs overflow. |
-| `scrollDistance`<br>*`scroll-distance`* | ✓ | Number | - | `200` | The distance to scroll when the scroll buttons are clicked. It fallsback to the default value if not provided, or its value is `0`. |
+| `noScrollControls`<br>*`no-scroll-controls`* | ✓ | boolean | - | `false` | Disables the scroll buttons that appear when tabs overflow. |
+| `scrollDistance`<br>*`scroll-distance`* | ✓ | number | - | `200` | The distance to scroll when the scroll buttons are clicked. It fallsback to the default value if not provided, or its value is `0`. |
 | `activation` | ✓ | `'auto' \| 'manual'` | - | `'auto'` | If set to `'auto'`, navigating the tabs using the keyboard (`Left`, `Right`, `Up`, `Down`, `Home`, `End` arrow keys) will automatically select the tab. If set to `'manual'`, the tab will receive focus but will not be selected until the user presses the `Enter` or `Space` key. |
-| `panelTransition`<br>*`panel-transition`* (Experimental) | ✓ | Boolean | - | `false` | If set to `true`, the tab panels will be animated when switching tabs using the [View Transitions API](https://developer.mozilla.org/docs/Web/API/View_Transitions_API). The animation is a smooth cross-fade which is the default view transition, but you can customize it with CSS as shown in the [example](#style) above. Any animation will be disabled if the browser does not support the View Transitions API or if the user has [reduced motion](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-motion) enabled. |
+| `panelTransition`<br>*`panel-transition`* (Experimental) | ✓ | boolean | - | `false` | If set to `true`, the tab panels will be animated when switching tabs using the [View Transitions API](https://developer.mozilla.org/docs/Web/API/View_Transitions_API). The animation is a smooth cross-fade which is the default view transition, but you can customize it with CSS as shown in the [example](#style) above. Any animation will be disabled if the browser does not support the View Transitions API or if the user has [reduced motion](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-motion) enabled. |
 
 #### &lt;a-tab&gt; properties
 
 | Name | Reflects | Type | Required | Default | Description |
 | ---- | -------- | ---- | -------- | ------- | ----------- |
-| `selected` | ✓ | Boolean | - | `false` | Determines if a tab is selected. Only one tab is selected at a time. If more than one tab is marked as selected, only the first one will be actually selected. If no tab is marked as selected, the first non-disabled tab will be selected by default. If a disabled tab is marked as selected, it will be ignored and the first non-disabled tab will be selected. It is highly recommended to set this property manually only during the initial render. If you need to programmatically select a tab, use the `selectTab` or `selectTabByIndex` methods instead, that will automatically update the `selected` property and link the tab to its corresponding tab panel. |
-| `disabled` | ✓ | Boolean | - | `false` | Determines if a tab is disabled. Disabled tabs cannot be selected. |
-| `closable` | ✓ | Boolean | - | `false` | Determines if a tab is closable. |
+| `selected` | ✓ | boolean | - | `false` | Determines if a tab is selected. Only one tab is selected at a time. If more than one tab is marked as selected, only the first one will be actually selected. If no tab is marked as selected, the first non-disabled tab will be selected by default. If a disabled tab is marked as selected, it will be ignored and the first non-disabled tab will be selected. It is highly recommended to set this property manually only during the initial render. If you need to programmatically select a tab, use the `selectTab`, `selectTabByIndex` or `selectTabById` methods instead, that will automatically update the `selected` property and link the tab to its corresponding tab panel. |
+| `disabled` | ✓ | boolean | - | `false` | Determines if a tab is disabled. Disabled tabs cannot be selected. |
+| `closable` | ✓ | boolean | - | `false` | Determines if a tab is closable. |
 
 ### Slots
 
@@ -125,8 +125,9 @@ By default, the component comes with the bare minimum styling. However, you can 
 
 | Name | Type | Description | Arguments |
 | ---- | ---- | ----------- | --------- |
-| `selectTab`<sup>1</sup> | Prototype | Selects the given tab. If the given tab is disabled or already selected, this method does nothing. | `tab: HTMLElement` |
-| `selectTabByIndex`<sup>1</sup> | Prototype | Selects the tab at the given index. If the tab at the given index is disabled or already selected, this method does nothing. | `index: String` |
+| `selectTab`<sup>1</sup> | Instance | Selects the given tab. If the given tab is disabled or already selected, this method does nothing. | `tab: HTMLElement` |
+| `selectTabByIndex`<sup>1</sup> | Instance | Selects the tab at the given index. If the tab at the given index is disabled or already selected, this method does nothing. | `index: number` |
+| `selectTabById`<sup>1</sup> | Instance | Selects the tab with the given id. If the tab with the given id is disabled or already selected, this method does nothing. This is mostly useful if you provide your own ids to the tabs. | `id: string` |
 
 <sup>1</sup> These methods are only available after the component has been defined. If you need to call these methods before the component has been defined, you can use the `whenDefined` method of the `CustomElementRegistry` interface. For example:
 
@@ -144,10 +145,10 @@ Promise.all([
 
 | Name | Description | Event Detail |
 | ---- | ----------- | ------------ |
-| `a-tab-show` | Emitted when a tab is shown (not in the initial render). | `{tabId: String}` |
-| `a-tab-hide` | Emitted when a tab is hidden. | `{tabId: String}` |
-| `a-tab-close` | Emitted when a tab is closed. | `{tabId: String}` |
-| `a-tab-select` | **DEPRECATED**: It will be removed in the next major version. Use `a-tab-show` instead. | `{tabId: String}` |
+| `a-tab-show` | Emitted when a tab is shown (not in the initial render). | `{tabId: string}` |
+| `a-tab-hide` | Emitted when a tab is hidden. | `{tabId: string}` |
+| `a-tab-close` | Emitted when a tab is closed. | `{tabId: string}` |
+| `a-tab-select` | **DEPRECATED**: It will be removed in the next major version. Use `a-tab-show` instead. | `{tabId: string}` |
 
 ## Changelog
 

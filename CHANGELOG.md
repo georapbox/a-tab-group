@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.3.0 (2023-11-XX)
+## v1.3.0 (2023-11-24)
 
 ### Bug Fixes
 
@@ -14,6 +14,7 @@
 - Add `nav--scrollable` CSS Part to navigation container when tabs are scrollable, to allow for more specific styling.
 - Add `a-tab-show` event to `a-tab` element, which is fired when the tab is shown and deprecate the `a-tab-select` event.
 - Add `a-tab-hide` event to `a-tab` element, which is fired when the tab is hidden.
+- Add `selectTabById()` method to `a-tab-group` element, which selects the tab with the given id.
 - Generate types declarations for the components.
 - Update dev dependencies.
 

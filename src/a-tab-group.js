@@ -230,6 +230,7 @@ template.innerHTML = /* html */`
  * @fires a-tab-hide - Fired when a tab is shown.
  *
  * @method selectTabByIndex - Selects the tab at the given index.
+ * @method selectTabById - Selects the tab with the given id.
  * @method selectTab - Selects the given tab.
  */
 class TabGroup extends HTMLElement {
@@ -776,13 +777,30 @@ class TabGroup extends HTMLElement {
    * Selects the tab at the given index.
    * If the tab at the given index is disabled or already selected, this method does nothing.
    *
-   * @param {Number} index The index of the tab to be selected.
+   * @param {number} index The index of the tab to be selected.
    */
   selectTabByIndex(index) {
     const tabs = this.#allTabs();
     const tab = tabs[index];
 
-    this.selectTab(tab);
+    if (tab) {
+      this.selectTab(tab);
+    }
+  }
+
+  /**
+   * Selects the tab with the given id.
+   * If the tab with the given id is disabled or already selected, this method does nothing.
+   *
+   * @param {string} id
+   */
+  selectTabById(id) {
+    const tabs = this.#allTabs();
+    const tab = tabs.find(tab => tab.id === id);
+
+    if (tab) {
+      this.selectTab(tab);
+    }
   }
 
   /**
@@ -794,14 +812,6 @@ class TabGroup extends HTMLElement {
   selectTab(tab) {
     const oldTab = this.#allTabs().find(t => t.selected);
 
-    if (oldTab) {
-      this.dispatchEvent(new CustomEvent(`${A_TAB}-hide`, {
-        bubbles: true,
-        composed: true,
-        detail: { tabId: oldTab.id }
-      }));
-    }
-
     if (!tab || tab.disabled || tab.selected) {
       return;
     }
@@ -810,6 +820,14 @@ class TabGroup extends HTMLElement {
 
     // Queue a microtask to ensure that the tab is focused on the next tick.
     setTimeout(() => tab.focus(), 0);
+
+    if (oldTab) {
+      this.dispatchEvent(new CustomEvent(`${A_TAB}-hide`, {
+        bubbles: true,
+        composed: true,
+        detail: { tabId: oldTab.id }
+      }));
+    }
 
     this.dispatchEvent(new CustomEvent(`${A_TAB}-show`, {
       bubbles: true,

@@ -286,13 +286,13 @@ describe('a-tab-group', () => {
 
     it('should select tab on click', async () => {
       const el = await fixture(html`
-      <a-tab-group>
-        <a-tab role="heading" selected>Tab 1</a-tab>
-        <a-tab-panel>Panel 1</a-tab-panel>
-        <a-tab role="heading">Tab 2</a-tab>
-        <a-tab-panel>Panel 2</a-tab-panel>
-      </a-tab-group>
-    `);
+        <a-tab-group>
+          <a-tab role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
 
       el.querySelectorAll('a-tab')[1].click();
       await elementUpdated(el);
@@ -306,13 +306,13 @@ describe('a-tab-group', () => {
 
     it('should not select tab on click if disabled', async () => {
       const el = await fixture(html`
-      <a-tab-group>
-        <a-tab role="heading" selected>Tab 1</a-tab>
-        <a-tab-panel>Panel 1</a-tab-panel>
-        <a-tab role="heading" disabled>Tab 2</a-tab>
-        <a-tab-panel>Panel 2</a-tab-panel>
-      </a-tab-group>
-    `);
+        <a-tab-group>
+          <a-tab role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading" disabled>Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
 
       el.querySelectorAll('a-tab')[1].click();
       await elementUpdated(el);
@@ -326,13 +326,13 @@ describe('a-tab-group', () => {
 
     it('should select a tab when calling "selectTab" method', async () => {
       const el = await fixture(html`
-      <a-tab-group>
-        <a-tab role="heading" selected>Tab 1</a-tab>
-        <a-tab-panel>Panel 1</a-tab-panel>
-        <a-tab role="heading">Tab 2</a-tab>
-        <a-tab-panel>Panel 2</a-tab-panel>
-      </a-tab-group>
-    `);
+        <a-tab-group>
+          <a-tab role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
 
       await elementUpdated(el);
 
@@ -347,13 +347,13 @@ describe('a-tab-group', () => {
 
     it('should not select a tab when calling "selectTab" method if tab is disabled', async () => {
       const el = await fixture(html`
-      <a-tab-group>
-        <a-tab role="heading" selected>Tab 1</a-tab>
-        <a-tab-panel>Panel 1</a-tab-panel>
-        <a-tab role="heading" disabled>Tab 2</a-tab>
-        <a-tab-panel>Panel 2</a-tab-panel>
-      </a-tab-group>
-    `);
+        <a-tab-group>
+          <a-tab role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading" disabled>Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
 
       await elementUpdated(el);
 
@@ -368,13 +368,13 @@ describe('a-tab-group', () => {
 
     it('should select a tab when calling "selectTabByIndex" method', async () => {
       const el = await fixture(html`
-      <a-tab-group>
-        <a-tab role="heading" selected>Tab 1</a-tab>
-        <a-tab-panel>Panel 1</a-tab-panel>
-        <a-tab role="heading">Tab 2</a-tab>
-        <a-tab-panel>Panel 2</a-tab-panel>
-      </a-tab-group>
-    `);
+        <a-tab-group>
+          <a-tab role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
 
       await elementUpdated(el);
 
@@ -389,13 +389,13 @@ describe('a-tab-group', () => {
 
     it('should not select a tab when calling "selectTabByIndex" method if tab is disabled', async () => {
       const el = await fixture(html`
-      <a-tab-group>
-        <a-tab role="heading" selected>Tab 1</a-tab>
-        <a-tab-panel>Panel 1</a-tab-panel>
-        <a-tab role="heading" disabled>Tab 2</a-tab>
-        <a-tab-panel>Panel 2</a-tab-panel>
-      </a-tab-group>
-    `);
+        <a-tab-group>
+          <a-tab role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading" disabled>Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
 
       await elementUpdated(el);
 
@@ -408,17 +408,59 @@ describe('a-tab-group', () => {
       expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.true;
     });
 
+    it('should select a tab when calling "selectTabById" method', async () => {
+      const el = await fixture(html`
+        <a-tab-group>
+          <a-tab role="heading" id="tab-1" selected>Tab 1</a-tab>
+          <a-tab-panel id="panel-1">Panel 1</a-tab-panel>
+          <a-tab role="heading" id="tab-2">Tab 2</a-tab>
+          <a-tab-panel id="panel-2">Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
+
+      await elementUpdated(el);
+
+      el.selectTabById('tab-2');
+
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.false;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.true;
+
+      expect(el.querySelectorAll('a-tab')[1].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.false;
+    });
+
+    it('should not select a tab when calling "selectTabById" method if tab is disabled', async () => {
+      const el = await fixture(html`
+        <a-tab-group>
+          <a-tab role="heading" id="tab-1" selected>Tab 1</a-tab>
+          <a-tab-panel id="panel-1">Panel 1</a-tab-panel>
+          <a-tab role="heading" id="tab-2" disabled>Tab 2</a-tab>
+          <a-tab-panel id="panel-2">Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
+
+      await elementUpdated(el);
+
+      el.selectTabById('tab-2');
+
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
+
+      expect(el.querySelectorAll('a-tab')[1].selected).to.be.false;
+      expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.true;
+    });
+
     it('should select the first non-disabled tab if a tab is disabled but also selected', async () => {
       const el = await fixture(html`
-      <a-tab-group>
-        <a-tab role="heading" disabled selected>Tab 1</a-tab>
-        <a-tab-panel>Panel 1</a-tab-panel>
-        <a-tab role="heading">Tab 2</a-tab>
-        <a-tab-panel>Panel 2</a-tab-panel>
-        <a-tab role="heading">Tab 3</a-tab>
-        <a-tab-panel>Panel 3</a-tab-panel>
-      </a-tab-group>
-    `);
+        <a-tab-group>
+          <a-tab role="heading" disabled selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading">Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+        </a-tab-group>
+      `);
 
       // Tab 1 is disabled, so tab 2 should be selected
       expect(el.querySelectorAll('a-tab')[1].selected).to.be.true;
@@ -427,15 +469,15 @@ describe('a-tab-group', () => {
 
     it('should remove a tab and its panel when clicking on the close button', async () => {
       const el = await fixture(html`
-      <a-tab-group>
-        <a-tab role="heading" selected>Tab 1</a-tab>
-        <a-tab-panel>Panel 1</a-tab-panel>
-        <a-tab role="heading" closable>Tab 2</a-tab>
-        <a-tab-panel>Panel 2</a-tab-panel>
-        <a-tab role="heading">Tab 3</a-tab>
-        <a-tab-panel>Panel 3</a-tab-panel>
-      </a-tab-group>
-    `);
+        <a-tab-group>
+          <a-tab role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading" closable>Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading">Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+        </a-tab-group>
+      `);
 
       expect(el.querySelectorAll('a-tab').length).to.equal(3);
       expect(el.querySelectorAll('a-tab-panel').length).to.equal(3);
@@ -771,15 +813,15 @@ describe('a-tab-group', () => {
   describe('scroll functionality', () => {
     it('should display scroll buttons if tabs overflow', async () => {
       const el = await fixture(html`
-      <a-tab-group style="width: 100px;">
-        <a-tab role="heading" selected>Tab 1</a-tab>
-        <a-tab-panel>Panel 1</a-tab-panel>
-        <a-tab role="heading" closable>Tab 2</a-tab>
-        <a-tab-panel>Panel 2</a-tab-panel>
-        <a-tab role="heading">Tab 3</a-tab>
-        <a-tab-panel>Panel 3</a-tab-panel>
-      </a-tab-group>
-    `);
+        <a-tab-group style="width: 100px;">
+          <a-tab role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading" closable>Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading">Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+        </a-tab-group>
+      `);
 
       const scrollButtons = el.shadowRoot.querySelectorAll('.tab-group__scroll-button');
       scrollButtons.forEach((button) => {
@@ -789,15 +831,15 @@ describe('a-tab-group', () => {
 
     it('should not display scroll buttons if tabs overflow when "no-scroll-controls" is set', async () => {
       const el = await fixture(html`
-      <a-tab-group no-scroll-controls style="width: 100px;">
-        <a-tab role="heading" selected>Tab 1</a-tab>
-        <a-tab-panel>Panel 1</a-tab-panel>
-        <a-tab role="heading" closable>Tab 2</a-tab>
-        <a-tab-panel>Panel 2</a-tab-panel>
-        <a-tab role="heading">Tab 3</a-tab>
-        <a-tab-panel>Panel 3</a-tab-panel>
-      </a-tab-group>
-    `);
+        <a-tab-group no-scroll-controls style="width: 100px;">
+          <a-tab role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading" closable>Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading">Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+        </a-tab-group>
+      `);
 
       const scrollButtons = el.shadowRoot.querySelectorAll('.tab-group__scroll-button');
       scrollButtons.forEach((button) => expect(button.hidden).to.be.true);
@@ -805,15 +847,15 @@ describe('a-tab-group', () => {
 
     it('should scroll tabs towards on scroll button click', async () => {
       const el = await fixture(html`
-      <a-tab-group style="width: 100px; --scroll-behavior: auto;">
-        <a-tab role="heading" selected>Tab 1</a-tab>
-        <a-tab-panel>Panel 1</a-tab-panel>
-        <a-tab role="heading" closable>Tab 2</a-tab>
-        <a-tab-panel>Panel 2</a-tab-panel>
-        <a-tab role="heading">Tab 3</a-tab>
-        <a-tab-panel>Panel 3</a-tab-panel>
-      </a-tab-group>
-    `);
+        <a-tab-group style="width: 100px; --scroll-behavior: auto;">
+          <a-tab role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading" closable>Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading">Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+        </a-tab-group>
+      `);
 
       const scrollButton = el.shadowRoot.querySelector('.tab-group__scroll-button--end');
       scrollButton.click();
