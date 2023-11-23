@@ -226,7 +226,8 @@ template.innerHTML = /* html */`
  * @cssproperty --scroll-button-height - The height of the scroll buttons.
  * @cssproperty --scroll-button-inline-offset - The inline offset of the scroll buttons.
  *
- * @fires a-tab-select - Fired when a tab is selected.
+ * @fires a-tab-show - Fired when a tab is shown.
+ * @fires a-tab-hide - Fired when a tab is shown.
  *
  * @method selectTabByIndex - Selects the tab at the given index.
  * @method selectTab - Selects the given tab.
@@ -791,6 +792,16 @@ class TabGroup extends HTMLElement {
    * @param {Tab} tab The tab to be selected.
    */
   selectTab(tab) {
+    const oldTab = this.#allTabs().find(t => t.selected);
+
+    if (oldTab) {
+      this.dispatchEvent(new CustomEvent(`${A_TAB}-hide`, {
+        bubbles: true,
+        composed: true,
+        detail: { tabId: oldTab.id }
+      }));
+    }
+
     if (!tab || tab.disabled || tab.selected) {
       return;
     }
@@ -800,10 +811,20 @@ class TabGroup extends HTMLElement {
     // Queue a microtask to ensure that the tab is focused on the next tick.
     setTimeout(() => tab.focus(), 0);
 
-    this.dispatchEvent(new CustomEvent(`${A_TAB}-select`, {
+    this.dispatchEvent(new CustomEvent(`${A_TAB}-show`, {
       bubbles: true,
       composed: true,
       detail: { tabId: tab.id }
+    }));
+
+    // @deprecated: It will be removed in the next major version.
+    this.dispatchEvent(new CustomEvent(`${A_TAB}-select`, {
+      bubbles: true,
+      composed: true,
+      detail: {
+        tabId: tab.id,
+        deprecationWarning: 'The `a-tab-select` event is deprecated. Please use `a-tab-show` instead.'
+      }
     }));
   }
 

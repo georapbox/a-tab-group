@@ -824,7 +824,7 @@ describe('a-tab-group', () => {
   });
 
   describe('custom events', () => {
-    it('should fire "a-tab-select" event on tab click', async () => {
+    it('should fire "a-tab-show" event when tab is shown', async () => {
       const el = await fixture(html`
         <a-tab-group>
           <a-tab id="tab-1" role="heading" selected>Tab 1</a-tab>
@@ -834,10 +834,26 @@ describe('a-tab-group', () => {
         </a-tab-group>
       `);
 
-      const listener = oneEvent(el, 'a-tab-select');
+      const listener = oneEvent(el, 'a-tab-show');
       el.querySelectorAll('a-tab')[1].click();
       const { detail } = await listener;
       expect(detail).to.deep.equal({ tabId: 'tab-2' });
+    });
+
+    it('should fire "a-tab-hide" event when tab is hidden', async () => {
+      const el = await fixture(html`
+        <a-tab-group>
+          <a-tab id="tab-1" role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel id="panel-1">Panel 1</a-tab-panel>
+          <a-tab id="tab-2" role="heading">Tab 2</a-tab>
+          <a-tab-panel id="panel-2">Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
+
+      const listener = oneEvent(el, 'a-tab-hide');
+      el.querySelectorAll('a-tab')[1].click();
+      const { detail } = await listener;
+      expect(detail).to.deep.equal({ tabId: 'tab-1' });
     });
 
     it('should fire "a-tab-close" event on close button click', async () => {

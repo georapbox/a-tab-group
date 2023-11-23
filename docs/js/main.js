@@ -24,8 +24,8 @@ import(componentUrl).then(() => {
     console.log(`${evt.type} =>`, evt.detail);
   };
 
-  document.addEventListener('a-tab-select', handleEvents);
-
+  document.addEventListener('a-tab-show', handleEvents);
+  document.addEventListener('a-tab-hide', handleEvents);
   document.addEventListener('a-tab-close', handleEvents);
 }).catch(err => {
   console.error(err);

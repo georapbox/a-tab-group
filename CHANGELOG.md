@@ -12,6 +12,8 @@
 - Add `contain: content` to host elements (`a-tab-group`, `a-tab`, `a-tab-panel`) to prevent layout thrashing.
 - Provide better ergonomics by automatically setting the `slot` attribute to `a-tab` and `a-tab-panel` respectively, if not provided.
 - Add `nav--scrollable` CSS Part to navigation container when tabs are scrollable, to allow for more specific styling.
+- Add `a-tab-show` event to `a-tab` element, which is fired when the tab is shown and deprecate the `a-tab-select` event.
+- Add `a-tab-hide` event to `a-tab` element, which is fired when the tab is hidden.
 - Generate types declarations for the components.
 - Update dev dependencies.
 

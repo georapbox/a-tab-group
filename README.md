@@ -144,8 +144,10 @@ Promise.all([
 
 | Name | Description | Event Detail |
 | ---- | ----------- | ------------ |
-| `a-tab-select` | Emitted when a tab is selected (not in the initial render). | `{tabId: String}` |
+| `a-tab-show` | Emitted when a tab is shown (not in the initial render). | `{tabId: String}` |
+| `a-tab-hide` | Emitted when a tab is hidden. | `{tabId: String}` |
 | `a-tab-close` | Emitted when a tab is closed. | `{tabId: String}` |
+| `a-tab-select` | **DEPRECATED**: It will be removed in the next major version. Use `a-tab-show` instead. | `{tabId: String}` |
 
 ## Changelog
 
