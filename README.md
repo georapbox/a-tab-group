@@ -116,7 +116,7 @@ By default, the component comes with the bare minimum styling. However, you can 
 | ---- | ----------- | ------- |
 | `--selected-tab-color` | The color of the selected tab. | `#005fcc` |
 | `--selected-tab-bg-color` | The background color of the selected tab. | `transparent` |
-| `--tabs-scroll-behavior` | The scroll behavior of the tabs. | `smooth` |
+| `--tabs-scroll-behavior` | The scroll behavior of the tabs. If reduce motion is enabled, the scroll behavior will be set to `auto`. | `smooth` |
 | `--scroll-button-width` | The width of the scroll buttons. | `2.125em` |
 | `--scroll-button-height` | The height of the scroll buttons. | `2.125em` |
 | `--scroll-button-inline-offset` | This is the value of the `left` property for the start scroll button and the `right` property for the end scroll button. | `0rem` |

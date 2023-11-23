@@ -48,6 +48,12 @@ template.innerHTML = /* html */`
       contain: content;
     }
 
+    @media (prefers-reduced-motion: reduce) {
+      :host {
+        --tabs-scroll-behavior: auto;
+      }
+    }
+
     :host([hidden]),
     [hidden],
     ::slotted([hidden]) {
@@ -82,11 +88,13 @@ template.innerHTML = /* html */`
       transform: translateY(-50%);
       width: var(--scroll-button-width);
       height: var(--scroll-button-height);
+      padding: 0; /* Required for iOS, otherwise the svg is not visible: https://stackoverflow.com/questions/66532071/flex-svg-behaving-strange-in-ios-safari-14-0-3 */
       border: 0;
       z-index: 1;
       background-color: transparent;
       font-size: inherit;
       cursor: pointer;
+      color: currentColor;
     }
 
     .tab-group__scroll-button--start {
@@ -176,7 +184,7 @@ template.innerHTML = /* html */`
       </div>
 
       <button type="button" part="scroll-button scroll-button--end" class="tab-group__scroll-button tab-group__scroll-button--end" aria-label="Scroll to end">
-        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1em" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
           <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
         </svg>
       </button>
@@ -374,7 +382,7 @@ class TabGroup extends HTMLElement {
       this.#resizeObserver = new ResizeObserver(entries => {
         const entry = entries?.[0];
         const targetElement = entry?.target;
-        const isElementScrollable = targetElement?.scrollWidth > (entry?.borderBoxSize?.[0]?.inlineSize || targetElement?.clientWidth);
+        const isElementScrollable = targetElement?.scrollWidth > targetElement?.clientWidth;
         scrollButtons.forEach(el => el.hidden = !isElementScrollable);
         navContainer?.part.toggle('nav--scrollable', isElementScrollable);
         navContainer?.classList.toggle('tab-group__nav--scrollable', isElementScrollable);
@@ -636,8 +644,11 @@ class TabGroup extends HTMLElement {
     }
 
     const sign = scrollButton.classList.contains('tab-group__scroll-button--start') ? -1 : 1;
+    const offsetLeft = tabsContainer.scrollLeft;
 
-    tabsContainer.scrollBy({ left: sign * this.scrollDistance });
+    tabsContainer.scrollTo({
+      left: offsetLeft + sign * this.scrollDistance
+    });
   };
 
   /**
@@ -812,14 +823,17 @@ class TabGroup extends HTMLElement {
   selectTab(tab) {
     const oldTab = this.#allTabs().find(t => t.selected);
 
-    if (!tab || tab.disabled || tab.selected) {
+    if (!tab || tab.disabled || tab.selected || tab.tagName.toLowerCase() !== A_TAB) {
       return;
     }
 
     this.#markTabSelected(tab);
 
     // Queue a microtask to ensure that the tab is focused on the next tick.
-    setTimeout(() => tab.focus(), 0);
+    setTimeout(() => {
+      tab.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+      tab.focus();
+    }, 0);
 
     if (oldTab) {
       this.dispatchEvent(new CustomEvent(`${A_TAB}-hide`, {

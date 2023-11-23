@@ -1,11 +1,15 @@
 import '../lib/browser-window.js';
 
-const isLocalhost = window.location.href.includes('127.0.0.1') || window.location.href.includes('localhost');
+const isLocalhost = true; // window.location.href.includes('127.0.0.1') || window.location.href.includes('localhost');
 const componentUrl = isLocalhost ? '../../dist/a-tab-group.js' : '../lib/a-tab-group.js';
 const form = document.querySelector('form');
 const tabGroupEl = document.querySelector('a-tab-group');
 
 import(componentUrl).then(() => {
+  form.addEventListener('submit', evt => {
+    evt.preventDefault();
+  });
+
   form.addEventListener('input', evt => {
     const field = evt.target;
 
