@@ -674,8 +674,7 @@ class TabGroup extends HTMLElement {
 
     if (tab) {
       tab.remove();
-
-      this.#dispatchHideEvent(tab.id);
+      tab.selected && this.#dispatchHideEvent(tab.id);
     }
 
     if (panel && panel.tagName.toLowerCase() === A_TAB_PANEL) {
