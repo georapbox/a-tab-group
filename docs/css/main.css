@@ -95,9 +95,6 @@ a-tab-group.custom-style {
   --tab-group-bg-color: #ffffff;
   --scroll-button-inline-offset: 0.25rem;
 
-  --tab-color: red;
-  --tab-panel-color: green;
-
   border: 1px solid var(--tab-group-border-color);
   border-radius: 0.25rem;
   background-color: var(--tab-group-bg-color);

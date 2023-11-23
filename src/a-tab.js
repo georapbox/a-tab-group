@@ -14,6 +14,11 @@ template.innerHTML = /* html */`
       contain: content;
     }
 
+    :host([hidden]),
+    [hidden] {
+      display: none !important;
+    }
+
     :host *,
     :host *::before,
     :host *::after {

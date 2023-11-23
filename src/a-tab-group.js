@@ -627,22 +627,15 @@ class TabGroup extends HTMLElement {
    */
   #handleScrollButtonClick = evt => {
     const scrollButton = evt.target.closest('.tab-group__scroll-button');
-
-    if (!scrollButton) {
-      return;
-    }
-
     const tabsContainer = this.shadowRoot?.querySelector('.tab-group__tabs');
 
-    if (!tabsContainer) {
+    if (!scrollButton || !tabsContainer) {
       return;
     }
 
-    const direction = scrollButton.classList.contains('tab-group__scroll-button--start') ? PLACEMENT_START : PLACEMENT_END;
+    const sign = scrollButton.classList.contains('tab-group__scroll-button--start') ? -1 : 1;
 
-    tabsContainer.scrollBy({
-      left: direction === PLACEMENT_START ? -this.scrollDistance : this.scrollDistance
-    });
+    tabsContainer.scrollBy({ left: sign * this.scrollDistance });
   };
 
   /**
@@ -798,18 +791,20 @@ class TabGroup extends HTMLElement {
    * @param {Tab} tab The tab to be selected.
    */
   selectTab(tab) {
-    if (tab && !tab.disabled && !tab.selected) {
-      this.#markTabSelected(tab);
-
-      // Queue a microtask to ensure that the tab is focused on the next tick.
-      setTimeout(() => tab.focus(), 0);
-
-      this.dispatchEvent(new CustomEvent(`${A_TAB}-select`, {
-        bubbles: true,
-        composed: true,
-        detail: { tabId: tab.id }
-      }));
+    if (!tab || tab.disabled || tab.selected) {
+      return;
     }
+
+    this.#markTabSelected(tab);
+
+    // Queue a microtask to ensure that the tab is focused on the next tick.
+    setTimeout(() => tab.focus(), 0);
+
+    this.dispatchEvent(new CustomEvent(`${A_TAB}-select`, {
+      bubbles: true,
+      composed: true,
+      detail: { tabId: tab.id }
+    }));
   }
 
   static defineCustomElement(elementName = A_TAB_GROUP) {
