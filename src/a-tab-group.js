@@ -243,6 +243,9 @@ class TabGroup extends HTMLElement {
   /** @type {ResizeObserver | null} */
   #resizeObserver = null;
 
+  /** @type {boolean} */
+  #hasTabSlotChangedOnce = false;
+
   constructor() {
     super();
 
@@ -413,8 +416,10 @@ class TabGroup extends HTMLElement {
   /**
    * Links up tabs with their adjacent panels using `aria-controls` and `aria-labelledby`.
    * This method makes sure only one tab is selected at a time.
+   *
+   * @param {boolean} shouldEmitShowEvent - Whether or not show event should be emitted.
    */
-  #linkPanels() {
+  #linkPanels(shouldEmitShowEvent = false) {
     const tabs = this.#allTabs();
 
     // Hide the tab group if there are no tabs.
@@ -436,8 +441,38 @@ class TabGroup extends HTMLElement {
     const tab = tabs.find(tab => tab.selected && !tab.disabled) || tabs.find(tab => !tab.disabled);
 
     if (tab) {
+      if (shouldEmitShowEvent && !tab.selected) {
+        this.#dispatchShowEvent(tab.id);
+      }
+
       this.#markTabSelected(tab);
     }
+  }
+
+  /**
+   * Dispatches the tab show event.
+   *
+   * @param {string} tabId
+   */
+  #dispatchShowEvent(tabId) {
+    this.dispatchEvent(new CustomEvent(`${A_TAB}-show`, {
+      bubbles: true,
+      composed: true,
+      detail: { tabId }
+    }));
+  }
+
+  /**
+   * Dispatches the tab hide event.
+   *
+   * @param {string} tabId
+   */
+  #dispatchHideEvent(tabId) {
+    this.dispatchEvent(new CustomEvent(`${A_TAB}-hide`, {
+      bubbles: true,
+      composed: true,
+      detail: { tabId }
+    }));
   }
 
   /**
@@ -639,6 +674,8 @@ class TabGroup extends HTMLElement {
 
     if (tab) {
       tab.remove();
+
+      this.#dispatchHideEvent(tab.id);
     }
 
     if (panel && panel.tagName.toLowerCase() === A_TAB_PANEL) {
@@ -649,10 +686,18 @@ class TabGroup extends HTMLElement {
   /**
    * Handles the slotchange event on the tab group.
    * This is called every time the user adds or removes a tab or panel.
+   *
+   * @param {any} evt The slotchange event.
    */
-  #handleSlotChange = () => {
-    this.#linkPanels();
+  #handleSlotChange = evt => {
+    const isTabSlot = evt.target.name === 'tab';
+
+    this.#linkPanels(isTabSlot && this.#hasTabSlotChangedOnce);
     this.#syncNav();
+
+    if (isTabSlot) {
+      this.#hasTabSlotChangedOnce = true;
+    }
   };
 
   /**
@@ -671,27 +716,20 @@ class TabGroup extends HTMLElement {
    * Marks the given tab as selected.
    * Additionally, it unhides the panel corresponding to the given tab.
    *
-   * @param {Tab} newTab - The tab to be selected.
+   * @param {Tab} tab - The tab to be selected.
    */
-  #markTabSelected(newTab) {
-    // Unselect all tabs and hide all panels.
+  #markTabSelected(tab) {
     this.#reset();
 
-    // If the tab doesn’t exist or is already selected, abort.
-    if (!newTab || newTab.selected) {
-      return;
+    if (tab && !tab.selected) {
+      tab.selected = true;
     }
 
-    // Get the panel that the `newTab` is associated with.
-    const newPanel = this.#panelForTab(newTab);
+    const panel = this.#panelForTab(tab);
 
-    // If that panel doesn’t exist, abort.
-    if (!newPanel) {
-      return;
+    if (panel) {
+      panel.hidden = false;
     }
-
-    newTab.selected = true;
-    newPanel.hidden = false;
   }
 
   /**
@@ -794,18 +832,10 @@ class TabGroup extends HTMLElement {
     }, 0);
 
     if (oldTab) {
-      this.dispatchEvent(new CustomEvent(`${A_TAB}-hide`, {
-        bubbles: true,
-        composed: true,
-        detail: { tabId: oldTab.id }
-      }));
+      this.#dispatchHideEvent(oldTab.id);
     }
 
-    this.dispatchEvent(new CustomEvent(`${A_TAB}-show`, {
-      bubbles: true,
-      composed: true,
-      detail: { tabId: tab.id }
-    }));
+    this.#dispatchShowEvent(tab.id);
 
     // @deprecated: It will be removed in the next major version.
     this.dispatchEvent(new CustomEvent(`${A_TAB}-select`, {

@@ -1,6 +1,6 @@
 import '../lib/browser-window.js';
 
-const isLocalhost = true; // window.location.href.includes('127.0.0.1') || window.location.href.includes('localhost');
+const isLocalhost = window.location.href.includes('127.0.0.1') || window.location.href.includes('localhost');
 const componentUrl = isLocalhost ? '../../dist/a-tab-group.js' : '../lib/a-tab-group.js';
 const form = document.querySelector('form');
 const tabGroupEl = document.querySelector('a-tab-group');
