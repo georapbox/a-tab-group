@@ -206,13 +206,11 @@ template.innerHTML = /* html */`
  * @property {boolean} noScrollControls - Whether or not the scroll controls are enabled.
  * @property {number} scrollDistance - The distance in pixels that the tabs will scroll when the scroll buttons are clicked.
  * @property {string} activation - The activation mode of the tabs.
- * @property {boolean} panelTransition - Whether or not the panel transition is enabled.
  *
  * @attribute placement - Reflects the placement property.
  * @attribute no-scroll-controls - Reflects the noScrollControls property.
  * @attribute scroll-distance - Reflects the scrollDistance property.
  * @attribute activation - Reflects the activation property.
- * @attribute panel-transition - Reflects the panelTransition property.
  *
  * @slot tab - Used for groupping tabs in the tab group. Must be <a-tab> elements.
  * @slot panel - Used for groupping tab panels in the tab group. Must be <a-tab-panel> elements.
@@ -242,9 +240,6 @@ template.innerHTML = /* html */`
  * @method selectTab - Selects the given tab.
  */
 class TabGroup extends HTMLElement {
-  /** @type {boolean} */
-  #shouldPanelTransitionBeEnabled = false; // Ensure that the first time a panel is shown, there will not be a transition.
-
   /** @type {ResizeObserver | null} */
   #resizeObserver = null;
 
@@ -338,23 +333,6 @@ class TabGroup extends HTMLElement {
   }
 
   /**
-   * @type {boolean} - Whether or not the panel transition is enabled.
-   * @default false
-   * @attribute panel-transition - Reflects the panelTransition property.
-   */
-  get panelTransition() {
-    return this.hasAttribute('panel-transition');
-  }
-
-  set panelTransition(value) {
-    if (value) {
-      this.setAttribute('panel-transition', '');
-    } else {
-      this.removeAttribute('panel-transition');
-    }
-  }
-
-  /**
    * Lifecycle method that is called when the element is first connected to the DOM.
    */
   connectedCallback() {
@@ -362,7 +340,6 @@ class TabGroup extends HTMLElement {
     this.#upgradeProperty('noScrollControls');
     this.#upgradeProperty('scrollDistance');
     this.#upgradeProperty('activation');
-    this.#upgradeProperty('panelTransition');
 
     const tabSlot = this.shadowRoot?.querySelector('slot[name=tab]');
     const panelSlot = this.shadowRoot?.querySelector('slot[name=panel]');
@@ -674,7 +651,6 @@ class TabGroup extends HTMLElement {
    * This is called every time the user adds or removes a tab or panel.
    */
   #handleSlotChange = () => {
-    this.#shouldPanelTransitionBeEnabled = false;
     this.#linkPanels();
     this.#syncNav();
   };
@@ -688,7 +664,7 @@ class TabGroup extends HTMLElement {
     const panels = this.#allPanels();
 
     tabs.forEach(tab => tab.selected = false);
-    this.#startPanelTransition(() => panels.forEach(panel => panel.hidden = true));
+    panels.forEach(panel => panel.hidden = true);
   }
 
   /**
@@ -715,8 +691,7 @@ class TabGroup extends HTMLElement {
     }
 
     newTab.selected = true;
-    this.#startPanelTransition(() => newPanel.hidden = false);
-    this.#shouldPanelTransitionBeEnabled = true;
+    newPanel.hidden = false;
   }
 
   /**
@@ -748,30 +723,13 @@ class TabGroup extends HTMLElement {
   }
 
   /**
-   * Starts the panel transition.
-   * If the panel transition is enabled, the callback is called when the transition is complete.
-   *
-   * @param {function} [callback = () => {}]
-   */
-  #startPanelTransition(callback = () => {}) {
-    // @ts-ignore
-    const isPanelTransitionEnabled = typeof document.startViewTransition === 'function'
-      && window.matchMedia('(prefers-reduced-motion: no-preference)').matches
-      && this.#shouldPanelTransitionBeEnabled
-      && this.panelTransition;
-
-    // @ts-ignore
-    isPanelTransitionEnabled ? document.startViewTransition(callback) : callback();
-  }
-
-  /**
    * This is to safe guard against cases where, for instance, a framework may have added the element to the page and set a
    * value on one of its properties, but lazy loaded its definition. Without this guard, the upgraded element would miss that
    * property and the instance property would prevent the class property setter from ever being called.
    *
    * https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
    *
-   * @param {'placement' | 'noScrollControls' | 'scrollDistance' | 'activation' | 'panelTransition'} prop - The property to upgrade.
+   * @param {'placement' | 'noScrollControls' | 'scrollDistance' | 'activation'} prop - The property to upgrade.
    */
   #upgradeProperty(prop) {
     /** @type {any} */

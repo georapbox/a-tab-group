@@ -112,21 +112,6 @@ describe('a-tab-group', () => {
       await elementUpdated(el);
       expect(el.activation).to.equal('auto');
     });
-
-    it('reflects attribute "panel-transition" to property "panelTransition"', async () => {
-      const el = await fixture(html`<a-tab-group panel-transition></a-tab-group>`);
-      expect(el.panelTransition).to.be.true;
-    });
-
-    it('reflects property "panelTransition" to attribute "panel-transition"', async () => {
-      const el = await fixture(html`<a-tab-group></a-tab-group>`);
-      el.panelTransition = true;
-      await elementUpdated(el);
-      expect(el).to.have.attribute('panel-transition');
-      el.panelTransition = false;
-      await elementUpdated(el);
-      expect(el).to.not.have.attribute('panel-transition');
-    });
   });
 
   describe('slots', () => {

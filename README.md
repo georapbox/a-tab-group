@@ -63,7 +63,6 @@ By default, the component comes with the bare minimum styling. However, you can 
 | `noScrollControls`<br>*`no-scroll-controls`* | ✓ | boolean | - | `false` | Disables the scroll buttons that appear when tabs overflow. |
 | `scrollDistance`<br>*`scroll-distance`* | ✓ | number | - | `200` | The distance to scroll when the scroll buttons are clicked. It fallsback to the default value if not provided, or its value is `0`. |
 | `activation` | ✓ | `'auto' \| 'manual'` | - | `'auto'` | If set to `'auto'`, navigating the tabs using the keyboard (`Left`, `Right`, `Up`, `Down`, `Home`, `End` arrow keys) will automatically select the tab. If set to `'manual'`, the tab will receive focus but will not be selected until the user presses the `Enter` or `Space` key. |
-| `panelTransition`<br>*`panel-transition`* (Experimental) | ✓ | boolean | - | `false` | If set to `true`, the tab panels will be animated when switching tabs using the [View Transitions API](https://developer.mozilla.org/docs/Web/API/View_Transitions_API). The animation is a smooth cross-fade which is the default view transition, but you can customize it with CSS as shown in the [example](#style) above. Any animation will be disabled if the browser does not support the View Transitions API or if the user has [reduced motion](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-motion) enabled. |
 
 #### &lt;a-tab&gt; properties
 
