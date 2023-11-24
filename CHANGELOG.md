@@ -1,10 +1,12 @@
 # CHANGELOG
 
-## v1.3.0 (2023-11-24)
+## v1.3.0 (2023-11-27)
 
 ### Bug Fixes
 
 - Add missing `nav` CSS Part to `a-tab-group` element.
+- Fix navigation scrolling issues on iOS.
+- Fix navigation scroll buttons bug on iOS that caused the buttons to not be visible when the tabs were scrollable.
 
 ### Other Changes
 
@@ -15,7 +17,7 @@
 - Add `a-tab-show` event to `a-tab` element, which is fired when the tab is shown and deprecate the `a-tab-select` event.
 - Add `a-tab-hide` event to `a-tab` element, which is fired when the tab is hidden.
 - Add `selectTabById()` method to `a-tab-group` element, which selects the tab with the given id.
-- Remove experimental view transitions on panels via `panel-transition` attribute.
+- Remove experimental view transitions on panels via `panel-transition` attribute. It was not working as expected and it will be re-evaluated in the future.
 - Generate types declarations for the components.
 - Update dev dependencies.
 

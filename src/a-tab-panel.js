@@ -57,6 +57,7 @@ class TabPanel extends HTMLElement {
   connectedCallback() {
     this.setAttribute('slot', 'panel');
     this.setAttribute('role', 'tabpanel');
+    this.setAttribute('hidden', '');
 
     if (!this.id) {
       this.id = uid('panel', (++panelCounter).toString());

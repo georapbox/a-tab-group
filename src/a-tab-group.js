@@ -301,11 +301,7 @@ class TabGroup extends HTMLElement {
   }
 
   set noScrollControls(value) {
-    if (value) {
-      this.setAttribute('no-scroll-controls', '');
-    } else {
-      this.removeAttribute('no-scroll-controls');
-    }
+    this.toggleAttribute('no-scroll-controls', !!value);
   }
 
   /**
@@ -348,7 +344,6 @@ class TabGroup extends HTMLElement {
     const panelSlot = this.shadowRoot?.querySelector('slot[name=panel]');
     const tabsContainer = this.shadowRoot?.querySelector('.tab-group__tabs');
     const navContainer = this.shadowRoot?.querySelector('.tab-group__nav');
-    /** @type {HTMLButtonElement[]} */
     const scrollButtons = Array.from(this.shadowRoot?.querySelectorAll('.tab-group__scroll-button') || []);
 
     tabSlot?.addEventListener('slotchange', this.#handleSlotChange);
@@ -363,14 +358,14 @@ class TabGroup extends HTMLElement {
         const entry = entries?.[0];
         const targetElement = entry?.target;
         const isElementScrollable = targetElement?.scrollWidth > targetElement?.clientWidth;
-        scrollButtons.forEach(el => el.hidden = !isElementScrollable);
+        scrollButtons.forEach(el => el.toggleAttribute('hidden', !isElementScrollable));
         navContainer?.part.toggle('nav--scrollable', isElementScrollable);
         navContainer?.classList.toggle('tab-group__nav--scrollable', isElementScrollable);
       });
     }
 
+    this.#hideEmptyTabGroup();
     this.#syncNav();
-    this.hidden = this.#allTabs().length === 0;
     this.placement = this.placement || PLACEMENT_TOP; // Set by default to `top` to reflect the default value in the CSS.
   }
 
@@ -414,16 +409,20 @@ class TabGroup extends HTMLElement {
   }
 
   /**
+   * Hides the tab group if there are no tabs.
+   */
+  #hideEmptyTabGroup() {
+    this.hidden = this.#allTabs().length === 0;
+  }
+
+  /**
    * Links up tabs with their adjacent panels using `aria-controls` and `aria-labelledby`.
    * This method makes sure only one tab is selected at a time.
-   *
-   * @param {boolean} shouldEmitShowEvent - Whether or not show event should be emitted.
    */
-  #linkPanels(shouldEmitShowEvent = false) {
+  #linkPanels() {
     const tabs = this.#allTabs();
 
-    // Hide the tab group if there are no tabs.
-    this.hidden = tabs.length === 0;
+    this.#hideEmptyTabGroup();
 
     // Give each panel a `aria-labelledby` attribute that refers to the tab that controls it.
     tabs.forEach(tab => {
@@ -436,43 +435,6 @@ class TabGroup extends HTMLElement {
       tab.setAttribute('aria-controls', panel.id);
       panel.setAttribute('aria-labelledby', tab.id);
     });
-
-    // Get the selected non-disabled tab, or the first non-disabled tab.
-    const tab = tabs.find(tab => tab.selected && !tab.disabled) || tabs.find(tab => !tab.disabled);
-
-    if (tab) {
-      if (shouldEmitShowEvent && !tab.selected) {
-        this.#dispatchShowEvent(tab.id);
-      }
-
-      this.#markTabSelected(tab);
-    }
-  }
-
-  /**
-   * Dispatches the tab show event.
-   *
-   * @param {string} tabId
-   */
-  #dispatchShowEvent(tabId) {
-    this.dispatchEvent(new CustomEvent(`${A_TAB}-show`, {
-      bubbles: true,
-      composed: true,
-      detail: { tabId }
-    }));
-  }
-
-  /**
-   * Dispatches the tab hide event.
-   *
-   * @param {string} tabId
-   */
-  #dispatchHideEvent(tabId) {
-    this.dispatchEvent(new CustomEvent(`${A_TAB}-hide`, {
-      bubbles: true,
-      composed: true,
-      detail: { tabId }
-    }));
   }
 
   /**
@@ -568,6 +530,112 @@ class TabGroup extends HTMLElement {
     }
 
     return tabs[newIdx % tabs.length];
+  }
+
+  /**
+   * Marks all tabs as unselected and hides all the panels.
+   * This is called every time the user selects a new tab.
+   */
+  #reset() {
+    const tabs = this.#allTabs();
+    const panels = this.#allPanels();
+
+    tabs.forEach(tab => tab.selected = false);
+    panels.forEach(panel => panel.hidden = true);
+  }
+
+  /**
+   * Syncs the tab group navigation with the current state of the tab group.
+   *
+   * This is called every time the user:
+   * - adds or removes a tab or panel
+   * - changes the placement of the tabs
+   * - enables or disables the scroll controls
+   *
+   * If the tabs container is scrollable and the scroll controls are enabled,
+   * the scroll buttons are displayed and the resize observer is started,
+   * otherwise they are hidden and the resize observer is stopped.
+   */
+  #syncNav() {
+    const navContainer = this.shadowRoot?.querySelector('.tab-group__nav');
+
+    /** @type {HTMLButtonElement[]} */
+    const scrollButtons = Array.from(this.shadowRoot?.querySelectorAll('.tab-group__scroll-button') || []);
+
+    if (this.noScrollControls || this.placement === PLACEMENT_START || this.placement === PLACEMENT_END) {
+      this.#stopResizeObserver();
+      scrollButtons.forEach(el => el.hidden = true);
+      navContainer?.classList.remove('tab-group__nav--scrollable');
+    } else {
+      this.#startResizeObserver();
+      scrollButtons.forEach(el => el.hidden = false);
+    }
+  }
+
+  /**
+   * Sets the selected tab when the slot changes.
+   * This is called every time the user adds or removes a tab or panel.
+   * This is useful when the user closes the selected tab and we need to select a new one.
+   */
+  #setTabSelectedOnSlotChange() {
+    const tabs = this.#allTabs();
+
+    // Get the selected non-disabled tab, or the first non-disabled tab.
+    const tab = tabs.find(tab => tab.selected && !tab.disabled) || tabs.find(tab => !tab.disabled);
+
+    if (tab) {
+      if (this.#hasTabSlotChangedOnce && !tab.selected) {
+        this.#dispatchShowEvent(tab.id);
+      }
+
+      this.#setTabSelected(tab);
+    }
+  }
+
+  /**
+   * Sets the given tab as selected.
+   * Additionally, it unhides the panel corresponding to the given tab.
+   *
+   * @param {Tab} tab - The tab to be selected.
+   */
+  #setTabSelected(tab) {
+    this.#reset();
+
+    if (tab) {
+      tab.selected = true;
+    }
+
+    const panel = this.#panelForTab(tab);
+
+    if (panel) {
+      panel.hidden = false;
+    }
+  }
+
+  /**
+   * Dispatches the tab show event.
+   *
+   * @param {string} tabId
+   */
+  #dispatchShowEvent(tabId) {
+    this.dispatchEvent(new CustomEvent(`${A_TAB}-show`, {
+      bubbles: true,
+      composed: true,
+      detail: { tabId }
+    }));
+  }
+
+  /**
+   * Dispatches the tab hide event.
+   *
+   * @param {string} tabId
+   */
+  #dispatchHideEvent(tabId) {
+    this.dispatchEvent(new CustomEvent(`${A_TAB}-hide`, {
+      bubbles: true,
+      composed: true,
+      detail: { tabId }
+    }));
   }
 
   /**
@@ -689,75 +757,14 @@ class TabGroup extends HTMLElement {
    * @param {any} evt The slotchange event.
    */
   #handleSlotChange = evt => {
-    const isTabSlot = evt.target.name === 'tab';
-
-    this.#linkPanels(isTabSlot && this.#hasTabSlotChangedOnce);
+    this.#linkPanels();
     this.#syncNav();
+    this.#setTabSelectedOnSlotChange();
 
-    if (isTabSlot) {
+    if (evt.target.name === 'tab') {
       this.#hasTabSlotChangedOnce = true;
     }
   };
-
-  /**
-   * Marks all tabs as unselected and hides all the panels.
-   * This is called every time the user selects a new tab.
-   */
-  #reset() {
-    const tabs = this.#allTabs();
-    const panels = this.#allPanels();
-
-    tabs.forEach(tab => tab.selected = false);
-    panels.forEach(panel => panel.hidden = true);
-  }
-
-  /**
-   * Marks the given tab as selected.
-   * Additionally, it unhides the panel corresponding to the given tab.
-   *
-   * @param {Tab} tab - The tab to be selected.
-   */
-  #markTabSelected(tab) {
-    this.#reset();
-
-    if (tab && !tab.selected) {
-      tab.selected = true;
-    }
-
-    const panel = this.#panelForTab(tab);
-
-    if (panel) {
-      panel.hidden = false;
-    }
-  }
-
-  /**
-   * Syncs the tab group navigation with the current state of the tab group.
-   *
-   * This is called every time the user:
-   * - adds or removes a tab or panel
-   * - changes the placement of the tabs
-   * - enables or disables the scroll controls
-   *
-   * If the tabs container is scrollable and the scroll controls are enabled,
-   * the scroll buttons are displayed and the resize observer is started,
-   * otherwise they are hidden and the resize observer is stopped.
-   */
-  #syncNav() {
-    const navContainer = this.shadowRoot?.querySelector('.tab-group__nav');
-
-    /** @type {HTMLButtonElement[]} */
-    const scrollButtons = Array.from(this.shadowRoot?.querySelectorAll('.tab-group__scroll-button') || []);
-
-    if (this.noScrollControls || this.placement === PLACEMENT_START || this.placement === PLACEMENT_END) {
-      this.#stopResizeObserver();
-      scrollButtons.forEach(el => el.hidden = true);
-      navContainer?.classList.remove('tab-group__nav--scrollable');
-    } else {
-      this.#startResizeObserver();
-      scrollButtons.forEach(el => el.hidden = false);
-    }
-  }
 
   /**
    * This is to safe guard against cases where, for instance, a framework may have added the element to the page and set a
@@ -822,7 +829,7 @@ class TabGroup extends HTMLElement {
       return;
     }
 
-    this.#markTabSelected(tab);
+    this.#setTabSelected(tab);
 
     // Queue a microtask to ensure that the tab is focused on the next tick.
     setTimeout(() => {
