@@ -1,5 +1,16 @@
 :root {
   --body-max-width: 768px;
+  --orange: rgb(170 127 0);
+  --green: rgb(25, 135, 84);
+  --red: rgb(220, 53, 69);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --orange: rgb(225 173 16);
+    --green: rgb(15 217 123);
+    --red: rgb(251 117 130);
+  }
 }
 
 *,
@@ -68,17 +79,32 @@ body.no-js a-tab-panel {
   margin-right: 0;
 }
 
-browser-window:not(.no-js) {
-  display: block;
-  min-height: 212px;
-}
-
 browser-window::part(base) {
   border-color: var(--border);
 }
 
 browser-window::part(main) {
   padding: 0.5rem 1rem;
+}
+
+#events {
+  max-height: 200px;
+}
+
+.events-details:has(#events:empty) #clearEventsBtn {
+  display: none;
+}
+
+.events-details > p {
+  margin: 0;
+}
+
+.events-details > pre {
+  margin-top: 0.5rem;
+}
+
+.events-details #clearEventsBtn {
+  margin: 0;
 }
 
 @media (prefers-color-scheme: dark) {
