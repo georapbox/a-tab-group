@@ -1,6 +1,7 @@
 // @ts-check
 
 import { uid } from './utils/uid.js';
+import { upgradeProperty } from './utils/upgrade-property.js';
 
 const A_TAB = 'a-tab';
 const template = document.createElement('template');
@@ -63,9 +64,10 @@ template.innerHTML = /* html */`
  * @summary
  * This is a tab for a <a-tab-group> tab panel.
  * `<a-tab>` should always be used with `role=heading` in the markup so that the semantics remain useable when JavaScript is failing.
- * @extends HTMLElement
+ * @documentation https://github.com/georapbox/a-tab-group
  *
  * @tagname a-tab
+ * @extends HTMLElement
  *
  * @property {boolean} selected - Whether the tab is selected.
  * @property {boolean} disabled - Whether the tab is disabled.
@@ -81,7 +83,7 @@ template.innerHTML = /* html */`
  *
  * @slot - The tab's content.
  *
- * @fires a-tab-close - Fires when the tab's close button is clicked.
+ * @event a-tab-close - Fires when the tab's close button is clicked.
  */
 class Tab extends HTMLElement {
   constructor() {
@@ -166,11 +168,7 @@ class Tab extends HTMLElement {
   }
 
   set selected(value) {
-    if (value) {
-      this.setAttribute('selected', '');
-    } else {
-      this.removeAttribute('selected');
-    }
+    this.toggleAttribute('selected', !!value);
   }
 
   /**
@@ -183,11 +181,7 @@ class Tab extends HTMLElement {
   }
 
   set disabled(value) {
-    if (value) {
-      this.setAttribute('disabled', '');
-    } else {
-      this.removeAttribute('disabled');
-    }
+    this.toggleAttribute('disabled', !!value);
   }
 
   /**
@@ -200,11 +194,7 @@ class Tab extends HTMLElement {
   }
 
   set closable(value) {
-    if (value) {
-      this.setAttribute('closable', '');
-    } else {
-      this.removeAttribute('closable');
-    }
+    this.toggleAttribute('closable', !!value);
   }
 
   /**
@@ -223,23 +213,12 @@ class Tab extends HTMLElement {
   };
 
   /**
-   * This is to safe guard against cases where, for instance, a framework may have added the element to the page and set a
-   * value on one of its properties, but lazy loaded its definition. Without this guard, the upgraded element would miss that
-   * property and the instance property would prevent the class property setter from ever being called.
-   *
-   * https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
+   * Wrapper for the `upgradeProperty` function.
    *
    * @param {'selected' | 'disabled' | 'closable'} prop - The property to upgrade.
    */
   #upgradeProperty(prop) {
-    /** @type {any} */
-    const instance = this;
-
-    if (Object.prototype.hasOwnProperty.call(instance, prop)) {
-      const value = instance[prop];
-      delete instance[prop];
-      instance[prop] = value;
-    }
+    return upgradeProperty(prop, this);
   }
 
   static defineCustomElement(elementName = A_TAB) {

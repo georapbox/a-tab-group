@@ -33,9 +33,10 @@ template.innerHTML = /* html */`
 
 /**
  * @summary This is a panel for a `<a-tab-group>` tab panel.
- * @extends HTMLElement
+ * @documentation https://github.com/georapbox/a-tab-group
  *
  * @tagname a-tab-panel
+ * @extends HTMLElement
  *
  * @csspart base - The component's base wrapper.
  *

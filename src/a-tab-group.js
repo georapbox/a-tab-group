@@ -5,6 +5,7 @@
 
 import './a-tab.js';
 import './a-tab-panel.js';
+import { upgradeProperty } from './utils/upgrade-property.js';
 
 const A_TAB_GROUP = 'a-tab-group';
 const A_TAB = 'a-tab';
@@ -198,9 +199,10 @@ template.innerHTML = /* html */`
 
 /**
  * @summary Container element for tabs and panels. All children of <a-tab-group> should be either `<a-tab>` or `<a-tab-panel>`.
- * @extends HTMLElement
+ * @documentation https://github.com/georapbox/a-tab-group
  *
  * @tagname a-tab-group
+ * @extends HTMLElement
  *
  * @property {string} placement - The placement of the tabs.
  * @property {boolean} noScrollControls - Whether or not the scroll controls are enabled.
@@ -232,8 +234,8 @@ template.innerHTML = /* html */`
  * @cssproperty --scroll-button-height - The height of the scroll buttons.
  * @cssproperty --scroll-button-inline-offset - The inline offset of the scroll buttons.
  *
- * @fires a-tab-show - Fired when a tab is shown.
- * @fires a-tab-hide - Fired when a tab is shown.
+ * @event a-tab-show - Fired when a tab is shown.
+ * @event a-tab-hide - Fired when a tab is shown.
  *
  * @method selectTabByIndex - Selects the tab at the given index.
  * @method selectTabById - Selects the tab with the given id.
@@ -577,7 +579,7 @@ class TabGroup extends HTMLElement {
    * This is called every time the user adds or removes a tab or panel.
    * This is useful when the user closes the selected tab and we need to select a new one.
    */
-  #setTabSelectedOnSlotChange() {
+  #setSelectedTabOnSlotChange() {
     const tabs = this.#allTabs();
 
     // Get the selected non-disabled tab, or the first non-disabled tab.
@@ -585,10 +587,14 @@ class TabGroup extends HTMLElement {
 
     if (tab) {
       if (this.#hasTabSlotChangedOnce && !tab.selected) {
-        this.#dispatchShowEvent(tab.id);
+        this.dispatchEvent(new CustomEvent(`${A_TAB}-show`, {
+          bubbles: true,
+          composed: true,
+          detail: { tabId: tab.id }
+        }));
       }
 
-      this.#setTabSelected(tab);
+      this.#setSelectedTab(tab);
     }
   }
 
@@ -598,7 +604,7 @@ class TabGroup extends HTMLElement {
    *
    * @param {Tab} tab - The tab to be selected.
    */
-  #setTabSelected(tab) {
+  #setSelectedTab(tab) {
     this.#reset();
 
     if (tab) {
@@ -613,30 +619,20 @@ class TabGroup extends HTMLElement {
   }
 
   /**
-   * Dispatches the tab show event.
+   * Handles the slotchange event on the tab group.
+   * This is called every time the user adds or removes a tab or panel.
    *
-   * @param {string} tabId
+   * @param {any} evt The slotchange event.
    */
-  #dispatchShowEvent(tabId) {
-    this.dispatchEvent(new CustomEvent(`${A_TAB}-show`, {
-      bubbles: true,
-      composed: true,
-      detail: { tabId }
-    }));
-  }
+  #handleSlotChange = evt => {
+    this.#linkPanels();
+    this.#syncNav();
+    this.#setSelectedTabOnSlotChange();
 
-  /**
-   * Dispatches the tab hide event.
-   *
-   * @param {string} tabId
-   */
-  #dispatchHideEvent(tabId) {
-    this.dispatchEvent(new CustomEvent(`${A_TAB}-hide`, {
-      bubbles: true,
-      composed: true,
-      detail: { tabId }
-    }));
-  }
+    if (evt.target.name === 'tab') {
+      this.#hasTabSlotChangedOnce = true;
+    }
+  };
 
   /**
    * Handles key events on the tab group.
@@ -742,7 +738,12 @@ class TabGroup extends HTMLElement {
 
     if (tab) {
       tab.remove();
-      tab.selected && this.#dispatchHideEvent(tab.id);
+
+      this.dispatchEvent(new CustomEvent(`${A_TAB}-hide`, {
+        bubbles: true,
+        composed: true,
+        detail: { tabId: tab.id }
+      }));
     }
 
     if (panel && panel.tagName.toLowerCase() === A_TAB_PANEL) {
@@ -751,39 +752,12 @@ class TabGroup extends HTMLElement {
   };
 
   /**
-   * Handles the slotchange event on the tab group.
-   * This is called every time the user adds or removes a tab or panel.
-   *
-   * @param {any} evt The slotchange event.
-   */
-  #handleSlotChange = evt => {
-    this.#linkPanels();
-    this.#syncNav();
-    this.#setTabSelectedOnSlotChange();
-
-    if (evt.target.name === 'tab') {
-      this.#hasTabSlotChangedOnce = true;
-    }
-  };
-
-  /**
-   * This is to safe guard against cases where, for instance, a framework may have added the element to the page and set a
-   * value on one of its properties, but lazy loaded its definition. Without this guard, the upgraded element would miss that
-   * property and the instance property would prevent the class property setter from ever being called.
-   *
-   * https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
+   * Wrapper for the `upgradeProperty` function.
    *
    * @param {'placement' | 'noScrollControls' | 'scrollDistance' | 'activation'} prop - The property to upgrade.
    */
   #upgradeProperty(prop) {
-    /** @type {any} */
-    const instance = this;
-
-    if (Object.prototype.hasOwnProperty.call(instance, prop)) {
-      const value = instance[prop];
-      delete instance[prop];
-      instance[prop] = value;
-    }
+    return upgradeProperty(prop, this);
   }
 
   /**
@@ -829,7 +803,7 @@ class TabGroup extends HTMLElement {
       return;
     }
 
-    this.#setTabSelected(tab);
+    this.#setSelectedTab(tab);
 
     // Queue a microtask to ensure that the tab is focused on the next tick.
     setTimeout(() => {
@@ -838,19 +812,24 @@ class TabGroup extends HTMLElement {
     }, 0);
 
     if (oldTab) {
-      this.#dispatchHideEvent(oldTab.id);
+      this.dispatchEvent(new CustomEvent(`${A_TAB}-hide`, {
+        bubbles: true,
+        composed: true,
+        detail: { tabId: oldTab.id }
+      }));
     }
 
-    this.#dispatchShowEvent(tab.id);
+    this.dispatchEvent(new CustomEvent(`${A_TAB}-show`, {
+      bubbles: true,
+      composed: true,
+      detail: { tabId: tab.id }
+    }));
 
     // @deprecated: It will be removed in the next major version.
     this.dispatchEvent(new CustomEvent(`${A_TAB}-select`, {
       bubbles: true,
       composed: true,
-      detail: {
-        tabId: tab.id,
-        deprecationWarning: 'The `a-tab-select` event is deprecated. Please use `a-tab-show` instead.'
-      }
+      detail: { tabId: tab.id }
     }));
   }
 

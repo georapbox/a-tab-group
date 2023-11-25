@@ -27,23 +27,22 @@ import './node_modules/@georapbox/a-tab-group/dist/a-tab-group.js';
 
 ### Markup
 
-All children of `<a-tab-group>` should be either `<a-tab>` or `<a-tab-panel>`. 
-The `<a-tab>` elements should be placed in the `tab` slot, and the `<a-tab-panel>` elements should be placed in the `panel` slot.
-The component will log an error if a `<a-tab>` is not a sibling of a `<a-tab-panel>`.
+All children of `<a-tab-group>` should be either `<a-tab>` or `<a-tab-panel>`.
+Every `<a-tab>` should have a corresponding `<a-tab-panel>` as a sibling, otherwise the component will log an error.
 
 ```html
 <a-tab-group>
-  <a-tab slot="tab" role="heading">Tab 1</a-tab>
-  <a-tab-panel slot="panel">Panel 1</a-tab-panel>
+  <a-tab role="heading">Tab 1</a-tab>
+  <a-tab-panel>Panel 1</a-tab-panel>
 
-  <a-tab slot="tab" role="heading">Tab 2</a-tab>
-  <a-tab-panel slot="panel">Panel 2</a-tab-panel>
+  <a-tab role="heading">Tab 2</a-tab>
+  <a-tab-panel>Panel 2</a-tab-panel>
 
-  <a-tab slot="tab" role="heading" disabled>Tab 3 (disabled)</a-tab>
-  <a-tab-panel slot="panel">Panel 3</a-tab-panel>
+  <a-tab role="heading" disabled>Tab 3 (disabled)</a-tab>
+  <a-tab-panel>Panel 3</a-tab-panel>
 
-  <a-tab slot="tab" role="heading" closable>Tab 4</a-tab>
-  <a-tab-panel slot="panel">Panel 4</a-tab-panel>
+  <a-tab role="heading" closable>Tab 4</a-tab>
+  <a-tab-panel>Panel 4</a-tab-panel>
 </a-tab-group>
 ```
 
