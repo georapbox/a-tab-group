@@ -389,6 +389,9 @@ class TabGroup extends HTMLElement {
     this.#stopResizeObserver();
   }
 
+  /**
+   * Starts observing the tabs container for resize events.
+   */
   #startResizeObserver() {
     if (!this.#resizeObserver) {
       return;
@@ -402,6 +405,9 @@ class TabGroup extends HTMLElement {
     }
   }
 
+  /**
+   * Stops observing the tabs container for resize events.
+   */
   #stopResizeObserver() {
     if (!this.#resizeObserver) {
       return;
@@ -599,8 +605,10 @@ class TabGroup extends HTMLElement {
   }
 
   /**
-   * Sets the given tab as selected.
-   * Additionally, it unhides the panel corresponding to the given tab.
+   * Sets the given tab as selected and shows the panel corresponding to the given tab.
+   * Differentiates from `selectTab()` in that it does not emit any events or focus the tab.
+   * Used internally to set the selected tab when a tab is selected by a side effect,
+   * eg. when a tabs and panels are added or removeda and there is a need to select a new tab.
    *
    * @param {Tab} tab - The tab to be selected.
    */
@@ -820,13 +828,6 @@ class TabGroup extends HTMLElement {
     }
 
     this.dispatchEvent(new CustomEvent(`${A_TAB}-show`, {
-      bubbles: true,
-      composed: true,
-      detail: { tabId: tab.id }
-    }));
-
-    // @deprecated: It will be removed in the next major version.
-    this.dispatchEvent(new CustomEvent(`${A_TAB}-select`, {
       bubbles: true,
       composed: true,
       detail: { tabId: tab.id }
