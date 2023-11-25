@@ -146,7 +146,6 @@ Promise.all([
 | `a-tab-show` | Emitted when a tab is shown (not in the initial render). | `{tabId: string}` |
 | `a-tab-hide` | Emitted when a tab is hidden. It is also emitted if the user closes a closable tab. | `{tabId: string}` |
 | `a-tab-close` | Emitted when a tab is closed by the user (if the tab is closable). | `{tabId: string}` |
-| `a-tab-select` | **DEPRECATED**: It will be removed in the next major version. Use `a-tab-show` instead. | `{tabId: string}` |
 
 ## Changelog
 
