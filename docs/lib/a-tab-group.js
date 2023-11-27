@@ -21,6 +21,7 @@ let t=(t="",e="")=>{let s=Math.random().toString(36).substring(2,8);return`${"st
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
+      width: 100%;
       padding: 0.375rem 0.75rem;
       white-space: nowrap;
       cursor: pointer;
