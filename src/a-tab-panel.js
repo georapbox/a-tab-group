@@ -2,9 +2,9 @@
 
 import { uid } from './utils/uid.js';
 
-const A_TAB_PANEL = 'a-tab-panel';
-const template = document.createElement('template');
 let panelCounter = 0;
+
+const template = document.createElement('template');
 
 template.innerHTML = /* html */`
   <style>
@@ -65,7 +65,7 @@ class TabPanel extends HTMLElement {
     }
   }
 
-  static defineCustomElement(elementName = A_TAB_PANEL) {
+  static defineCustomElement(elementName = 'a-tab-panel') {
     if (typeof window !== 'undefined' && !window.customElements.get(elementName)) {
       window.customElements.define(elementName, TabPanel);
     }

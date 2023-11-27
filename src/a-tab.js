@@ -3,9 +3,9 @@
 import { uid } from './utils/uid.js';
 import { upgradeProperty } from './utils/upgrade-property.js';
 
-const A_TAB = 'a-tab';
-const template = document.createElement('template');
 let tabCounter = 0;
+
+const template = document.createElement('template');
 
 template.innerHTML = /* html */`
   <style>
@@ -205,7 +205,7 @@ class Tab extends HTMLElement {
   #handleCloseButtonClick = evt => {
     evt.stopPropagation();
 
-    this.dispatchEvent(new CustomEvent(`${A_TAB}-close`, {
+    this.dispatchEvent(new CustomEvent(`a-tab-close`, {
       bubbles: true,
       composed: true,
       detail: { tabId: this.id }
@@ -221,7 +221,7 @@ class Tab extends HTMLElement {
     return upgradeProperty(prop, this);
   }
 
-  static defineCustomElement(elementName = A_TAB) {
+  static defineCustomElement(elementName = 'a-tab') {
     if (typeof window !== 'undefined' && !window.customElements.get(elementName)) {
       window.customElements.define(elementName, Tab);
     }

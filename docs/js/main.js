@@ -32,7 +32,7 @@ import(componentUrl).then(() => {
     div.style.color = evt.type === 'a-tab-show' ? 'var(--green)' : evt.type === 'a-tab-hide' ? 'var(--orange)' : 'var(--red)';
     div.textContent = `${evt.type} => ${JSON.stringify(evt.detail)}`;
     eventsEl.appendChild(div);
-    eventsEl.scrollTo({ top: eventsEl.scrollHeight, behavior: 'smooth' });
+    eventsEl.scrollTop = eventsEl.scrollHeight;
 
     if (isLocalhost) {
       console.log(evt.type, evt.detail);
