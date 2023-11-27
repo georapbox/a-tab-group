@@ -747,7 +747,7 @@ class TabGroup extends HTMLElement {
     if (tab) {
       tab.remove();
 
-      this.dispatchEvent(new CustomEvent(`${A_TAB}-hide`, {
+      tab.selected && this.dispatchEvent(new CustomEvent('a-tab-hide', {
         bubbles: true,
         composed: true,
         detail: { tabId: tab.id }

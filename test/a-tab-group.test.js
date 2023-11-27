@@ -1,11 +1,11 @@
 import { aTimeout, elementUpdated, expect, fixture, fixtureCleanup, html, oneEvent, triggerFocusFor } from '@open-wc/testing';
 import { sendKeys } from '@web/test-runner-commands';
-import { spy } from 'sinon';
+import sinon from 'sinon';
 import '../src/a-tab-group.js';
 
 describe('a-tab-group', () => {
   beforeEach(() => {
-    spy(console, 'error');
+    sinon.spy(console, 'error');
 
     // Disable ResizeObserver loop limit exceeded error.
     // https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded/64197640#64197640
@@ -883,7 +883,7 @@ describe('a-tab-group', () => {
       expect(detail).to.deep.equal({ tabId: 'tab-1' });
     });
 
-    it('should fire "a-tab-close" event on close button click', async () => {
+    it('should not fire "a-tab-hide" event when tab is hidden if tab is closed by user and is not currently selected', async () => {
       const el = await fixture(html`
         <a-tab-group>
           <a-tab id="tab-1" role="heading" selected>Tab 1</a-tab>
@@ -893,10 +893,10 @@ describe('a-tab-group', () => {
         </a-tab-group>
       `);
 
-      const listener = oneEvent(el, 'a-tab-close');
+      const spy = sinon.spy();
+      el.addEventListener('a-tab-hide', spy);
       el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.tab__close').click();
-      const { detail } = await listener;
-      expect(detail).to.deep.equal({ tabId: 'tab-2' });
+      expect(spy).not.to.have.been.called;
     });
   });
 

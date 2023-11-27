@@ -1,4 +1,4 @@
-import { elementUpdated, expect, fixture, fixtureCleanup, html } from '@open-wc/testing';
+import { elementUpdated, expect, fixture, fixtureCleanup, html, oneEvent } from '@open-wc/testing';
 import '../src/a-tab.js';
 
 describe('a-tab', () => {
@@ -99,6 +99,17 @@ describe('a-tab', () => {
       const el = await fixture(html`<a-tab closable></a-tab>`);
       const closeButtonIcon = el.shadowRoot.querySelector('[part="close-tab-icon"]');
       expect(closeButtonIcon).to.exist;
+    });
+  });
+
+  describe('custom events', () => {
+    it('should fire "a-tab-close" event on close button click', async () => {
+      const el = await fixture(html`<a-tab id="tab-1" role="heading" closable></a-tab>`);
+      const listener = oneEvent(el, 'a-tab-close');
+      const closeButton = el.shadowRoot.querySelector('.tab__close');
+      closeButton.click();
+      const { detail } = await listener;
+      expect(detail).to.deep.equal({ tabId: 'tab-1' });
     });
   });
 });
