@@ -7,6 +7,7 @@ export default {
   nodeResolve: true,
   browsers: [
     playwrightLauncher({ product: 'chromium' }),
-    playwrightLauncher({ product: 'firefox' })
+    playwrightLauncher({ product: 'firefox' }),
+    playwrightLauncher({ product: 'webkit' })
   ]
 };

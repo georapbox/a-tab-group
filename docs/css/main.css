@@ -1,5 +1,16 @@
 :root {
   --body-max-width: 768px;
+  --orange: #856609;
+  --green: #0a7a46;
+  --red: #cd1a2c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --orange: #e1ad10;
+    --green: #0fd97b;
+    --red: #fb7582;
+  }
 }
 
 *,
@@ -8,7 +19,15 @@
   box-sizing: border-box;
 }
 
-body.no-js details,
+.noscript-banner {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--border-radius);
+  background-color: var(--focus);
+  text-align: center;
+}
+
+body.no-js details:not(.source-code),
 body.no-js .nav-instructions {
   display: none;
 }
@@ -26,14 +45,18 @@ body.no-js a-tab-panel {
   display: block;
 }
 
+.component-description p {
+  margin: 0 0 0.5rem 0;
+}
+
+.component-description p:last-child {
+  margin-bottom: 0;
+}
+
 @media screen and (max-width: 768px) {
   form {
     flex-direction: column;
   }
-}
-
-.events-container:has(.events:empty) {
-  display: none;
 }
 
 .form-row {
@@ -56,8 +79,38 @@ body.no-js a-tab-panel {
   margin-right: 0;
 }
 
-.tabs-container:not(.no-js) {
-  min-height: 110px;
+browser-window::part(base) {
+  border-color: var(--border);
+}
+
+browser-window::part(main) {
+  padding: 0.5rem 1rem;
+}
+
+#events {
+  max-height: 200px;
+}
+
+.events-details:has(#events:empty) #clearEventsBtn {
+  display: none;
+}
+
+.events-details > p {
+  margin: 0;
+}
+
+.events-details > pre {
+  margin-top: 0.5rem;
+}
+
+.events-details #clearEventsBtn {
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  browser-window {
+    --bw-background: var(--background-alt);
+  }
 }
 
 /* Component custom style */
@@ -67,9 +120,6 @@ a-tab-group.custom-style {
   --tab-group-border-color: var(--border);
   --tab-group-bg-color: #ffffff;
   --scroll-button-inline-offset: 0.25rem;
-
-  --tab-color: red;
-  --tab-panel-color: green;
 
   border: 1px solid var(--tab-group-border-color);
   border-radius: 0.25rem;

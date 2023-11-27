@@ -1,10 +1,17 @@
+import '../lib/browser-window.js';
+
 const isLocalhost = window.location.href.includes('127.0.0.1') || window.location.href.includes('localhost');
 const componentUrl = isLocalhost ? '../../dist/a-tab-group.js' : '../lib/a-tab-group.js';
 const form = document.querySelector('form');
 const tabGroupEl = document.querySelector('a-tab-group');
 const eventsEl = document.getElementById('events');
+const clearEventsBtn = document.getElementById('clearEventsBtn');
 
 import(componentUrl).then(() => {
+  form.addEventListener('submit', evt => {
+    evt.preventDefault();
+  });
+
   form.addEventListener('input', evt => {
     const field = evt.target;
 
@@ -20,12 +27,24 @@ import(componentUrl).then(() => {
   });
 
   const handleEvents = evt => {
-    eventsEl.innerHTML = `${evt.type} => ${JSON.stringify(evt.detail)}`;
-    console.log(`${evt.type} =>`, evt.detail);
+    const div = document.createElement('div');
+    div.style.margin = '0 0 0.25rem 0';
+    div.style.color = evt.type === 'a-tab-show' ? 'var(--green)' : evt.type === 'a-tab-hide' ? 'var(--orange)' : 'var(--red)';
+    div.textContent = `${evt.type} => ${JSON.stringify(evt.detail)}`;
+    eventsEl.appendChild(div);
+    eventsEl.scrollTop = eventsEl.scrollHeight;
+
+    if (isLocalhost) {
+      console.log(evt.type, evt.detail);
+    }
   };
 
-  document.addEventListener('a-tab-select', handleEvents);
+  clearEventsBtn.addEventListener('click', () => {
+    eventsEl.innerHTML = '';
+  });
 
+  document.addEventListener('a-tab-show', handleEvents);
+  document.addEventListener('a-tab-hide', handleEvents);
   document.addEventListener('a-tab-close', handleEvents);
 }).catch(err => {
   console.error(err);
