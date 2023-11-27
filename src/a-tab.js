@@ -200,7 +200,7 @@ class Tab extends HTMLElement {
   /**
    * Handles the click event on the close button.
    *
-   * @param {Event} evt The click event.
+   * @param {Event} evt - The click event.
    */
   #handleCloseButtonClick = evt => {
     evt.stopPropagation();

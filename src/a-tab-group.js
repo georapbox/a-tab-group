@@ -479,8 +479,8 @@ class TabGroup extends HTMLElement {
   /**
    * Get the panel for the given tab.
    *
-   * @param {Tab} tab The tab whose panel is to be returned.
-   * @returns {TabPanel | null} The panel controlled by the given tab.
+   * @param {Tab} tab - The tab whose panel is to be returned.
+   * @returns {TabPanel | null} - The panel controlled by the given tab.
    */
   #panelForTab(tab) {
     const panelId = tab.getAttribute('aria-controls');
@@ -643,7 +643,7 @@ class TabGroup extends HTMLElement {
    * Handles the slotchange event on the tab group.
    * This is called every time the user adds or removes a tab or panel.
    *
-   * @param {any} evt The slotchange event.
+   * @param {any} evt - The slotchange event.
    */
   #handleSlotChange = evt => {
     this.#linkPanels();
@@ -658,7 +658,7 @@ class TabGroup extends HTMLElement {
   /**
    * Handles key events on the tab group.
    *
-   * @param {any} evt The keydown event.
+   * @param {any} evt - The keydown event.
    */
   #handleKeyDown = evt => {
     if (
@@ -717,7 +717,7 @@ class TabGroup extends HTMLElement {
   /**
    * Handles click events on the tab group.
    *
-   * @param {any} evt The click event.
+   * @param {any} evt - The click event.
    */
   #handleTabClick = evt => {
     const tab = evt.target.closest('a-tab');
@@ -730,7 +730,7 @@ class TabGroup extends HTMLElement {
   /**
    * Handles the scroll button click event.
    *
-   * @param {any} evt The click event.
+   * @param {any} evt - The click event.
    */
   #handleScrollButtonClick = evt => {
     const scrollButton = evt.target.closest('.tab-group__scroll-button');
@@ -751,7 +751,7 @@ class TabGroup extends HTMLElement {
   /**
    * Handles the tab close button click event.
    *
-   * @param {any} evt The click event.
+   * @param {any} evt - The click event.
    */
   #handleTabClose = evt => {
     const tab = evt.target;
@@ -785,7 +785,7 @@ class TabGroup extends HTMLElement {
    * Selects the tab at the given index.
    * If the tab at the given index is disabled or already selected, this method does nothing.
    *
-   * @param {number} index The index of the tab to be selected.
+   * @param {number} index - The index of the tab to be selected.
    */
   selectTabByIndex(index) {
     const tabs = this.#allTabs();
@@ -800,7 +800,7 @@ class TabGroup extends HTMLElement {
    * Selects the tab with the given id.
    * If the tab with the given id is disabled or already selected, this method does nothing.
    *
-   * @param {string} id
+   * @param {string} id - The id of the tab to be selected.
    */
   selectTabById(id) {
     const tabs = this.#allTabs();
@@ -815,7 +815,7 @@ class TabGroup extends HTMLElement {
    * Selects the given tab.
    * If the given tab is disabled or already selected, this method does nothing.
    *
-   * @param {Tab} tab The tab to be selected.
+   * @param {Tab} tab - The tab to be selected.
    */
   selectTab(tab) {
     const oldTab = this.#allTabs().find(t => t.selected);
