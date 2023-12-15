@@ -24,6 +24,11 @@ const PLACEMENT = {
 };
 
 /**
+ * The valid placements for the tabs.
+ */
+const validPlacements = Object.entries(PLACEMENT).map(([, value]) => value);
+
+/**
  * The available activation modes for the tabs.
  */
 const ACTIVATION = {
@@ -42,7 +47,7 @@ const KEYCODE = {
   HOME: 'Home',
   END: 'End',
   ENTER: 'Enter',
-  SPACE: 'Space'
+  SPACE: ' '
 };
 
 const template = document.createElement('template');
@@ -381,7 +386,7 @@ class TabGroup extends HTMLElement {
 
     this.#hideEmptyTabGroup();
     this.#syncNav();
-    this.placement = this.placement || PLACEMENT.TOP; // Set by default to `top` to reflect the default value in the CSS.
+    this.placement = validPlacements.includes(this.placement || '') ? this.placement : PLACEMENT.TOP;
   }
 
   /**
@@ -668,21 +673,42 @@ class TabGroup extends HTMLElement {
       return;
     }
 
-    let tab;
+    const placement = validPlacements.includes(this.placement || '') ? this.placement : PLACEMENT.TOP;
+    const orientation = [PLACEMENT.TOP, PLACEMENT.BOTTOM].includes(placement || '') ? 'horizontal' : 'vertical';
+    const direction = getComputedStyle(this).direction;
+    let tab = null;
 
-    switch (evt.code) {
+    switch (evt.key) {
       case KEYCODE.LEFT:
-      case KEYCODE.UP:
-        tab = this.#prevTab();
-        if (tab) {
-          this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
+        if (orientation === 'horizontal') {
+          tab = direction === 'ltr' ? this.#prevTab() : this.#nextTab();
+          if (tab) {
+            this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
+          }
         }
         break;
       case KEYCODE.RIGHT:
+        if (orientation === 'horizontal') {
+          tab = direction === 'ltr' ? this.#nextTab() : this.#prevTab();
+          if (tab) {
+            this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
+          }
+        }
+        break;
+      case KEYCODE.UP:
+        if (orientation === 'vertical') {
+          tab = this.#prevTab();
+          if (tab) {
+            this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
+          }
+        }
+        break;
       case KEYCODE.DOWN:
-        tab = this.#nextTab();
-        if (tab) {
-          this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
+        if (orientation === 'vertical') {
+          tab = this.#nextTab();
+          if (tab) {
+            this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
+          }
         }
         break;
       case KEYCODE.HOME:
