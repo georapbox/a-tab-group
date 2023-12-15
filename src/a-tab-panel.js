@@ -4,26 +4,30 @@ import { uid } from './utils/uid.js';
 
 let panelCounter = 0;
 
+const styles = /* css */`
+  :host {
+    box-sizing: border-box;
+    display: block;
+    contain: content;
+  }
+
+  :host([hidden]),
+  [hidden] {
+    display: none !important;
+  }
+
+  :host *,
+  :host *::before,
+  :host *::after {
+    box-sizing: inherit;
+  }
+`;
+
 const template = document.createElement('template');
 
 template.innerHTML = /* html */`
   <style>
-    :host {
-      box-sizing: border-box;
-      display: block;
-      contain: content;
-    }
-
-    :host([hidden]),
-    [hidden] {
-      display: none !important;
-    }
-
-    :host *,
-    :host *::before,
-    :host *::after {
-      box-sizing: inherit;
-    }
+    ${styles}
   </style>
 
   <div part="base" class="tab-panel">
