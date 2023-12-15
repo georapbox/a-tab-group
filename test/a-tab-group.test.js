@@ -164,6 +164,7 @@ describe('a-tab-group', () => {
         </a-tab-group>
       `);
       await elementUpdated(el);
+      await aTimeout(100); // Wait for ResizeObserver
       const nav = el.shadowRoot.querySelector('[part*="nav--scrollable"]');
       expect(nav).to.exist;
     });
