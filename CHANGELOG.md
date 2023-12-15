@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v2.1.0 (2023-12-18)
+
+- Handled navigation with arrow keys appropriately according to directonality.
+- Updated arrow keys navigation to use `KeyboardEvent.key` instead of `KeyboardEvent.code` for better support in different keyboard layouts.
+
 ## v2.0.0 (2023-11-27)
 
 ### Breaking Changes
