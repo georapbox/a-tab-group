@@ -379,12 +379,14 @@ class TabGroup extends HTMLElement {
 
     if ('ResizeObserver' in window) {
       this.#resizeObserver = new ResizeObserver(entries => {
-        const entry = entries?.[0];
-        const targetElement = entry?.target;
-        const isElementScrollable = targetElement?.scrollWidth > targetElement?.clientWidth;
-        scrollButtons.forEach(el => el.toggleAttribute('hidden', !isElementScrollable));
-        navContainer?.part.toggle('nav--scrollable', isElementScrollable);
-        navContainer?.classList.toggle('tab-group__nav--scrollable', isElementScrollable);
+        window.requestAnimationFrame(() => {
+          const entry = entries?.[0];
+          const targetElement = entry?.target;
+          const isElementScrollable = targetElement?.scrollWidth > targetElement?.clientWidth;
+          scrollButtons.forEach(el => el.toggleAttribute('hidden', !isElementScrollable));
+          navContainer?.part.toggle('nav--scrollable', isElementScrollable);
+          navContainer?.classList.toggle('tab-group__nav--scrollable', isElementScrollable);
+        });
       });
     }
 
