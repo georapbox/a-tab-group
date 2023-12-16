@@ -1,5 +1,12 @@
 // @ts-check
 
+/**
+ * Represents a value that may be of type T, or null.
+ *
+ * @template T
+ * @typedef {T | null} Nullable
+ */
+
 /** @typedef {import('./a-tab').Tab} Tab */
 /** @typedef {import('./a-tab-panel').TabPanel} TabPanel */
 
@@ -91,7 +98,7 @@ const styles = /* css */`
     position: relative;
   }
 
-  .tab-group__nav--scrollable {
+  .tab-group__nav--has-scroll-controls {
     padding: 0 calc(var(--scroll-button-width) + var(--scroll-button-inline-offset));
   }
 
@@ -241,7 +248,7 @@ template.innerHTML = /* html */`
  *
  * @csspart base - The component's base wrapper.
  * @csspart nav - The nav container.
- * @csspart nav--scrollable - The nav container when it is scrollable.
+ * @csspart nav--has-scroll-controls - The nav container when the scroll controls are enabled and visible.
  * @csspart scroll-button - The scroll button.
  * @csspart scroll-button--start - The scroll button for scrolling towards the start.
  * @csspart scroll-button--end - The scroll button for scrolling towards the end.
@@ -264,8 +271,11 @@ template.innerHTML = /* html */`
  * @method selectTab - Selects the given tab.
  */
 class TabGroup extends HTMLElement {
-  /** @type {ResizeObserver | null} */
+  /** @type {Nullable<ResizeObserver>} */
   #resizeObserver = null;
+
+  /** @type {Nullable<number>} */
+  #rafId = null;
 
   /** @type {boolean} */
   #hasTabSlotChangedOnce = false;
@@ -301,7 +311,7 @@ class TabGroup extends HTMLElement {
   }
 
   /**
-   * @type {string | null} - The placement of the tabs.
+   * @type {Nullable<string>} - The placement of the tabs.
    * @default 'top'
    * @attribute placement - Reflects the placement property.
    */
@@ -379,13 +389,13 @@ class TabGroup extends HTMLElement {
 
     if ('ResizeObserver' in window) {
       this.#resizeObserver = new ResizeObserver(entries => {
-        window.requestAnimationFrame(() => {
+        this.#rafId = window.requestAnimationFrame(() => {
           const entry = entries?.[0];
           const targetElement = entry?.target;
           const isElementScrollable = targetElement?.scrollWidth > targetElement?.clientWidth;
           scrollButtons.forEach(el => el.toggleAttribute('hidden', !isElementScrollable));
-          navContainer?.part.toggle('nav--scrollable', isElementScrollable);
-          navContainer?.classList.toggle('tab-group__nav--scrollable', isElementScrollable);
+          navContainer?.part.toggle('nav--has-scroll-controls', isElementScrollable);
+          navContainer?.classList.toggle('tab-group__nav--has-scroll-controls', isElementScrollable);
         });
       });
     }
@@ -438,6 +448,11 @@ class TabGroup extends HTMLElement {
     }
 
     this.#resizeObserver.disconnect();
+
+    if (this.#rafId !== null) {
+      window.cancelAnimationFrame(this.#rafId);
+      this.#rafId = null;
+    }
   }
 
   /**
@@ -500,7 +515,7 @@ class TabGroup extends HTMLElement {
    * Get the panel for the given tab.
    *
    * @param {Tab} tab - The tab whose panel is to be returned.
-   * @returns {TabPanel | null} - The panel controlled by the given tab.
+   * @returns {Nullable<TabPanel>} - The panel controlled by the given tab.
    */
   #panelForTab(tab) {
     const panelId = tab.getAttribute('aria-controls');
@@ -606,7 +621,8 @@ class TabGroup extends HTMLElement {
     if (this.noScrollControls || this.placement === PLACEMENT.START || this.placement === PLACEMENT.END) {
       this.#stopResizeObserver();
       scrollButtons.forEach(el => el.hidden = true);
-      navContainer?.classList.remove('tab-group__nav--scrollable');
+      navContainer?.part.remove('nav--has-scroll-controls');
+      navContainer?.classList.remove('tab-group__nav--has-scroll-controls');
     } else {
       this.#startResizeObserver();
       scrollButtons.forEach(el => el.hidden = false);

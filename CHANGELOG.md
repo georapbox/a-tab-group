@@ -11,6 +11,7 @@
 
 - Refactored arrow keys navigation to use the "Left" and "Right" keys for horizontal navigation and the "Up" and "Down" keys for vertical navigation.
 - Updated arrow keys navigation to use `KeyboardEvent.key` instead of `KeyboardEvent.code` for better support in different keyboard layouts.
+- Remove `nav--scrollable` CSS Part from navigation container and replace it with `nav--has-scroll-controls` CSS Part, which is added when scroll controls are enabled and visible.
 
 ## v2.0.0 (2023-11-27)
 

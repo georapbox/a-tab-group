@@ -153,7 +153,7 @@ describe('a-tab-group', () => {
       expect(nav).to.exist;
     });
 
-    it('should have "nav--scrollable" CSS part', async () => {
+    it('should have "nav--has-scroll-controls" CSS part if nav container is small enough and scroll controls are enabled', async () => {
       const el = await fixture(html`
         <!-- Small container to ensure nav is scrollable -->
         <a-tab-group style="width: 50px;">
@@ -165,8 +165,24 @@ describe('a-tab-group', () => {
       `);
       await elementUpdated(el);
       await aTimeout(100); // Wait for ResizeObserver
-      const nav = el.shadowRoot.querySelector('[part*="nav--scrollable"]');
+      const nav = el.shadowRoot.querySelector('[part*="nav--has-scroll-controls"]');
       expect(nav).to.exist;
+    });
+
+    it('should not have "nav--has-scroll-controls" CSS part if nav container is small enough but scroll controls are not enabled', async () => {
+      const el = await fixture(html`
+        <!-- Small container to ensure nav is scrollable -->
+        <a-tab-group no-scroll-controls style="width: 50px;">
+          <a-tab role="heading">Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
+      await elementUpdated(el);
+      await aTimeout(100); // Wait for ResizeObserver
+      const nav = el.shadowRoot.querySelector('[part*="nav--has-scroll-controls"]');
+      expect(nav).to.not.exist;
     });
 
     it('should have "scroll-button" CSS part', async () => {
