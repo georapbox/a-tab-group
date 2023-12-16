@@ -84,7 +84,7 @@
     <summary>Customize tab group</summary>
 
     <form autocomplete="off">
-      <fieldset>
+      <fieldset style="margin-bottom: 1.25rem;">
         <legend>Attributes</legend>
         <div class="form-row">
           <div class="form-col">
@@ -122,7 +122,21 @@
         <div class="form-col">
           <div>
             <input type="checkbox" id="custom-style" name="custom-style">
-            <label for="custom-style">Custom styling</label>
+            <label for="custom-style">Apply custom styling</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        Directionality:
+        <div style="display: flex; column-gap: 0.5rem; flex-wrap: wrap;">
+          <div>
+            <input type="radio" id="ltr" name="dir" value="ltr" checked>
+            <label for="ltr">left to right (ltr)</label><br />
+          </div>
+          <div>
+            <input type="radio" id="rtl" name="dir" value="rtl">
+            <label for="rtl">right to left (rtl)</label><br />
           </div>
         </div>
       </div>
