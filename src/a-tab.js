@@ -5,55 +5,59 @@ import { upgradeProperty } from './utils/upgrade-property.js';
 
 let tabCounter = 0;
 
+const styles = /* css */`
+  :host {
+    box-sizing: border-box;
+    display: inline-block;
+    contain: content;
+  }
+
+  :host([hidden]),
+  [hidden] {
+    display: none !important;
+  }
+
+  :host *,
+  :host *::before,
+  :host *::after {
+    box-sizing: inherit;
+  }
+
+  .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  :host([disabled]) .tab {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  :host([selected]) .tab {
+    color: var(--selected-tab-color);
+    background-color: var(--selected-tab-bg-color);
+  }
+
+  .tab__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    font-size: inherit;
+    cursor: pointer;
+  }
+`;
+
 const template = document.createElement('template');
 
 template.innerHTML = /* html */`
   <style>
-    :host {
-      box-sizing: border-box;
-      display: inline-block;
-      contain: content;
-    }
-
-    :host([hidden]),
-    [hidden] {
-      display: none !important;
-    }
-
-    :host *,
-    :host *::before,
-    :host *::after {
-      box-sizing: inherit;
-    }
-
-    .tab {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      width: 100%;
-      padding: 0.375rem 0.75rem;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-
-    :host([disabled]) .tab {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    :host([selected]) .tab {
-      color: var(--selected-tab-color);
-      background-color: var(--selected-tab-bg-color);
-    }
-
-    .tab__close {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.25rem;
-      font-size: inherit;
-      cursor: pointer;
-    }
+    ${styles}
   </style>
 
   <div part="base" class="tab">

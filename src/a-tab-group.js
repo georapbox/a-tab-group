@@ -1,5 +1,12 @@
 // @ts-check
 
+/**
+ * Represents a value that may be of type T, or null.
+ *
+ * @template T
+ * @typedef {T | null} Nullable
+ */
+
 /** @typedef {import('./a-tab').Tab} Tab */
 /** @typedef {import('./a-tab-panel').TabPanel} TabPanel */
 
@@ -24,6 +31,11 @@ const PLACEMENT = {
 };
 
 /**
+ * The valid placements for the tabs.
+ */
+const validPlacements = Object.entries(PLACEMENT).map(([, value]) => value);
+
+/**
  * The available activation modes for the tabs.
  */
 const ACTIVATION = {
@@ -42,162 +54,166 @@ const KEYCODE = {
   HOME: 'Home',
   END: 'End',
   ENTER: 'Enter',
-  SPACE: 'Space'
+  SPACE: ' '
 };
+
+const styles = /* css */`
+  :host {
+    --selected-tab-color: #005fcc;
+    --selected-tab-bg-color: transparent;
+    --tabs-scroll-behavior: smooth;
+    --scroll-button-width: 2.125em;
+    --scroll-button-height: 2.125em;
+    --scroll-button-inline-offset: 0rem;
+
+    box-sizing: border-box;
+    display: block;
+    contain: content;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :host {
+      --tabs-scroll-behavior: auto;
+    }
+  }
+
+  :host([hidden]),
+  [hidden],
+  ::slotted([hidden]) {
+    display: none !important;
+  }
+
+  :host *,
+  :host *::before,
+  :host *::after {
+    box-sizing: inherit;
+  }
+
+  .tab-group {
+    display: flex;
+    width: 100%;
+  }
+
+  .tab-group__nav {
+    position: relative;
+  }
+
+  .tab-group__nav--has-scroll-controls {
+    padding: 0 calc(var(--scroll-button-width) + var(--scroll-button-inline-offset));
+  }
+
+  .tab-group__scroll-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--scroll-button-width);
+    height: var(--scroll-button-height);
+    padding: 0; /* Required for iOS, otherwise the svg is not visible: https://stackoverflow.com/questions/66532071/flex-svg-behaving-strange-in-ios-safari-14-0-3 */
+    border: 0;
+    z-index: 1;
+    background-color: transparent;
+    font-size: inherit;
+    cursor: pointer;
+    color: currentColor;
+  }
+
+  .tab-group__scroll-button--start {
+    left: var(--scroll-button-inline-offset);
+  }
+
+  .tab-group__scroll-button--end {
+    right: var(--scroll-button-inline-offset);
+  }
+
+  .tab-group__tabs {
+    display: flex;
+    padding: 0.25rem;
+    overflow-x: auto;
+    scroll-behavior: var(--tabs-scroll-behavior);
+    scrollbar-width: none;
+  }
+
+  .tab-group__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-group__panels {
+    padding: 1rem 0;
+  }
+
+  /* placement="top" */
+  .tab-group,
+  :host([placement="top"]) .tab-group {
+    flex-direction: column;
+  }
+
+  /* placement="bottom" */
+  :host([placement="${PLACEMENT.BOTTOM}"]) .tab-group {
+    flex-direction: column;
+  }
+
+  :host([placement="${PLACEMENT.BOTTOM}"]) .tab-group__nav {
+    order: 1;
+  }
+
+  /* placement="start" */
+  :host([placement="${PLACEMENT.START}"]) .tab-group {
+    flex-direction: row;
+  }
+
+  :host([placement="${PLACEMENT.START}"]) .tab-group__tabs {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  :host([placement="${PLACEMENT.START}"]) .tab-group__panels {
+    flex: 1;
+    padding: 0 1rem;
+  }
+
+  /* placement="end" */
+  :host([placement="${PLACEMENT.END}"]) .tab-group {
+    flex-direction: row;
+  }
+
+  :host([placement="${PLACEMENT.END}"]) .tab-group__nav {
+    order: 1;
+  }
+
+  :host([placement="${PLACEMENT.END}"]) .tab-group__tabs {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  :host([placement="${PLACEMENT.END}"]) .tab-group__panels {
+    flex: 1;
+    padding: 0 1rem;
+  }
+`;
 
 const template = document.createElement('template');
 
 template.innerHTML = /* html */`
   <style>
-    :host {
-      --selected-tab-color: #005fcc;
-      --selected-tab-bg-color: transparent;
-      --tabs-scroll-behavior: smooth;
-      --scroll-button-width: 2.125em;
-      --scroll-button-height: 2.125em;
-      --scroll-button-inline-offset: 0rem;
-
-      box-sizing: border-box;
-      display: block;
-      contain: content;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      :host {
-        --tabs-scroll-behavior: auto;
-      }
-    }
-
-    :host([hidden]),
-    [hidden],
-    ::slotted([hidden]) {
-      display: none !important;
-    }
-
-    :host *,
-    :host *::before,
-    :host *::after {
-      box-sizing: inherit;
-    }
-
-    .tab-group {
-      display: flex;
-      width: 100%;
-    }
-
-    .tab-group__nav {
-      position: relative;
-    }
-
-    .tab-group__nav--scrollable {
-      padding: 0 calc(var(--scroll-button-width) + var(--scroll-button-inline-offset));
-    }
-
-    .tab-group__scroll-button {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: var(--scroll-button-width);
-      height: var(--scroll-button-height);
-      padding: 0; /* Required for iOS, otherwise the svg is not visible: https://stackoverflow.com/questions/66532071/flex-svg-behaving-strange-in-ios-safari-14-0-3 */
-      border: 0;
-      z-index: 1;
-      background-color: transparent;
-      font-size: inherit;
-      cursor: pointer;
-      color: currentColor;
-    }
-
-    .tab-group__scroll-button--start {
-      left: var(--scroll-button-inline-offset);
-    }
-
-    .tab-group__scroll-button--end {
-      right: var(--scroll-button-inline-offset);
-    }
-
-    .tab-group__tabs {
-      display: flex;
-      padding: 0.25rem;
-      overflow-x: auto;
-      scroll-behavior: var(--tabs-scroll-behavior);
-      scrollbar-width: none;
-    }
-
-    .tab-group__tabs::-webkit-scrollbar {
-      display: none;
-    }
-
-    .tab-group__panels {
-      padding: 1rem 0;
-    }
-
-    /* placement="top" */
-    .tab-group,
-    :host([placement="top"]) .tab-group {
-      flex-direction: column;
-    }
-
-    /* placement="bottom" */
-    :host([placement="${PLACEMENT.BOTTOM}"]) .tab-group {
-      flex-direction: column;
-    }
-
-    :host([placement="${PLACEMENT.BOTTOM}"]) .tab-group__nav {
-      order: 1;
-    }
-
-    /* placement="start" */
-    :host([placement="${PLACEMENT.START}"]) .tab-group {
-      flex-direction: row;
-    }
-
-    :host([placement="${PLACEMENT.START}"]) .tab-group__tabs {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    :host([placement="${PLACEMENT.START}"]) .tab-group__panels {
-      flex: 1;
-      padding: 0 1rem;
-    }
-
-    /* placement="end" */
-    :host([placement="${PLACEMENT.END}"]) .tab-group {
-      flex-direction: row;
-    }
-
-    :host([placement="${PLACEMENT.END}"]) .tab-group__nav {
-      order: 1;
-    }
-
-    :host([placement="${PLACEMENT.END}"]) .tab-group__tabs {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    :host([placement="${PLACEMENT.END}"]) .tab-group__panels {
-      flex: 1;
-      padding: 0 1rem;
-    }
+    ${styles}
   </style>
 
   <div part="base" class="tab-group">
     <div part="nav" class="tab-group__nav">
-      <button type="button" part="scroll-button scroll-button--start" class="tab-group__scroll-button tab-group__scroll-button--start" aria-label="Scroll to start">
+      <button type="button" part="scroll-button scroll-button--start" class="tab-group__scroll-button tab-group__scroll-button--start" aria-label="Scroll to start" tabindex="-1">
         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
           <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
         </svg>
       </button>
 
-      <div part="tabs" class="tab-group__tabs" role="tablist">
+      <div part="tabs" class="tab-group__tabs" role="tablist" tabindex="-1">
         <slot name="tab"></slot>
       </div>
 
-      <button type="button" part="scroll-button scroll-button--end" class="tab-group__scroll-button tab-group__scroll-button--end" aria-label="Scroll to end">
+      <button type="button" part="scroll-button scroll-button--end" class="tab-group__scroll-button tab-group__scroll-button--end" aria-label="Scroll to end" tabindex="-1">
         <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1em" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
           <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
         </svg>
@@ -232,7 +248,7 @@ template.innerHTML = /* html */`
  *
  * @csspart base - The component's base wrapper.
  * @csspart nav - The nav container.
- * @csspart nav--scrollable - The nav container when it is scrollable.
+ * @csspart nav--has-scroll-controls - The nav container when the scroll controls are enabled and visible.
  * @csspart scroll-button - The scroll button.
  * @csspart scroll-button--start - The scroll button for scrolling towards the start.
  * @csspart scroll-button--end - The scroll button for scrolling towards the end.
@@ -255,8 +271,11 @@ template.innerHTML = /* html */`
  * @method selectTab - Selects the given tab.
  */
 class TabGroup extends HTMLElement {
-  /** @type {ResizeObserver | null} */
+  /** @type {Nullable<ResizeObserver>} */
   #resizeObserver = null;
+
+  /** @type {Nullable<number>} */
+  #rafId = null;
 
   /** @type {boolean} */
   #hasTabSlotChangedOnce = false;
@@ -292,7 +311,7 @@ class TabGroup extends HTMLElement {
   }
 
   /**
-   * @type {string | null} - The placement of the tabs.
+   * @type {Nullable<string>} - The placement of the tabs.
    * @default 'top'
    * @attribute placement - Reflects the placement property.
    */
@@ -370,18 +389,20 @@ class TabGroup extends HTMLElement {
 
     if ('ResizeObserver' in window) {
       this.#resizeObserver = new ResizeObserver(entries => {
-        const entry = entries?.[0];
-        const targetElement = entry?.target;
-        const isElementScrollable = targetElement?.scrollWidth > targetElement?.clientWidth;
-        scrollButtons.forEach(el => el.toggleAttribute('hidden', !isElementScrollable));
-        navContainer?.part.toggle('nav--scrollable', isElementScrollable);
-        navContainer?.classList.toggle('tab-group__nav--scrollable', isElementScrollable);
+        this.#rafId = window.requestAnimationFrame(() => {
+          const entry = entries?.[0];
+          const targetElement = entry?.target;
+          const isElementScrollable = targetElement?.scrollWidth > targetElement?.clientWidth;
+          scrollButtons.forEach(el => el.toggleAttribute('hidden', !isElementScrollable));
+          navContainer?.part.toggle('nav--has-scroll-controls', isElementScrollable);
+          navContainer?.classList.toggle('tab-group__nav--has-scroll-controls', isElementScrollable);
+        });
       });
     }
 
     this.#hideEmptyTabGroup();
     this.#syncNav();
-    this.placement = this.placement || PLACEMENT.TOP; // Set by default to `top` to reflect the default value in the CSS.
+    this.placement = validPlacements.includes(this.placement || '') ? this.placement : PLACEMENT.TOP;
   }
 
   /**
@@ -427,6 +448,20 @@ class TabGroup extends HTMLElement {
     }
 
     this.#resizeObserver.disconnect();
+
+    if (this.#rafId !== null) {
+      window.cancelAnimationFrame(this.#rafId);
+      this.#rafId = null;
+    }
+  }
+
+  /**
+   * Gets the direction of the tab group.
+   *
+   * @returns {string} The direction of the tab group.
+   */
+  #getDirection() {
+    return getComputedStyle(this).direction || 'ltr';
   }
 
   /**
@@ -480,7 +515,7 @@ class TabGroup extends HTMLElement {
    * Get the panel for the given tab.
    *
    * @param {Tab} tab - The tab whose panel is to be returned.
-   * @returns {TabPanel | null} - The panel controlled by the given tab.
+   * @returns {Nullable<TabPanel>} - The panel controlled by the given tab.
    */
   #panelForTab(tab) {
     const panelId = tab.getAttribute('aria-controls');
@@ -586,7 +621,8 @@ class TabGroup extends HTMLElement {
     if (this.noScrollControls || this.placement === PLACEMENT.START || this.placement === PLACEMENT.END) {
       this.#stopResizeObserver();
       scrollButtons.forEach(el => el.hidden = true);
-      navContainer?.classList.remove('tab-group__nav--scrollable');
+      navContainer?.part.remove('nav--has-scroll-controls');
+      navContainer?.classList.remove('tab-group__nav--has-scroll-controls');
     } else {
       this.#startResizeObserver();
       scrollButtons.forEach(el => el.hidden = false);
@@ -668,21 +704,42 @@ class TabGroup extends HTMLElement {
       return;
     }
 
-    let tab;
+    const placement = validPlacements.includes(this.placement || '') ? this.placement : PLACEMENT.TOP;
+    const orientation = [PLACEMENT.TOP, PLACEMENT.BOTTOM].includes(placement || '') ? 'horizontal' : 'vertical';
+    const direction = this.#getDirection();
+    let tab = null;
 
-    switch (evt.code) {
+    switch (evt.key) {
       case KEYCODE.LEFT:
-      case KEYCODE.UP:
-        tab = this.#prevTab();
-        if (tab) {
-          this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
+        if (orientation === 'horizontal') {
+          tab = direction === 'ltr' ? this.#prevTab() : this.#nextTab();
+          if (tab) {
+            this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
+          }
         }
         break;
       case KEYCODE.RIGHT:
+        if (orientation === 'horizontal') {
+          tab = direction === 'ltr' ? this.#nextTab() : this.#prevTab();
+          if (tab) {
+            this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
+          }
+        }
+        break;
+      case KEYCODE.UP:
+        if (orientation === 'vertical') {
+          tab = this.#prevTab();
+          if (tab) {
+            this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
+          }
+        }
+        break;
       case KEYCODE.DOWN:
-        tab = this.#nextTab();
-        if (tab) {
-          this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
+        if (orientation === 'vertical') {
+          tab = this.#nextTab();
+          if (tab) {
+            this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
+          }
         }
         break;
       case KEYCODE.HOME:

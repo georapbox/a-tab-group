@@ -153,7 +153,7 @@ describe('a-tab-group', () => {
       expect(nav).to.exist;
     });
 
-    it('should have "nav--scrollable" CSS part', async () => {
+    it('should have "nav--has-scroll-controls" CSS part if nav container is small enough and scroll controls are enabled', async () => {
       const el = await fixture(html`
         <!-- Small container to ensure nav is scrollable -->
         <a-tab-group style="width: 50px;">
@@ -164,8 +164,25 @@ describe('a-tab-group', () => {
         </a-tab-group>
       `);
       await elementUpdated(el);
-      const nav = el.shadowRoot.querySelector('[part*="nav--scrollable"]');
+      await aTimeout(100); // Wait for ResizeObserver
+      const nav = el.shadowRoot.querySelector('[part*="nav--has-scroll-controls"]');
       expect(nav).to.exist;
+    });
+
+    it('should not have "nav--has-scroll-controls" CSS part if nav container is small enough but scroll controls are not enabled', async () => {
+      const el = await fixture(html`
+        <!-- Small container to ensure nav is scrollable -->
+        <a-tab-group no-scroll-controls style="width: 50px;">
+          <a-tab role="heading">Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
+      await elementUpdated(el);
+      await aTimeout(100); // Wait for ResizeObserver
+      const nav = el.shadowRoot.querySelector('[part*="nav--has-scroll-controls"]');
+      expect(nav).to.not.exist;
     });
 
     it('should have "scroll-button" CSS part', async () => {
@@ -475,7 +492,7 @@ describe('a-tab-group', () => {
   });
 
   describe('keyboard navigation', () => {
-    it('cycle through tabs using "Right" and "Down" arrow keys when activation is "auto"', async () => {
+    it('cycle through tabs using "Right" arrow keys when activation="auto" and placement="top', async () => {
       const el = await fixture(html`
         <a-tab-group>
           <a-tab role="heading" selected>Tab 1</a-tab>
@@ -495,26 +512,65 @@ describe('a-tab-group', () => {
 
       await triggerFocusFor(el.querySelectorAll('a-tab')[0]);
 
-      // Pressing right arrow key should select tab 2
+      // Pressing "Right" arrow key should select tab 2
       await sendKeys({ press: 'ArrowRight' });
 
       expect(el.querySelectorAll('a-tab')[1].selected).to.be.true;
       expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.false;
 
-      // Pressing right arrow key should select tab 4 (tab 3 is disabled)
+      // Pressing "Right" arrow key should select tab 4 (tab 3 is disabled)
       await sendKeys({ press: 'ArrowRight' });
 
       expect(el.querySelectorAll('a-tab')[3].selected).to.be.true;
       expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
 
-      // Pressing down arrow key should select tab 1 again
+      // Pressing "Right" arrow key should select tab 1 again
+      await sendKeys({ press: 'ArrowRight' });
+
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
+    });
+
+    it('cycle through tabs using "Down" arrow keys when activation="auto" and placement="start"', async () => {
+      const el = await fixture(html`
+        <a-tab-group placement="start">
+          <a-tab role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading" disabled>Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+          <a-tab role="heading">Tab 4</a-tab>
+          <a-tab-panel>Panel 4</a-tab-panel>
+        </a-tab-group>
+      `);
+
+      // Tab 1 should be selected by default
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
+
+      await triggerFocusFor(el.querySelectorAll('a-tab')[0]);
+
+      // Pressing "Down" arrow key should select tab 2
+      await sendKeys({ press: 'ArrowDown' });
+
+      expect(el.querySelectorAll('a-tab')[1].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.false;
+
+      // Pressing "Down" arrow key should select tab 4 (tab 3 is disabled)
+      await sendKeys({ press: 'ArrowDown' });
+
+      expect(el.querySelectorAll('a-tab')[3].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
+
+      // Pressing "Down" arrow key should select tab 1 again
       await sendKeys({ press: 'ArrowDown' });
 
       expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
       expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
     });
 
-    it('cycle through tabs using "Right" and "Down" arrow keys when activation is "manual"', async () => {
+    it('cycle through tabs using "Right" arrow keys when activation="manual" and placement="top"', async () => {
       const el = await fixture(html`
         <a-tab-group activation="manual">
           <a-tab role="heading" selected>Tab 1</a-tab>
@@ -534,21 +590,63 @@ describe('a-tab-group', () => {
 
       await triggerFocusFor(el.querySelectorAll('a-tab')[0]);
 
-      // Pressing right arrow key should focus but not select tab 2
+      // Pressing "Right" arrow key should focus but not select tab 2
       await sendKeys({ press: 'ArrowRight' });
 
       expect(el.querySelectorAll('a-tab')[1].matches(':focus')).to.be.true;
       expect(el.querySelectorAll('a-tab')[1].selected).to.be.false;
       expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.true;
 
-      // Pressing right arrow key should focus but not select tab 4 (tab 3 is disabled)
+      // Pressing "Right" arrow key should focus but not select tab 4 (tab 3 is disabled)
       await sendKeys({ press: 'ArrowRight' });
 
       expect(el.querySelectorAll('a-tab')[3].matches(':focus')).to.be.true;
       expect(el.querySelectorAll('a-tab')[3].selected).to.be.false;
       expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.true;
 
-      // Pressing down arrow key should focus back on tab 1
+      // Pressing "Right" arrow key should focus back on tab 1
+      await sendKeys({ press: 'ArrowRight' });
+
+      expect(el.querySelectorAll('a-tab')[0].matches(':focus')).to.be.true;
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
+    });
+
+    it('cycle through tabs using "Down" arrow keys when activation="manual" and placement="start"', async () => {
+      const el = await fixture(html`
+        <a-tab-group activation="manual" placement="start">
+          <a-tab role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading" disabled>Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+          <a-tab role="heading">Tab 4</a-tab>
+          <a-tab-panel>Panel 4</a-tab-panel>
+        </a-tab-group>
+      `);
+
+      // Tab 1 should be selected by default
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
+
+      await triggerFocusFor(el.querySelectorAll('a-tab')[0]);
+
+      // Pressing "Down" arrow key should focus but not select tab 2
+      await sendKeys({ press: 'ArrowDown' });
+
+      expect(el.querySelectorAll('a-tab')[1].matches(':focus')).to.be.true;
+      expect(el.querySelectorAll('a-tab')[1].selected).to.be.false;
+      expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.true;
+
+      // Pressing "Down" arrow key should focus but not select tab 4 (tab 3 is disabled)
+      await sendKeys({ press: 'ArrowDown' });
+
+      expect(el.querySelectorAll('a-tab')[3].matches(':focus')).to.be.true;
+      expect(el.querySelectorAll('a-tab')[3].selected).to.be.false;
+      expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.true;
+
+      // Pressing "Down" arrow key should focus back on tab 1
       await sendKeys({ press: 'ArrowDown' });
 
       expect(el.querySelectorAll('a-tab')[0].matches(':focus')).to.be.true;
@@ -556,7 +654,7 @@ describe('a-tab-group', () => {
       expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
     });
 
-    it('cycle through tabs using "Left" and "Up" arrow keys when activation is "auto"', async () => {
+    it('cycle through tabs using "Left" arrow keys when activation="auto" and placement="top"', async () => {
       const el = await fixture(html`
         <a-tab-group>
           <a-tab role="heading">Tab 1</a-tab>
@@ -576,26 +674,65 @@ describe('a-tab-group', () => {
 
       await triggerFocusFor(el.querySelectorAll('a-tab')[3]);
 
-      // Pressing left arrow key should select tab 2 (tab 3 is disabled)
+      // Pressing "Left" arrow key should select tab 2 (tab 3 is disabled)
       await sendKeys({ press: 'ArrowLeft' });
 
       expect(el.querySelectorAll('a-tab')[1].selected).to.be.true;
       expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.false;
 
-      // Pressing left arrow key should select tab 1
+      // Pressing "Left" arrow key should select tab 1
       await sendKeys({ press: 'ArrowLeft' });
 
       expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
       expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
 
-      // Pressing up arrow key should select tab 4 again
+      // Pressing "Left" arrow key should select tab 4 again
+      await sendKeys({ press: 'ArrowLeft' });
+
+      expect(el.querySelectorAll('a-tab')[3].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
+    });
+
+    it('cycle through tabs using "Up" arrow keys when activation="auto" and placement="start"', async () => {
+      const el = await fixture(html`
+        <a-tab-group placement="start">
+          <a-tab role="heading">Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading" disabled>Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+          <a-tab role="heading" selected>Tab 4</a-tab>
+          <a-tab-panel>Panel 4</a-tab-panel>
+        </a-tab-group>
+      `);
+
+      // Tab 4 should be selected by default
+      expect(el.querySelectorAll('a-tab')[3].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
+
+      await triggerFocusFor(el.querySelectorAll('a-tab')[3]);
+
+      // Pressing "Up" arrow key should select tab 2 (tab 3 is disabled)
+      await sendKeys({ press: 'ArrowUp' });
+
+      expect(el.querySelectorAll('a-tab')[1].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.false;
+
+      // Pressing "Up" arrow key should select tab 1
+      await sendKeys({ press: 'ArrowUp' });
+
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
+
+      // Pressing "Up" arrow key should select tab 4 again
       await sendKeys({ press: 'ArrowUp' });
 
       expect(el.querySelectorAll('a-tab')[3].selected).to.be.true;
       expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
     });
 
-    it('cycle through tabs using "Left" and "Up" arrow keys when activation is "manual"', async () => {
+    it('cycle through tabs using "Left" arrow keys when activation="manual" and placement="top"', async () => {
       const el = await fixture(html`
         <a-tab-group activation="manual">
           <a-tab role="heading">Tab 1</a-tab>
@@ -615,21 +752,63 @@ describe('a-tab-group', () => {
 
       await triggerFocusFor(el.querySelectorAll('a-tab')[3]);
 
-      // Pressing left arrow key should focus but not select tab 2 (tab 3 is disabled)
+      // Pressing "Left" arrow key should focus but not select tab 2 (tab 3 is disabled)
       await sendKeys({ press: 'ArrowLeft' });
 
       expect(el.querySelectorAll('a-tab')[1].matches(':focus')).to.be.true;
       expect(el.querySelectorAll('a-tab')[1].selected).to.be.false;
       expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.true;
 
-      // Pressing left arrow key should focus but not select tab 1
+      // Pressing "Left" arrow key should focus but not select tab 1
       await sendKeys({ press: 'ArrowLeft' });
 
       expect(el.querySelectorAll('a-tab')[0].matches(':focus')).to.be.true;
       expect(el.querySelectorAll('a-tab')[0].selected).to.be.false;
       expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.true;
 
-      // Pressing up arrow key should focus back on tab 4
+      // Pressing "Left" arrow key should focus back on tab 4
+      await sendKeys({ press: 'ArrowLeft' });
+
+      expect(el.querySelectorAll('a-tab')[3].matches(':focus')).to.be.true;
+      expect(el.querySelectorAll('a-tab')[3].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
+    });
+
+    it('cycle through tabs using "Up" arrow keys when activation="manual" and placement="start"', async () => {
+      const el = await fixture(html`
+        <a-tab-group activation="manual" placement="start">
+          <a-tab role="heading">Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading" disabled>Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+          <a-tab role="heading" selected>Tab 4</a-tab>
+          <a-tab-panel>Panel 4</a-tab-panel>
+        </a-tab-group>
+      `);
+
+      // Tab 4 should be selected by default
+      expect(el.querySelectorAll('a-tab')[3].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
+
+      await triggerFocusFor(el.querySelectorAll('a-tab')[3]);
+
+      // Pressing "Up" arrow key should focus but not select tab 2 (tab 3 is disabled)
+      await sendKeys({ press: 'ArrowUp' });
+
+      expect(el.querySelectorAll('a-tab')[1].matches(':focus')).to.be.true;
+      expect(el.querySelectorAll('a-tab')[1].selected).to.be.false;
+      expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.true;
+
+      // Pressing "Up" arrow key should focus but not select tab 1
+      await sendKeys({ press: 'ArrowUp' });
+
+      expect(el.querySelectorAll('a-tab')[0].matches(':focus')).to.be.true;
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.false;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.true;
+
+      // Pressing "Up" arrow key should focus back on tab 4
       await sendKeys({ press: 'ArrowUp' });
 
       expect(el.querySelectorAll('a-tab')[3].matches(':focus')).to.be.true;
@@ -793,6 +972,48 @@ describe('a-tab-group', () => {
       expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
       expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
     });
+
+    it('test navigation with direcionality set to RTL', async () => {
+      const el = await fixture(html`
+        <a-tab-group dir="rtl">
+          <a-tab role="heading">Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading">Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+        </a-tab-group>
+      `);
+
+      // Tab 1 should be selected by default
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
+
+      // Pressing "Left" arrow key should select tab 2
+      await triggerFocusFor(el.querySelectorAll('a-tab')[0]);
+      await sendKeys({ press: 'ArrowLeft' });
+
+      expect(el.querySelectorAll('a-tab')[1].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.false;
+
+      // Pressing "Left" arrow key should select tab 3
+      await sendKeys({ press: 'ArrowLeft' });
+
+      expect(el.querySelectorAll('a-tab')[2].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[2].hidden).to.be.false;
+
+      // Pressing "Left" arrow key should select tab 1 again
+      await sendKeys({ press: 'ArrowLeft' });
+
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
+
+      // Pressing "Right" arrow key should select tab 3
+      await sendKeys({ press: 'ArrowRight' });
+
+      expect(el.querySelectorAll('a-tab')[2].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[2].hidden).to.be.false;
+    });
   });
 
   describe('scroll functionality', () => {
@@ -830,7 +1051,7 @@ describe('a-tab-group', () => {
       scrollButtons.forEach((button) => expect(button.hidden).to.be.true);
     });
 
-    it('should scroll tabs towards on scroll button click', async () => {
+    it('should scroll tabs on scroll button click', async () => {
       const el = await fixture(html`
         <a-tab-group style="width: 100px; --scroll-behavior: auto;">
           <a-tab role="heading" selected>Tab 1</a-tab>
@@ -842,8 +1063,8 @@ describe('a-tab-group', () => {
         </a-tab-group>
       `);
 
-      const scrollButton = el.shadowRoot.querySelector('.tab-group__scroll-button--end');
-      scrollButton.click();
+      const scrollEndButton = el.shadowRoot.querySelector('.tab-group__scroll-button--end');
+      scrollEndButton.click();
       await aTimeout(250); // Wait for scroll to finish.
       const tabsContainer = el.shadowRoot.querySelector('.tab-group__tabs');
       expect(tabsContainer.scrollLeft).to.be.greaterThan(0);
@@ -881,6 +1102,22 @@ describe('a-tab-group', () => {
       el.querySelectorAll('a-tab')[1].click();
       const { detail } = await listener;
       expect(detail).to.deep.equal({ tabId: 'tab-1' });
+    });
+
+    it('should fire "a-tab-hide" event when tab is hidden if tab is closed by user and is currently selected', async () => {
+      const el = await fixture(html`
+        <a-tab-group>
+          <a-tab id="tab-1" role="heading">Tab 1</a-tab>
+          <a-tab-panel id="panel-1">Panel 1</a-tab-panel>
+          <a-tab id="tab-2" role="heading" selected closable>Tab 2</a-tab>
+          <a-tab-panel id="panel-2">Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
+
+      const spy = sinon.spy();
+      el.addEventListener('a-tab-hide', spy);
+      el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.tab__close').click();
+      expect(spy).to.have.been.called;
     });
 
     it('should not fire "a-tab-hide" event when tab is hidden if tab is closed by user and is not currently selected', async () => {

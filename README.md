@@ -86,7 +86,7 @@ By default, the component comes with the bare minimum styling. However, you can 
 | ---- | ----------- |
 | `base` | The tab groups's base wrapper. |
 | `nav` | The tab group's navigation container. |
-| `nav--scrollable` | The tab group's navigation container when tabs are scrollable. |
+| `nav--has-scroll-controls` | The tab group's navigation container when scroll controls are enabled and visible. |
 | `scroll-button` | The scroll buttons that show when tabs are scrollable. |
 | `scroll-button--start` | The scroll button for scrolling towards the start. |
 | `scroll-button--end` | The scroll button for scrolling towards the end. |
