@@ -972,6 +972,48 @@ describe('a-tab-group', () => {
       expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
       expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
     });
+
+    it('test navigation with direcionality set to RTL', async () => {
+      const el = await fixture(html`
+        <a-tab-group dir="rtl">
+          <a-tab role="heading">Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading">Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+        </a-tab-group>
+      `);
+
+      // Tab 1 should be selected by default
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
+
+      // Pressing "Left" arrow key should select tab 2
+      await triggerFocusFor(el.querySelectorAll('a-tab')[0]);
+      await sendKeys({ press: 'ArrowLeft' });
+
+      expect(el.querySelectorAll('a-tab')[1].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[1].hidden).to.be.false;
+
+      // Pressing "Left" arrow key should select tab 3
+      await sendKeys({ press: 'ArrowLeft' });
+
+      expect(el.querySelectorAll('a-tab')[2].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[2].hidden).to.be.false;
+
+      // Pressing "Left" arrow key should select tab 1 again
+      await sendKeys({ press: 'ArrowLeft' });
+
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
+
+      // Pressing "Right" arrow key should select tab 3
+      await sendKeys({ press: 'ArrowRight' });
+
+      expect(el.querySelectorAll('a-tab')[2].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[2].hidden).to.be.false;
+    });
   });
 
   describe('scroll functionality', () => {
@@ -1009,7 +1051,7 @@ describe('a-tab-group', () => {
       scrollButtons.forEach((button) => expect(button.hidden).to.be.true);
     });
 
-    it('should scroll tabs towards on scroll button click', async () => {
+    it('should scroll tabs on scroll button click', async () => {
       const el = await fixture(html`
         <a-tab-group style="width: 100px; --scroll-behavior: auto;">
           <a-tab role="heading" selected>Tab 1</a-tab>
@@ -1021,8 +1063,8 @@ describe('a-tab-group', () => {
         </a-tab-group>
       `);
 
-      const scrollButton = el.shadowRoot.querySelector('.tab-group__scroll-button--end');
-      scrollButton.click();
+      const scrollEndButton = el.shadowRoot.querySelector('.tab-group__scroll-button--end');
+      scrollEndButton.click();
       await aTimeout(250); // Wait for scroll to finish.
       const tabsContainer = el.shadowRoot.querySelector('.tab-group__tabs');
       expect(tabsContainer.scrollLeft).to.be.greaterThan(0);
@@ -1060,6 +1102,22 @@ describe('a-tab-group', () => {
       el.querySelectorAll('a-tab')[1].click();
       const { detail } = await listener;
       expect(detail).to.deep.equal({ tabId: 'tab-1' });
+    });
+
+    it('should fire "a-tab-hide" event when tab is hidden if tab is closed by user and is currently selected', async () => {
+      const el = await fixture(html`
+        <a-tab-group>
+          <a-tab id="tab-1" role="heading">Tab 1</a-tab>
+          <a-tab-panel id="panel-1">Panel 1</a-tab-panel>
+          <a-tab id="tab-2" role="heading" selected closable>Tab 2</a-tab>
+          <a-tab-panel id="panel-2">Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
+
+      const spy = sinon.spy();
+      el.addEventListener('a-tab-hide', spy);
+      el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.tab__close').click();
+      expect(spy).to.have.been.called;
     });
 
     it('should not fire "a-tab-hide" event when tab is hidden if tab is closed by user and is not currently selected', async () => {

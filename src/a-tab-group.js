@@ -461,7 +461,7 @@ class TabGroup extends HTMLElement {
    * @returns {string} The direction of the tab group.
    */
   #getDirection() {
-    return getComputedStyle(this).direction;
+    return getComputedStyle(this).direction || 'ltr';
   }
 
   /**
