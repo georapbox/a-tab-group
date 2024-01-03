@@ -237,11 +237,13 @@ template.innerHTML = /* html */`
  * @property {boolean} noScrollControls - Whether or not the scroll controls are enabled.
  * @property {number} scrollDistance - The distance in pixels that the tabs will scroll when the scroll buttons are clicked.
  * @property {string} activation - The activation mode of the tabs.
+ * @property {boolean} noTabCycling - Whether or not the tabs should cycle when reaching the first or last tab using the keyboard.
  *
  * @attribute placement - Reflects the placement property.
  * @attribute no-scroll-controls - Reflects the noScrollControls property.
  * @attribute scroll-distance - Reflects the scrollDistance property.
  * @attribute activation - Reflects the activation property.
+ * @attribute no-tab-cycling - Reflects the noTabCycling property.
  *
  * @slot tab - Used for groupping tabs in the tab group. Must be <a-tab> elements.
  * @slot panel - Used for groupping tab panels in the tab group. Must be <a-tab-panel> elements.
@@ -316,7 +318,7 @@ class TabGroup extends HTMLElement {
    * @attribute placement - Reflects the placement property.
    */
   get placement() {
-    return this.getAttribute('placement');
+    return this.getAttribute('placement') || PLACEMENT.TOP;
   }
 
   set placement(value) {
@@ -366,6 +368,19 @@ class TabGroup extends HTMLElement {
   }
 
   /**
+   * @type {boolean} - Whether or not the tabs should cycle when reaching the first or last tab using the keyboard.
+   * @default false
+   * @attribute no-tab-cycling - Reflects the noTabCycling property.
+   */
+  get noTabCycling() {
+    return this.hasAttribute('no-tab-cycling');
+  }
+
+  set noTabCycling(value) {
+    this.toggleAttribute('no-tab-cycling', !!value);
+  }
+
+  /**
    * Lifecycle method that is called when the element is first connected to the DOM.
    */
   connectedCallback() {
@@ -373,6 +388,7 @@ class TabGroup extends HTMLElement {
     this.#upgradeProperty('noScrollControls');
     this.#upgradeProperty('scrollDistance');
     this.#upgradeProperty('activation');
+    this.#upgradeProperty('noTabCycling');
 
     const tabSlot = this.shadowRoot?.querySelector('slot[name=tab]');
     const panelSlot = this.shadowRoot?.querySelector('slot[name=panel]');
@@ -525,17 +541,17 @@ class TabGroup extends HTMLElement {
   /**
    * Get the first non-disabled tab in the tab group.
    *
-   * @returns {Tab | undefined} The first tab in the tab group.
+   * @returns {Nullable<Tab>} The first tab in the tab group.
    */
   #firstTab() {
     const tabs = this.#allTabs();
-    return tabs.find(tab => !tab.disabled);
+    return tabs.find(tab => !tab.disabled) || null;
   }
 
   /**
    * Get the last non-disabled tab in the tab group.
    *
-   * @returns {Tab | undefined} The last tab in the tab group.
+   * @returns {Nullable<Tab>} The last tab in the tab group.
    */
   #lastTab() {
     const tabs = this.#allTabs();
@@ -545,13 +561,15 @@ class TabGroup extends HTMLElement {
         return tabs[i];
       }
     }
+
+    return null;
   }
 
   /**
    * Get the tab that comes before the currently selected one, wrapping around when reaching the first tab.
    * If the currently selected tab is disabled, the method will skip it.
    *
-   * @returns {Tab} The previous tab.
+   * @returns {Nullable<Tab>} The previous tab.
    */
   #prevTab() {
     const tabs = this.#allTabs();
@@ -564,6 +582,11 @@ class TabGroup extends HTMLElement {
       newIdx--;
     }
 
+    // Stop cycling through tabs if we reach the beginning and tab cycling is disabled.
+    if (this.noTabCycling && newIdx < 0) {
+      return null;
+    }
+
     // Add `tabs.length` to make sure the index is a positive number and get the modulus to wrap around if necessary.
     return tabs[(newIdx + tabs.length) % tabs.length];
   }
@@ -572,7 +595,7 @@ class TabGroup extends HTMLElement {
    * Get the tab that comes after the currently selected one, wrapping around when reaching the last tab.
    * If the currently selected tab is disabled, the method will skip it.
    *
-   * @returns {Tab} The next tab.
+   * @returns {Nullable<Tab>} The next tab.
    */
   #nextTab() {
     const tabs = this.#allTabs();
@@ -583,6 +606,11 @@ class TabGroup extends HTMLElement {
     // Keep looping until we find a non-disabled tab.
     while (tabs[newIdx % tabs.length].disabled) {
       newIdx++;
+    }
+
+    // Stop cycling through tabs if we reach the end and tab cycling is disabled.
+    if (this.noTabCycling && newIdx >= tabs.length) {
+      return null;
     }
 
     return tabs[newIdx % tabs.length];
@@ -832,7 +860,7 @@ class TabGroup extends HTMLElement {
   /**
    * Wrapper for the `upgradeProperty` function.
    *
-   * @param {'placement' | 'noScrollControls' | 'scrollDistance' | 'activation'} prop - The property to upgrade.
+   * @param {'placement' | 'noScrollControls' | 'scrollDistance' | 'activation' | 'noTabCycling'} prop - The property to upgrade.
    */
   #upgradeProperty(prop) {
     return upgradeProperty(prop, this);
@@ -884,10 +912,10 @@ class TabGroup extends HTMLElement {
     this.#setSelectedTab(tab);
 
     // Queue a microtask to ensure that the tab is focused on the next tick.
-    setTimeout(() => {
+    window.requestAnimationFrame(() => {
       tab.scrollIntoView({ inline: 'nearest', block: 'nearest' });
       tab.focus();
-    }, 0);
+    });
 
     if (oldTab) {
       this.dispatchEvent(new CustomEvent('a-tab-hide', {

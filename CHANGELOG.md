@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v2.2.0 (2024-01-03)
+
+- Added `no-tab-cycling` attribute to `a-tab-group` element, which disables tab cycling when the user reaches the first or last tab using the keyboard.
+
 ## v2.1.0 (2023-12-18)
 
 ## Bug Fixes

@@ -62,6 +62,7 @@ By default, the component comes with the bare minimum styling. However, you can 
 | `noScrollControls`<br>*`no-scroll-controls`* | ✓ | boolean | - | `false` | Disables the scroll buttons that appear when tabs overflow. |
 | `scrollDistance`<br>*`scroll-distance`* | ✓ | number | - | `200` | The distance to scroll when the scroll buttons are clicked. It fallsback to the default value if not provided, or its value is `0`. |
 | `activation` | ✓ | `'auto' \| 'manual'` | - | `'auto'` | If set to `'auto'`, navigating the tabs using the keyboard (`Left`, `Right`, `Up`, `Down`, `Home`, `End` arrow keys) will automatically select the tab. If set to `'manual'`, the tab will receive focus but will not be selected until the user presses the `Enter` or `Space` key. |
+| `noTabCycling`<br>*`no-tab-cycling`* | ✓ | boolean | - | `false` | Disables tab cycling when the user reaches the first or last tab using the keyboard. |
 
 #### &lt;a-tab&gt; properties
 
@@ -127,7 +128,7 @@ By default, the component comes with the bare minimum styling. However, you can 
 | `selectTabByIndex`<sup>1</sup> | Instance | Selects the tab at the given index. If the tab at the given index is disabled or already selected, this method does nothing. | `index: number` |
 | `selectTabById`<sup>1</sup> | Instance | Selects the tab with the given id. If the tab with the given id is disabled or already selected, this method does nothing. This is mostly useful if you provide your own ids to the tabs. | `id: string` |
 
-<sup>1</sup> These methods are only available after the component has been defined. If you need to call these methods before the component has been defined, you can use the `whenDefined` method of the `CustomElementRegistry` interface. For example:
+<sup>1</sup> Instance methods are only available after the component has been defined. To ensure that the components have been defined, you can use the `whenDefined` method of the `CustomElementRegistry` interface. For example:
 
 ```js
 Promise.all([
@@ -144,7 +145,7 @@ Promise.all([
 | Name | Description | Event Detail |
 | ---- | ----------- | ------------ |
 | `a-tab-show` | Emitted when a tab is shown (not in the initial render). | `{tabId: string}` |
-| `a-tab-hide` | Emitted when a tab is hidden. It is also emitted if the user closes a closable tab. | `{tabId: string}` |
+| `a-tab-hide` | Emitted when a tab is hidden. It is also emitted if the user closes a closable tab which is currently selected. | `{tabId: string}` |
 | `a-tab-close` | Emitted when a tab is closed by the user (if the tab is closable). | `{tabId: string}` |
 
 ## Changelog
