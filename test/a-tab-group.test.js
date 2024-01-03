@@ -730,6 +730,11 @@ describe('a-tab-group', () => {
       expect(el.querySelectorAll('a-tab')[3].matches(':focus')).to.be.true;
       expect(el.querySelectorAll('a-tab')[3].selected).to.be.false;
       expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.true;
+
+      // Tab 1 should still be selected but not focused
+      expect(el.querySelectorAll('a-tab')[0].matches(':focus')).to.be.false;
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
     });
 
     it('should cycle through tabs using "Down" arrow keys when activation="manual" and placement="start"', async () => {
@@ -814,6 +819,11 @@ describe('a-tab-group', () => {
       expect(el.querySelectorAll('a-tab')[3].matches(':focus')).to.be.true;
       expect(el.querySelectorAll('a-tab')[3].selected).to.be.false;
       expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.true;
+
+      // Tab 1 should still be selected but not focused
+      expect(el.querySelectorAll('a-tab')[0].matches(':focus')).to.be.false;
+      expect(el.querySelectorAll('a-tab')[0].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.false;
     });
 
     it('should cycle through tabs using "Left" arrow keys when activation="auto" and placement="top"', async () => {
@@ -1054,6 +1064,11 @@ describe('a-tab-group', () => {
       expect(el.querySelectorAll('a-tab')[0].matches(':focus')).to.be.true;
       expect(el.querySelectorAll('a-tab')[0].selected).to.be.false;
       expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.true;
+
+      // Tab 4 should still be selected but not focused
+      expect(el.querySelectorAll('a-tab')[3].matches(':focus')).to.be.false;
+      expect(el.querySelectorAll('a-tab')[3].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
     });
 
     it('should cycle through tabs using "Up" arrow keys when activation="manual" and placement="start"', async () => {
@@ -1138,6 +1153,11 @@ describe('a-tab-group', () => {
       expect(el.querySelectorAll('a-tab')[0].matches(':focus')).to.be.true;
       expect(el.querySelectorAll('a-tab')[0].selected).to.be.false;
       expect(el.querySelectorAll('a-tab-panel')[0].hidden).to.be.true;
+
+      // Tab 4 should still be selected but not focused
+      expect(el.querySelectorAll('a-tab')[3].matches(':focus')).to.be.false;
+      expect(el.querySelectorAll('a-tab')[3].selected).to.be.true;
+      expect(el.querySelectorAll('a-tab-panel')[3].hidden).to.be.false;
     });
 
     it('should select the first and last tab when pressing "Home" and "End" keys respectively', async () => {

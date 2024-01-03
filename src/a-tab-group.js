@@ -912,10 +912,10 @@ class TabGroup extends HTMLElement {
     this.#setSelectedTab(tab);
 
     // Queue a microtask to ensure that the tab is focused on the next tick.
-    setTimeout(() => {
+    window.requestAnimationFrame(() => {
       tab.scrollIntoView({ inline: 'nearest', block: 'nearest' });
       tab.focus();
-    }, 0);
+    });
 
     if (oldTab) {
       this.dispatchEvent(new CustomEvent('a-tab-hide', {

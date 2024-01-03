@@ -128,7 +128,7 @@ By default, the component comes with the bare minimum styling. However, you can 
 | `selectTabByIndex`<sup>1</sup> | Instance | Selects the tab at the given index. If the tab at the given index is disabled or already selected, this method does nothing. | `index: number` |
 | `selectTabById`<sup>1</sup> | Instance | Selects the tab with the given id. If the tab with the given id is disabled or already selected, this method does nothing. This is mostly useful if you provide your own ids to the tabs. | `id: string` |
 
-<sup>1</sup> These methods are only available after the component has been defined. If you need to call these methods before the component has been defined, you can use the `whenDefined` method of the `CustomElementRegistry` interface. For example:
+<sup>1</sup> Instance methods are only available after the component has been defined. To ensure that the components have been defined, you can use the `whenDefined` method of the `CustomElementRegistry` interface. For example:
 
 ```js
 Promise.all([
@@ -145,7 +145,7 @@ Promise.all([
 | Name | Description | Event Detail |
 | ---- | ----------- | ------------ |
 | `a-tab-show` | Emitted when a tab is shown (not in the initial render). | `{tabId: string}` |
-| `a-tab-hide` | Emitted when a tab is hidden. It is also emitted if the user closes a closable tab. | `{tabId: string}` |
+| `a-tab-hide` | Emitted when a tab is hidden. It is also emitted if the user closes a closable tab which is currently selected. | `{tabId: string}` |
 | `a-tab-close` | Emitted when a tab is closed by the user (if the tab is closable). | `{tabId: string}` |
 
 ## Changelog
