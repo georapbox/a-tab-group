@@ -146,7 +146,7 @@ const styles = /* css */`
 
   /* placement="top" */
   .tab-group,
-  :host([placement="top"]) .tab-group {
+  :host([placement="${PLACEMENT.TOP}"]) .tab-group {
     flex-direction: column;
   }
 
@@ -418,7 +418,6 @@ class TabGroup extends HTMLElement {
 
     this.#hideEmptyTabGroup();
     this.#syncNav();
-    this.placement = validPlacements.includes(this.placement || '') ? this.placement : PLACEMENT.TOP;
   }
 
   /**
