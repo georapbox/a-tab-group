@@ -3,6 +3,7 @@
 ## v2.2.1 (2024-01-20)
 
 - Do not add `placelment="top"` attribute to host element when connected to DOM if is not set by the user intentionally. This change is made to avoid unnecessary attribute mutations. Fixes [#5](https://github.com/georapbox/a-tab-group/issues/5).
+- Updated dev dependencies.
 
 ## v2.2.0 (2024-01-03)
 
