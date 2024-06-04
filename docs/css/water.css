@@ -13,7 +13,7 @@
   --text-main: #363636;
   --text-bright: #000;
   --text-muted: #70777f;
-  --links: #0076d1;
+  --links: #0063af;
   --focus: #0096bfab;
   --border: #dbdbdb;
   --border-radius: 6px;
@@ -291,7 +291,7 @@ input[type='button'] {
   padding-left: 30px;
 }
 
-button:hover {
+button:hover:not(:disabled) {
   background: var(--button-hover);
 }
 
@@ -444,6 +444,7 @@ input[type='range']::-webkit-slider-thumb {
   border-radius: 50%;
   background: var(--border);
   -webkit-appearance: none;
+  appearance: none;
   margin-top: -7px;
 }
 
@@ -509,12 +510,9 @@ input[type='range']:focus::-ms-fill-upper {
   background: var(--background);
 }
 
-a {
-  text-decoration: none;
-  color: var(--links);
-}
-
+a,
 a:hover {
+  color: var(--links);
   text-decoration: underline;
 }
 
@@ -621,11 +619,11 @@ details> :last-child {
   margin-bottom: 0;
 }
 
-details summary {
+details>summary {
   transition: margin var(--animation-duration) ease-out;
 }
 
-details[open] summary {
+details[open]>summary {
   margin-bottom: 10px;
 }
 
@@ -644,6 +642,10 @@ details> :not(summary) {
 
 summary::-webkit-details-marker {
   color: var(--text-main);
+}
+
+summary:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--focus);
 }
 
 dialog {

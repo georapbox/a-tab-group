@@ -46,7 +46,7 @@ template.innerHTML = /* html */`
  *
  * @slot - The content of the tab panel.
  */
-class TabPanel extends HTMLElement {
+class ATabPanel extends HTMLElement {
   constructor() {
     super();
 
@@ -71,11 +71,11 @@ class TabPanel extends HTMLElement {
 
   static defineCustomElement(elementName = 'a-tab-panel') {
     if (typeof window !== 'undefined' && !window.customElements.get(elementName)) {
-      window.customElements.define(elementName, TabPanel);
+      window.customElements.define(elementName, ATabPanel);
     }
   }
 }
 
-TabPanel.defineCustomElement();
+ATabPanel.defineCustomElement();
 
-export { TabPanel };
+export { ATabPanel };

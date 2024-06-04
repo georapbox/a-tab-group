@@ -90,7 +90,7 @@ template.innerHTML = /* html */`
  *
  * @event a-tab-close - Fires when the tab's close button is clicked.
  */
-class Tab extends HTMLElement {
+class ATab extends HTMLElement {
   constructor() {
     super();
 
@@ -228,11 +228,11 @@ class Tab extends HTMLElement {
 
   static defineCustomElement(elementName = 'a-tab') {
     if (typeof window !== 'undefined' && !window.customElements.get(elementName)) {
-      window.customElements.define(elementName, Tab);
+      window.customElements.define(elementName, ATab);
     }
   }
 }
 
-Tab.defineCustomElement();
+ATab.defineCustomElement();
 
-export { Tab };
+export { ATab };

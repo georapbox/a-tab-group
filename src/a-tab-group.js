@@ -7,11 +7,11 @@
  * @typedef {T | null} Nullable
  */
 
-/** @typedef {import('./a-tab').Tab} Tab */
-/** @typedef {import('./a-tab-panel').TabPanel} TabPanel */
+/** @typedef {import('./a-tab').ATab} Tab */
+/** @typedef {import('./a-tab-panel').ATabPanel} TabPanel */
 
-import './a-tab.js';
-import './a-tab-panel.js';
+export { ATab } from './a-tab.js';
+export { ATabPanel } from './a-tab-panel.js';
 import { upgradeProperty } from './utils/upgrade-property.js';
 
 /**
@@ -272,7 +272,7 @@ template.innerHTML = /* html */`
  * @method selectTabById - Selects the tab with the given id.
  * @method selectTab - Selects the given tab.
  */
-class TabGroup extends HTMLElement {
+class ATabGroup extends HTMLElement {
   /** @type {Nullable<ResizeObserver>} */
   #resizeObserver = null;
 
@@ -933,11 +933,11 @@ class TabGroup extends HTMLElement {
 
   static defineCustomElement(elementName = 'a-tab-group') {
     if (typeof window !== 'undefined' && !window.customElements.get(elementName)) {
-      window.customElements.define(elementName, TabGroup);
+      window.customElements.define(elementName, ATabGroup);
     }
   }
 }
 
-TabGroup.defineCustomElement();
+ATabGroup.defineCustomElement();
 
-export { TabGroup };
+export { ATabGroup };
