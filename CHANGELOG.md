@@ -3,6 +3,7 @@
 ## v2.3.0 (2024-06-04)
 
 - Re-export `ATabPanel` and `ATab` classes from the package. Fixes [#7](https://github.com/georapbox/a-tab-group/issues/7).
+- Updated dev dependencies.
 
 ## v2.2.1 (2024-01-20)
 
