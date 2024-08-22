@@ -5,7 +5,7 @@ import { upgradeProperty } from './utils/upgrade-property.js';
 
 let tabCounter = 0;
 
-const styles = /* css */`
+const styles = /* css */ `
   :host {
     box-sizing: border-box;
     display: inline-block;
@@ -55,7 +55,7 @@ const styles = /* css */`
 
 const template = document.createElement('template');
 
-template.innerHTML = /* html */`
+template.innerHTML = /* html */ `
   <style>
     ${styles}
   </style>
@@ -126,7 +126,7 @@ class ATab extends HTMLElement {
         const closeButton = document.createElement('span');
         closeButton.className = 'tab__close';
         closeButton.setAttribute('part', 'close-tab');
-        closeButton.innerHTML = /* html */`<svg part="close-tab-icon" xmlns="http://www.w3.org/2000/svg" width="0.875em" height="0.875em" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>`;
+        closeButton.innerHTML = /* html */ `<svg part="close-tab-icon" xmlns="http://www.w3.org/2000/svg" width="0.875em" height="0.875em" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>`;
         this.shadowRoot?.querySelector('.tab')?.appendChild(closeButton);
         closeButton.addEventListener('click', this.#handleCloseButtonClick);
       } else {
@@ -210,11 +210,13 @@ class ATab extends HTMLElement {
   #handleCloseButtonClick = evt => {
     evt.stopPropagation();
 
-    this.dispatchEvent(new CustomEvent(`a-tab-close`, {
-      bubbles: true,
-      composed: true,
-      detail: { tabId: this.id }
-    }));
+    this.dispatchEvent(
+      new CustomEvent(`a-tab-close`, {
+        bubbles: true,
+        composed: true,
+        detail: { tabId: this.id }
+      })
+    );
   };
 
   /**

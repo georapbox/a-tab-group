@@ -1,4 +1,13 @@
-import { aTimeout, elementUpdated, expect, fixture, fixtureCleanup, html, oneEvent, triggerFocusFor } from '@open-wc/testing';
+import {
+  aTimeout,
+  elementUpdated,
+  expect,
+  fixture,
+  fixtureCleanup,
+  html,
+  oneEvent,
+  triggerFocusFor
+} from '@open-wc/testing';
 import { sendKeys } from '@web/test-runner-commands';
 import sinon from 'sinon';
 import '../src/a-tab-group.js';
@@ -1374,7 +1383,7 @@ describe('a-tab-group', () => {
       `);
 
       const scrollButtons = el.shadowRoot.querySelectorAll('.tab-group__scroll-button');
-      scrollButtons.forEach((button) => {
+      scrollButtons.forEach(button => {
         expect(button.hidden).to.be.false;
       });
     });
@@ -1392,7 +1401,7 @@ describe('a-tab-group', () => {
       `);
 
       const scrollButtons = el.shadowRoot.querySelectorAll('.tab-group__scroll-button');
-      scrollButtons.forEach((button) => expect(button.hidden).to.be.true);
+      scrollButtons.forEach(button => expect(button.hidden).to.be.true);
     });
 
     it('should scroll tabs on scroll button click', async () => {

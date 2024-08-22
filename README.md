@@ -2,7 +2,7 @@
 [![npm license](https://img.shields.io/npm/l/@georapbox/a-tab-group.svg)](https://www.npmjs.com/package/@georapbox/a-tab-group)
 
 [demo]: https://georapbox.github.io/a-tab-group/
-[license]: https://georapbox.mit-license.org/@2023
+[license]: https://github.com/georapbox/a-tab-group/blob/main/LICENSE
 [changelog]: https://github.com/georapbox/a-tab-group/blob/main/CHANGELOG.md
 
 # &lt;a-tab-group&gt;
@@ -151,6 +151,53 @@ Promise.all([
 ## Changelog
 
 For API updates and breaking changes, check the [CHANGELOG][changelog].
+
+## Development setup
+
+### Prerequisites
+
+The project requires `Node.js` and `npm` to be installed on your environment. Preferrably, use [nvm](https://github.com/nvm-sh/nvm) Node Version Manager and use the version of Node.js specified in the `.nvmrc` file by running `nvm use`.
+
+### Install dependencies
+
+Install the project dependencies by running the following command.
+
+```sh
+npm install
+```
+
+### Build for development
+
+Watch for changes and start a development server by running the following command.
+
+```sh
+npm start
+```
+
+### Linting
+
+Lint the code by running the following command.
+
+```sh
+npm run lint
+```
+
+### Testing
+
+Run the tests by running any of the following commands.
+
+```sh
+npm test
+npm run test:watch # watch mode
+```
+
+### Build for production
+
+Create a production build by running the following command.
+
+```sh
+npm run build
+```
 
 ## License
 

@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v2.3.1 (2024-08-22)
+
+- Replace parcel with esbuild for bundling.
+- Update ESLint to use flat configuration.
+- Use Prettier for code formatting.
+- Update dev dependencies.
+
 ## v2.3.0 (2024-06-04)
 
 - Re-export `ATabPanel` and `ATab` classes from the package. Fixes [#7](https://github.com/georapbox/a-tab-group/issues/7).

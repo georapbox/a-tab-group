@@ -4,7 +4,7 @@ import { uid } from './utils/uid.js';
 
 let panelCounter = 0;
 
-const styles = /* css */`
+const styles = /* css */ `
   :host {
     box-sizing: border-box;
     display: block;
@@ -25,7 +25,7 @@ const styles = /* css */`
 
 const template = document.createElement('template');
 
-template.innerHTML = /* html */`
+template.innerHTML = /* html */ `
   <style>
     ${styles}
   </style>

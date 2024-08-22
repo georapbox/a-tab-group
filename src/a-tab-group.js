@@ -57,7 +57,7 @@ const KEYCODE = {
   SPACE: ' '
 };
 
-const styles = /* css */`
+const styles = /* css */ `
   :host {
     --selected-tab-color: #005fcc;
     --selected-tab-bg-color: transparent;
@@ -196,7 +196,7 @@ const styles = /* css */`
 
 const template = document.createElement('template');
 
-template.innerHTML = /* html */`
+template.innerHTML = /* html */ `
   <style>
     ${styles}
   </style>
@@ -572,9 +572,10 @@ class ATabGroup extends HTMLElement {
    */
   #prevTab() {
     const tabs = this.#allTabs();
-    let newIdx = this.activation === ACTIVATION.MANUAL
-      ? tabs.findIndex(tab => tab.matches(':focus')) - 1
-      : tabs.findIndex(tab => tab.selected) - 1;
+    let newIdx =
+      this.activation === ACTIVATION.MANUAL
+        ? tabs.findIndex(tab => tab.matches(':focus')) - 1
+        : tabs.findIndex(tab => tab.selected) - 1;
 
     // Keep looping until we find a non-disabled tab.
     while (tabs[(newIdx + tabs.length) % tabs.length].disabled) {
@@ -598,9 +599,10 @@ class ATabGroup extends HTMLElement {
    */
   #nextTab() {
     const tabs = this.#allTabs();
-    let newIdx = this.activation === ACTIVATION.MANUAL
-      ? tabs.findIndex(tab => tab.matches(':focus')) + 1
-      : tabs.findIndex(tab => tab.selected) + 1;
+    let newIdx =
+      this.activation === ACTIVATION.MANUAL
+        ? tabs.findIndex(tab => tab.matches(':focus')) + 1
+        : tabs.findIndex(tab => tab.selected) + 1;
 
     // Keep looping until we find a non-disabled tab.
     while (tabs[newIdx % tabs.length].disabled) {
@@ -623,8 +625,8 @@ class ATabGroup extends HTMLElement {
     const tabs = this.#allTabs();
     const panels = this.#allPanels();
 
-    tabs.forEach(tab => tab.selected = false);
-    panels.forEach(panel => panel.hidden = true);
+    tabs.forEach(tab => (tab.selected = false));
+    panels.forEach(panel => (panel.hidden = true));
   }
 
   /**
@@ -647,12 +649,12 @@ class ATabGroup extends HTMLElement {
 
     if (this.noScrollControls || this.placement === PLACEMENT.START || this.placement === PLACEMENT.END) {
       this.#stopResizeObserver();
-      scrollButtons.forEach(el => el.hidden = true);
+      scrollButtons.forEach(el => (el.hidden = true));
       navContainer?.part.remove('nav--has-scroll-controls');
       navContainer?.classList.remove('tab-group__nav--has-scroll-controls');
     } else {
       this.#startResizeObserver();
-      scrollButtons.forEach(el => el.hidden = false);
+      scrollButtons.forEach(el => (el.hidden = false));
     }
   }
 
@@ -669,11 +671,13 @@ class ATabGroup extends HTMLElement {
 
     if (tab) {
       if (this.#hasTabSlotChangedOnce && !tab.selected) {
-        this.dispatchEvent(new CustomEvent('a-tab-show', {
-          bubbles: true,
-          composed: true,
-          detail: { tabId: tab.id }
-        }));
+        this.dispatchEvent(
+          new CustomEvent('a-tab-show', {
+            bubbles: true,
+            composed: true,
+            detail: { tabId: tab.id }
+          })
+        );
       }
 
       this.#setSelectedTab(tab);
@@ -725,8 +729,8 @@ class ATabGroup extends HTMLElement {
    */
   #handleKeyDown = evt => {
     if (
-      evt.target.tagName.toLowerCase() !== 'a-tab' // Ignore any key presses that have a modifier.
-      || evt.altKey // Don’t handle modifier shortcuts typically used by assistive technology.
+      evt.target.tagName.toLowerCase() !== 'a-tab' || // Ignore any key presses that have a modifier.
+      evt.altKey // Don’t handle modifier shortcuts typically used by assistive technology.
     ) {
       return;
     }
@@ -844,11 +848,15 @@ class ATabGroup extends HTMLElement {
     if (tab) {
       tab.remove();
 
-      tab.selected && this.dispatchEvent(new CustomEvent('a-tab-hide', {
-        bubbles: true,
-        composed: true,
-        detail: { tabId: tab.id }
-      }));
+      if (tab.selected) {
+        this.dispatchEvent(
+          new CustomEvent('a-tab-hide', {
+            bubbles: true,
+            composed: true,
+            detail: { tabId: tab.id }
+          })
+        );
+      }
     }
 
     if (panel && panel.tagName.toLowerCase() === 'a-tab-panel') {
@@ -917,18 +925,22 @@ class ATabGroup extends HTMLElement {
     });
 
     if (oldTab) {
-      this.dispatchEvent(new CustomEvent('a-tab-hide', {
-        bubbles: true,
-        composed: true,
-        detail: { tabId: oldTab.id }
-      }));
+      this.dispatchEvent(
+        new CustomEvent('a-tab-hide', {
+          bubbles: true,
+          composed: true,
+          detail: { tabId: oldTab.id }
+        })
+      );
     }
 
-    this.dispatchEvent(new CustomEvent('a-tab-show', {
-      bubbles: true,
-      composed: true,
-      detail: { tabId: tab.id }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('a-tab-show', {
+        bubbles: true,
+        composed: true,
+        detail: { tabId: tab.id }
+      })
+    );
   }
 
   static defineCustomElement(elementName = 'a-tab-group') {
