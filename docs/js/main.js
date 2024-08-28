@@ -8,11 +8,11 @@ const tabGroupEl = document.querySelector('a-tab-group');
 const eventsEl = document.getElementById('events');
 const clearEventsBtn = document.getElementById('clearEventsBtn');
 
-try {
-  await import(componentUrl);
-} catch (err) {
-  console.error(err);
-}
+import(componentUrl);
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.hljs.highlightAll();
+});
 
 form.addEventListener('submit', evt => {
   evt.preventDefault();
