@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v2.4.0 (2024-08-29)
+
+- Add `tabindex="-1" to non-selected tabs to prevent them from being focusable when navigating with the keyboard.
+- Remove `tabindex="-1"` attribute from the "Scroll to start" and "Scroll to end" buttons, to allow them to be focusable when navigating with the keyboard.
+
 ## v2.3.1 (2024-08-22)
 
 - Replace parcel with esbuild for bundling.

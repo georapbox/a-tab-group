@@ -114,11 +114,12 @@ class ATab extends HTMLElement {
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'selected' && oldValue !== newValue) {
       this.setAttribute('aria-selected', this.selected.toString());
+      this.setAttribute('tabindex', this.disabled || !this.selected ? '-1' : '0');
     }
 
     if (name === 'disabled' && oldValue !== newValue) {
       this.setAttribute('aria-disabled', this.disabled.toString());
-      this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+      this.setAttribute('tabindex', this.disabled || !this.selected ? '-1' : '0');
     }
 
     if (name === 'closable' && oldValue !== newValue) {
@@ -152,7 +153,7 @@ class ATab extends HTMLElement {
     this.setAttribute('slot', 'tab');
     this.setAttribute('role', 'tab');
     this.setAttribute('aria-selected', 'false');
-    this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    this.setAttribute('tabindex', this.disabled || !this.selected ? '-1' : '0');
   }
 
   /**
