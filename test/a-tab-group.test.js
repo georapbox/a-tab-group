@@ -50,6 +50,96 @@ describe('a-tab-group', () => {
 
       await expect(el).to.be.accessible();
     });
+
+    it('the tabs container should have role="tablist"', async () => {
+      const el = await fixture(html`<a-tab-group></a-tab-group>`);
+      const tabsContainer = el.shadowRoot.querySelector('.tab-group__tabs');
+      expect(tabsContainer.getAttribute('role')).to.equal('tablist');
+    });
+
+    it('the tablist element should have aria-orientation="horizontal" when placement="top"', async () => {
+      const el = await fixture(html`<a-tab-group placement="top"></a-tab-group>`);
+      const tabsContainer = el.shadowRoot.querySelector('.tab-group__tabs');
+      expect(tabsContainer.getAttribute('aria-orientation')).to.equal('horizontal');
+    });
+
+    it('the tablist element should have aria-orientation="horizontal" when placement="bottom"', async () => {
+      const el = await fixture(html`<a-tab-group placement="bottom"></a-tab-group>`);
+      const tabsContainer = el.shadowRoot.querySelector('.tab-group__tabs');
+      expect(tabsContainer.getAttribute('aria-orientation')).to.equal('horizontal');
+    });
+
+    it('the tablist element should have aria-orientation="vertical" when placement="start"', async () => {
+      const el = await fixture(html`<a-tab-group placement="start"></a-tab-group>`);
+      const tabsContainer = el.shadowRoot.querySelector('.tab-group__tabs');
+      expect(tabsContainer.getAttribute('aria-orientation')).to.equal('vertical');
+    });
+
+    it('the tablist element should have aria-orientation="vertical" when placement="end"', async () => {
+      const el = await fixture(html`<a-tab-group placement="end"></a-tab-group>`);
+      const tabsContainer = el.shadowRoot.querySelector('.tab-group__tabs');
+      expect(tabsContainer.getAttribute('aria-orientation')).to.equal('vertical');
+    });
+
+    it('the selected tab should have aria-selected="true"', async () => {
+      const el = await fixture(html`
+        <a-tab-group>
+          <a-tab role="heading">Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading" selected>Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading">Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+        </a-tab-group>
+      `);
+      const selectedTab = el.querySelector('a-tab[selected]');
+      expect(selectedTab.getAttribute('aria-selected')).to.equal('true');
+    });
+
+    it('the selected tab should have tabindex="0"', async () => {
+      const el = await fixture(html`
+        <a-tab-group>
+          <a-tab role="heading">Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading" selected>Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading">Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+        </a-tab-group>
+      `);
+      const selectedTab = el.querySelector('a-tab[selected]');
+      expect(selectedTab.getAttribute('tabindex')).to.equal('0');
+    });
+
+    it('the non-selected tabs should have tabindex="-1"', async () => {
+      const el = await fixture(html`
+        <a-tab-group>
+          <a-tab role="heading" selected>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+          <a-tab role="heading">Tab 3</a-tab>
+          <a-tab-panel>Panel 3</a-tab-panel>
+        </a-tab-group>
+      `);
+      const nonSelectedTabs = el.querySelectorAll('a-tab:not([selected])');
+      nonSelectedTabs.forEach(tab => {
+        expect(tab.getAttribute('tabindex')).to.equal('-1');
+      });
+    });
+
+    it('the disabled tabs should have aria-disabled="true"', async () => {
+      const el = await fixture(html`
+        <a-tab-group>
+          <a-tab role="heading" disabled>Tab 1</a-tab>
+          <a-tab-panel>Panel 1</a-tab-panel>
+          <a-tab role="heading">Tab 2</a-tab>
+          <a-tab-panel>Panel 2</a-tab-panel>
+        </a-tab-group>
+      `);
+      const disabledTab = el.querySelector('a-tab[disabled]');
+      expect(disabledTab.getAttribute('aria-disabled')).to.equal('true');
+    });
   });
 
   describe('attributes - properties', () => {

@@ -643,6 +643,7 @@ class ATabGroup extends HTMLElement {
    */
   #syncNav() {
     const navContainer = this.shadowRoot?.querySelector('.tab-group__nav');
+    const tabsContainer = this.shadowRoot?.querySelector('.tab-group__tabs');
 
     /** @type {HTMLButtonElement[]} */
     const scrollButtons = Array.from(this.shadowRoot?.querySelectorAll('.tab-group__scroll-button') || []);
@@ -652,9 +653,11 @@ class ATabGroup extends HTMLElement {
       scrollButtons.forEach(el => (el.hidden = true));
       navContainer?.part.remove('nav--has-scroll-controls');
       navContainer?.classList.remove('tab-group__nav--has-scroll-controls');
+      tabsContainer?.setAttribute('aria-orientation', 'vertical');
     } else {
       this.#startResizeObserver();
       scrollButtons.forEach(el => (el.hidden = false));
+      tabsContainer?.setAttribute('aria-orientation', 'horizontal');
     }
   }
 
