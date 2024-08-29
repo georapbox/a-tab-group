@@ -46,6 +46,10 @@ body.no-js a-tab-panel {
   display: block;
 }
 
+body.no-js a-tab-panel {
+  margin-block-end: 1rem;
+}
+
 .component-description p {
   margin: 0 0 0.5rem 0;
 }

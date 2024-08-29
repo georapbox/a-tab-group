@@ -114,11 +114,12 @@ class ATab extends HTMLElement {
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'selected' && oldValue !== newValue) {
       this.setAttribute('aria-selected', this.selected.toString());
+      this.setAttribute('tabindex', this.disabled || !this.selected ? '-1' : '0');
     }
 
     if (name === 'disabled' && oldValue !== newValue) {
       this.setAttribute('aria-disabled', this.disabled.toString());
-      this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+      this.setAttribute('tabindex', this.disabled || !this.selected ? '-1' : '0');
     }
 
     if (name === 'closable' && oldValue !== newValue) {
@@ -126,7 +127,7 @@ class ATab extends HTMLElement {
         const closeButton = document.createElement('span');
         closeButton.className = 'tab__close';
         closeButton.setAttribute('part', 'close-tab');
-        closeButton.innerHTML = /* html */ `<svg part="close-tab-icon" xmlns="http://www.w3.org/2000/svg" width="0.875em" height="0.875em" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>`;
+        closeButton.innerHTML = /* html */ `<svg part="close-tab-icon" xmlns="http://www.w3.org/2000/svg" width="0.875em" height="0.875em" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>`;
         this.shadowRoot?.querySelector('.tab')?.appendChild(closeButton);
         closeButton.addEventListener('click', this.#handleCloseButtonClick);
       } else {
@@ -152,7 +153,7 @@ class ATab extends HTMLElement {
     this.setAttribute('slot', 'tab');
     this.setAttribute('role', 'tab');
     this.setAttribute('aria-selected', 'false');
-    this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    this.setAttribute('tabindex', this.disabled || !this.selected ? '-1' : '0');
   }
 
   /**

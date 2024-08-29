@@ -8,11 +8,11 @@ const tabGroupEl = document.querySelector('a-tab-group');
 const eventsEl = document.getElementById('events');
 const clearEventsBtn = document.getElementById('clearEventsBtn');
 
-try {
-  await import(componentUrl);
-} catch (err) {
-  console.error(err);
-}
+import(componentUrl);
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.hljs.highlightAll();
+});
 
 form.addEventListener('submit', evt => {
   evt.preventDefault();
@@ -53,3 +53,7 @@ clearEventsBtn.addEventListener('click', () => {
 document.addEventListener('a-tab-show', handleEvents);
 document.addEventListener('a-tab-hide', handleEvents);
 document.addEventListener('a-tab-close', handleEvents);
+
+if (getComputedStyle(tabGroupEl).direction === 'rtl') {
+  document.querySelectorAll('input[name="dir"]')[1].checked = true;
+}

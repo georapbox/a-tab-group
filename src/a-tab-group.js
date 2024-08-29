@@ -31,6 +31,14 @@ const PLACEMENT = {
 };
 
 /**
+ * The available directions for the tab group.
+ */
+const DIR = {
+  LTR: 'ltr',
+  RTL: 'rtl'
+};
+
+/**
  * The valid placements for the tabs.
  */
 const validPlacements = Object.entries(PLACEMENT).map(([, value]) => value);
@@ -128,6 +136,18 @@ const styles = /* css */ `
     right: var(--scroll-button-inline-offset);
   }
 
+  :host([dir="${DIR.RTL}"]) .tab-group__scroll-button--start {
+    right: var(--scroll-button-inline-offset);
+    left: auto;
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  :host([dir="${DIR.RTL}"]) .tab-group__scroll-button--end {
+    left: var(--scroll-button-inline-offset);
+    right: auto;
+    transform: translateY(-50%) rotate(180deg);
+  }
+
   .tab-group__tabs {
     display: flex;
     padding: 0.25rem;
@@ -203,7 +223,7 @@ template.innerHTML = /* html */ `
 
   <div part="base" class="tab-group">
     <div part="nav" class="tab-group__nav">
-      <button type="button" part="scroll-button scroll-button--start" class="tab-group__scroll-button tab-group__scroll-button--start" aria-label="Scroll to start" tabindex="-1">
+      <button type="button" part="scroll-button scroll-button--start" class="tab-group__scroll-button tab-group__scroll-button--start" aria-label="Scroll to start">
         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
           <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
         </svg>
@@ -213,7 +233,7 @@ template.innerHTML = /* html */ `
         <slot name="tab"></slot>
       </div>
 
-      <button type="button" part="scroll-button scroll-button--end" class="tab-group__scroll-button tab-group__scroll-button--end" aria-label="Scroll to end" tabindex="-1">
+      <button type="button" part="scroll-button scroll-button--end" class="tab-group__scroll-button tab-group__scroll-button--end" aria-label="Scroll to end">
         <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1em" fill="currentColor" viewBox="0 0 16 16" part="scroll-button-icon">
           <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
         </svg>
@@ -418,6 +438,9 @@ class ATabGroup extends HTMLElement {
 
     this.#hideEmptyTabGroup();
     this.#syncNav();
+
+    // Setting the direction attribute on the host element, to make sure the scroll buttons are positioned correctly.
+    this.#getDirection() === DIR.RTL ? this.setAttribute('dir', DIR.RTL) : this.removeAttribute('dir');
   }
 
   /**
@@ -473,10 +496,10 @@ class ATabGroup extends HTMLElement {
   /**
    * Gets the direction of the tab group.
    *
-   * @returns {string} The direction of the tab group.
+   * @returns {'ltr' | 'rtl'} The direction of the tab group.
    */
   #getDirection() {
-    return getComputedStyle(this).direction || 'ltr';
+    return /** @type {'ltr' | 'rtl'} */ (getComputedStyle(this).direction || DIR.LTR);
   }
 
   /**
@@ -643,6 +666,7 @@ class ATabGroup extends HTMLElement {
    */
   #syncNav() {
     const navContainer = this.shadowRoot?.querySelector('.tab-group__nav');
+    const tabsContainer = this.shadowRoot?.querySelector('.tab-group__tabs');
 
     /** @type {HTMLButtonElement[]} */
     const scrollButtons = Array.from(this.shadowRoot?.querySelectorAll('.tab-group__scroll-button') || []);
@@ -652,9 +676,11 @@ class ATabGroup extends HTMLElement {
       scrollButtons.forEach(el => (el.hidden = true));
       navContainer?.part.remove('nav--has-scroll-controls');
       navContainer?.classList.remove('tab-group__nav--has-scroll-controls');
+      tabsContainer?.setAttribute('aria-orientation', 'vertical');
     } else {
       this.#startResizeObserver();
       scrollButtons.forEach(el => (el.hidden = false));
+      tabsContainer?.setAttribute('aria-orientation', 'horizontal');
     }
   }
 
@@ -743,7 +769,7 @@ class ATabGroup extends HTMLElement {
     switch (evt.key) {
       case KEYCODE.LEFT:
         if (orientation === 'horizontal') {
-          tab = direction === 'ltr' ? this.#prevTab() : this.#nextTab();
+          tab = direction === DIR.LTR ? this.#prevTab() : this.#nextTab();
           if (tab) {
             this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
           }
@@ -751,7 +777,7 @@ class ATabGroup extends HTMLElement {
         break;
       case KEYCODE.RIGHT:
         if (orientation === 'horizontal') {
-          tab = direction === 'ltr' ? this.#nextTab() : this.#prevTab();
+          tab = direction === DIR.LTR ? this.#nextTab() : this.#prevTab();
           if (tab) {
             this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
           }
@@ -828,7 +854,10 @@ class ATabGroup extends HTMLElement {
       return;
     }
 
-    const sign = scrollButton.classList.contains('tab-group__scroll-button--start') ? -1 : 1;
+    const isStartButton = scrollButton.classList.contains('tab-group__scroll-button--start');
+    const direction = this.#getDirection();
+    const isLTR = direction === DIR.LTR;
+    const sign = isStartButton ? (isLTR ? -1 : 1) : isLTR ? 1 : -1;
     const offsetLeft = tabsContainer.scrollLeft;
 
     tabsContainer.scrollTo({
