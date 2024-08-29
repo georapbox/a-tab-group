@@ -2,6 +2,10 @@
 
 ## v2.4.0 (2024-08-29)
 
+### Accessibility updates
+
+Accessibility improvements following the [ARIA Authoring Practices Guide (APG)](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
+
 - Add `tabindex="-1"` to non-selected tabs to prevent them from being focusable when navigating with the keyboard.
 - Remove `tabindex="-1"` attribute from the "Scroll to start" and "Scroll to end" buttons, to allow them to be focusable when navigating with the keyboard.
 - Add `aria-orientation` attribute to the tablist element to indicate the orientation of the tabs.

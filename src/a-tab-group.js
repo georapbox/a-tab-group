@@ -31,6 +31,14 @@ const PLACEMENT = {
 };
 
 /**
+ * The available directions for the tab group.
+ */
+const DIR = {
+  LTR: 'ltr',
+  RTL: 'rtl'
+};
+
+/**
  * The valid placements for the tabs.
  */
 const validPlacements = Object.entries(PLACEMENT).map(([, value]) => value);
@@ -126,6 +134,18 @@ const styles = /* css */ `
 
   .tab-group__scroll-button--end {
     right: var(--scroll-button-inline-offset);
+  }
+
+  :host([dir="${DIR.RTL}"]) .tab-group__scroll-button--start {
+    right: var(--scroll-button-inline-offset);
+    left: auto;
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  :host([dir="${DIR.RTL}"]) .tab-group__scroll-button--end {
+    left: var(--scroll-button-inline-offset);
+    right: auto;
+    transform: translateY(-50%) rotate(180deg);
   }
 
   .tab-group__tabs {
@@ -418,6 +438,9 @@ class ATabGroup extends HTMLElement {
 
     this.#hideEmptyTabGroup();
     this.#syncNav();
+
+    // Setting the direction attribute on the host element, to make sure the scroll buttons are positioned correctly.
+    this.#getDirection() === DIR.RTL ? this.setAttribute('dir', DIR.RTL) : this.removeAttribute('dir');
   }
 
   /**
@@ -473,10 +496,10 @@ class ATabGroup extends HTMLElement {
   /**
    * Gets the direction of the tab group.
    *
-   * @returns {string} The direction of the tab group.
+   * @returns {'ltr' | 'rtl'} The direction of the tab group.
    */
   #getDirection() {
-    return getComputedStyle(this).direction || 'ltr';
+    return /** @type {'ltr' | 'rtl'} */ (getComputedStyle(this).direction || DIR.LTR);
   }
 
   /**
@@ -746,7 +769,7 @@ class ATabGroup extends HTMLElement {
     switch (evt.key) {
       case KEYCODE.LEFT:
         if (orientation === 'horizontal') {
-          tab = direction === 'ltr' ? this.#prevTab() : this.#nextTab();
+          tab = direction === DIR.LTR ? this.#prevTab() : this.#nextTab();
           if (tab) {
             this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
           }
@@ -754,7 +777,7 @@ class ATabGroup extends HTMLElement {
         break;
       case KEYCODE.RIGHT:
         if (orientation === 'horizontal') {
-          tab = direction === 'ltr' ? this.#nextTab() : this.#prevTab();
+          tab = direction === DIR.LTR ? this.#nextTab() : this.#prevTab();
           if (tab) {
             this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
           }
@@ -831,7 +854,10 @@ class ATabGroup extends HTMLElement {
       return;
     }
 
-    const sign = scrollButton.classList.contains('tab-group__scroll-button--start') ? -1 : 1;
+    const isStartButton = scrollButton.classList.contains('tab-group__scroll-button--start');
+    const direction = this.#getDirection();
+    const isLTR = direction === DIR.LTR;
+    const sign = isStartButton ? (isLTR ? -1 : 1) : isLTR ? 1 : -1;
     const offsetLeft = tabsContainer.scrollLeft;
 
     tabsContainer.scrollTo({

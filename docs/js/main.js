@@ -53,3 +53,7 @@ clearEventsBtn.addEventListener('click', () => {
 document.addEventListener('a-tab-show', handleEvents);
 document.addEventListener('a-tab-hide', handleEvents);
 document.addEventListener('a-tab-close', handleEvents);
+
+if (getComputedStyle(tabGroupEl).direction === 'rtl') {
+  document.querySelectorAll('input[name="dir"]')[1].checked = true;
+}
