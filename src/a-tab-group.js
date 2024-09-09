@@ -1,8 +1,6 @@
 // @ts-check
 
 /**
- * Represents a value that may be of type T, or null.
- *
  * @template T
  * @typedef {T | null} Nullable
  */
@@ -31,7 +29,7 @@ const PLACEMENT = {
 };
 
 /**
- * The available directions for the tab group.
+ * The available directionality values for the tab group.
  */
 const DIR = {
   LTR: 'ltr',
@@ -136,13 +134,15 @@ const styles = /* css */ `
     right: var(--scroll-button-inline-offset);
   }
 
-  :host([dir="${DIR.RTL}"]) .tab-group__scroll-button--start {
+  :host([dir="${DIR.RTL}"]) .tab-group__scroll-button--start,
+  :host(:dir(${DIR.RTL})) .tab-group__scroll-button--start {
     right: var(--scroll-button-inline-offset);
     left: auto;
     transform: translateY(-50%) rotate(180deg);
   }
 
-  :host([dir="${DIR.RTL}"]) .tab-group__scroll-button--end {
+  :host([dir="${DIR.RTL}"]) .tab-group__scroll-button--end,
+  :host(:dir(${DIR.RTL})) .tab-group__scroll-button--end {
     left: var(--scroll-button-inline-offset);
     right: auto;
     transform: translateY(-50%) rotate(180deg);
@@ -217,9 +217,7 @@ const styles = /* css */ `
 const template = document.createElement('template');
 
 template.innerHTML = /* html */ `
-  <style>
-    ${styles}
-  </style>
+  <style>${styles}</style>
 
   <div part="base" class="tab-group">
     <div part="nav" class="tab-group__nav">
@@ -438,9 +436,6 @@ class ATabGroup extends HTMLElement {
 
     this.#hideEmptyTabGroup();
     this.#syncNav();
-
-    // Setting the direction attribute on the host element, to make sure the scroll buttons are positioned correctly.
-    this.#getDirection() === DIR.RTL ? this.setAttribute('dir', DIR.RTL) : this.removeAttribute('dir');
   }
 
   /**
@@ -494,12 +489,18 @@ class ATabGroup extends HTMLElement {
   }
 
   /**
-   * Gets the direction of the tab group.
+   * Gets the directionality of the tab group.
    *
-   * @returns {'ltr' | 'rtl'} The direction of the tab group.
+   * @returns {'ltr' | 'rtl'} - The direction of the tab group.
    */
-  #getDirection() {
-    return /** @type {'ltr' | 'rtl'} */ (getComputedStyle(this).direction || DIR.LTR);
+  #getDirectionality() {
+    return /** @type {'ltr' | 'rtl'} */ (
+      window.CSS.supports('selector(:dir(ltr))')
+        ? this.matches(':dir(ltr)')
+          ? DIR.LTR
+          : DIR.RTL
+        : window.getComputedStyle(this).direction || DIR.LTR
+    );
   }
 
   /**
@@ -534,7 +535,7 @@ class ATabGroup extends HTMLElement {
   /**
    * Get all panels in the tab group.
    *
-   * @returns {TabPanel[]} All the panels in the tab group.
+   * @returns {TabPanel[]} - All the panels in the tab group.
    */
   #allPanels() {
     return Array.from(this.querySelectorAll('a-tab-panel'));
@@ -543,7 +544,7 @@ class ATabGroup extends HTMLElement {
   /**
    * Get all tabs in the tab group.
    *
-   * @returns {Tab[]} All the tabs in the tab group.
+   * @returns {Tab[]} - All the tabs in the tab group.
    */
   #allTabs() {
     return Array.from(this.querySelectorAll('a-tab'));
@@ -563,7 +564,7 @@ class ATabGroup extends HTMLElement {
   /**
    * Get the first non-disabled tab in the tab group.
    *
-   * @returns {Nullable<Tab>} The first tab in the tab group.
+   * @returns {Nullable<Tab>} - The first tab in the tab group.
    */
   #firstTab() {
     const tabs = this.#allTabs();
@@ -573,7 +574,7 @@ class ATabGroup extends HTMLElement {
   /**
    * Get the last non-disabled tab in the tab group.
    *
-   * @returns {Nullable<Tab>} The last tab in the tab group.
+   * @returns {Nullable<Tab>} - The last tab in the tab group.
    */
   #lastTab() {
     const tabs = this.#allTabs();
@@ -591,7 +592,7 @@ class ATabGroup extends HTMLElement {
    * Get the tab that comes before the currently selected one, wrapping around when reaching the first tab.
    * If the currently selected tab is disabled, the method will skip it.
    *
-   * @returns {Nullable<Tab>} The previous tab.
+   * @returns {Nullable<Tab>} - The previous tab.
    */
   #prevTab() {
     const tabs = this.#allTabs();
@@ -618,7 +619,7 @@ class ATabGroup extends HTMLElement {
    * Get the tab that comes after the currently selected one, wrapping around when reaching the last tab.
    * If the currently selected tab is disabled, the method will skip it.
    *
-   * @returns {Nullable<Tab>} The next tab.
+   * @returns {Nullable<Tab>} - The next tab.
    */
   #nextTab() {
     const tabs = this.#allTabs();
@@ -763,13 +764,13 @@ class ATabGroup extends HTMLElement {
 
     const placement = validPlacements.includes(this.placement || '') ? this.placement : PLACEMENT.TOP;
     const orientation = [PLACEMENT.TOP, PLACEMENT.BOTTOM].includes(placement || '') ? 'horizontal' : 'vertical';
-    const direction = this.#getDirection();
+    const directionality = this.#getDirectionality();
     let tab = null;
 
     switch (evt.key) {
       case KEYCODE.LEFT:
         if (orientation === 'horizontal') {
-          tab = direction === DIR.LTR ? this.#prevTab() : this.#nextTab();
+          tab = directionality === DIR.LTR ? this.#prevTab() : this.#nextTab();
           if (tab) {
             this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
           }
@@ -777,7 +778,7 @@ class ATabGroup extends HTMLElement {
         break;
       case KEYCODE.RIGHT:
         if (orientation === 'horizontal') {
-          tab = direction === DIR.LTR ? this.#nextTab() : this.#prevTab();
+          tab = directionality === DIR.LTR ? this.#nextTab() : this.#prevTab();
           if (tab) {
             this.activation === ACTIVATION.MANUAL ? tab.focus() : this.selectTab(tab);
           }
@@ -855,8 +856,7 @@ class ATabGroup extends HTMLElement {
     }
 
     const isStartButton = scrollButton.classList.contains('tab-group__scroll-button--start');
-    const direction = this.#getDirection();
-    const isLTR = direction === DIR.LTR;
+    const isLTR = this.#getDirectionality() === DIR.LTR;
     const sign = isStartButton ? (isLTR ? -1 : 1) : isLTR ? 1 : -1;
     const offsetLeft = tabsContainer.scrollLeft;
 

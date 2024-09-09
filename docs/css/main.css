@@ -84,7 +84,14 @@ body.no-js a-tab-panel {
   margin-right: 0;
 }
 
+browser-window {
+  --min-browser-window-height: 9.0625rem;
+  min-height: var(--min-browser-window-height);
+  display: block;
+}
+
 browser-window::part(base) {
+  min-height: calc(var(--min-browser-window-height) - 2px);
   border-color: var(--border);
 }
 
