@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v2.4.1 (2024-09-10)
+
+- Updated the directionality check to use the `:dir()` pseudo-class selector, improving performance and accuracy over previous implementation that relied on `getComputedStyle`. This change ensures more reliable detection of right-to-left (RTL) and left-to-right (LTR) directionality. For better compatibility with older browsers, the `:dir()` selector is used in conjunction with the `getComputedStyle` method as a fallback.
+
 ## v2.4.0 (2024-08-29)
 
 ### Accessibility updates
