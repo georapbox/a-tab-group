@@ -101,6 +101,7 @@ browser-window::part(main) {
 
 #events {
   max-height: 200px;
+  overscroll-behavior: contain;
 }
 
 .events-details:has(#events:empty) #clearEventsBtn {
