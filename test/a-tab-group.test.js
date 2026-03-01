@@ -33,6 +33,7 @@ describe('a-tab-group', () => {
   afterEach(() => {
     fixtureCleanup();
     console.error.restore();
+    sinon.restore();
   });
 
   describe('accessibility', () => {
@@ -1560,7 +1561,7 @@ describe('a-tab-group', () => {
       const spy = sinon.spy();
       el.addEventListener('a-tab-hide', spy);
       el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.tab__close').click();
-      expect(spy).to.have.been.called;
+      sinon.assert.calledOnce(spy);
     });
 
     it('should not fire "a-tab-hide" event when tab is hidden if tab is closed by user and is not currently selected', async () => {
@@ -1576,7 +1577,7 @@ describe('a-tab-group', () => {
       const spy = sinon.spy();
       el.addEventListener('a-tab-hide', spy);
       el.querySelectorAll('a-tab')[1].shadowRoot.querySelector('.tab__close').click();
-      expect(spy).not.to.have.been.called;
+      sinon.assert.notCalled(spy);
     });
   });
 
@@ -1588,7 +1589,7 @@ describe('a-tab-group', () => {
         </a-tab-group>
       `);
 
-      expect(console.error).to.have.been.calledOnceWithExactly('Tab #orphan-tab is not a sibling of a <a-tab-panel>');
+      sinon.assert.calledOnceWithExactly(console.error, 'Tab #orphan-tab is not a sibling of a <a-tab-panel>');
     });
   });
 });
